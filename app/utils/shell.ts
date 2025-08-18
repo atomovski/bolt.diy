@@ -1,56 +1,32 @@
-import type { WebContainer, WebContainerProcess } from '@webcontainer/api';
+import type { Sandbox } from 'e2b';
 import type { ITerminal } from '~/types/terminal';
-import { withResolvers } from './promises';
 import { atom } from 'nanostores';
-import { expoUrlAtom } from '~/lib/stores/qrCodeStore';
+import { logger } from './logger';
 
-export async function newShellProcess(webcontainer: WebContainer, terminal: ITerminal) {
-  const args: string[] = [];
-
-  // we spawn a JSH process with a fallback cols and rows in case the process is not attached yet to a visible terminal
-  const process = await webcontainer.spawn('/bin/jsh', ['--osc', ...args], {
-    terminal: {
-      cols: terminal.cols ?? 80,
-      rows: terminal.rows ?? 15,
+export async function newShellProcess(sandbox: Sandbox, terminal: ITerminal) {
+  // E2B uses PTY for terminal display only
+  const ptyProcess = await sandbox.pty.create({
+    cols: terminal.cols ?? 80,
+    rows: terminal.rows ?? 15,
+    onData: (data) => {
+      try {
+        terminal.write(new TextDecoder().decode(data));
+      } catch (error) {
+        console.warn('Failed to decode PTY data:', error);
+      }
     },
   });
 
-  const input = process.input.getWriter();
-  const output = process.output;
-
-  const jshReady = withResolvers<void>();
-
-  let isInteractive = false;
-  output.pipeTo(
-    new WritableStream({
-      write(data) {
-        if (!isInteractive) {
-          const [, osc] = data.match(/\x1b\]654;([^\x07]+)\x07/) || [];
-
-          if (osc === 'interactive') {
-            // wait until we see the interactive OSC
-            isInteractive = true;
-
-            jshReady.resolve();
-          }
-        }
-
-        terminal.write(data);
-      },
-    }),
-  );
-
+  // Handle terminal input
   terminal.onData((data) => {
-    // console.log('terminal onData', { data, isInteractive });
-
-    if (isInteractive) {
-      input.write(data);
+    try {
+      sandbox.pty.sendInput(ptyProcess.pid, new TextEncoder().encode(data));
+    } catch (error) {
+      console.warn('Failed to send input to PTY:', error);
     }
   });
 
-  await jshReady.promise;
-
-  return process;
+  return ptyProcess;
 }
 
 export type ExecutionResult = { output: string; exitCode: number } | undefined;
@@ -58,14 +34,12 @@ export type ExecutionResult = { output: string; exitCode: number } | undefined;
 export class BoltShell {
   #initialized: (() => void) | undefined;
   #readyPromise: Promise<void>;
-  #webcontainer: WebContainer | undefined;
+  #sandbox: Sandbox | undefined;
   #terminal: ITerminal | undefined;
-  #process: WebContainerProcess | undefined;
+  #ptyProcess: any | undefined;
   executionState = atom<
     { sessionId: string; active: boolean; executionPrms?: Promise<any>; abort?: () => void } | undefined
   >();
-  #outputStream: ReadableStreamDefaultReader<string> | undefined;
-  #shellInputStream: WritableStreamDefaultWriter<string> | undefined;
 
   constructor() {
     this.#readyPromise = new Promise((resolve) => {
@@ -77,98 +51,41 @@ export class BoltShell {
     return this.#readyPromise;
   }
 
-  async init(webcontainer: WebContainer, terminal: ITerminal) {
-    this.#webcontainer = webcontainer;
+  async init(sandbox: Sandbox, terminal: ITerminal) {
+    this.#sandbox = sandbox;
     this.#terminal = terminal;
 
-    // Use all three streams from tee: one for terminal, one for command execution, one for Expo URL detection
-    const { process, commandStream, expoUrlStream } = await this.newBoltShellProcess(webcontainer, terminal);
-    this.#process = process;
-    this.#outputStream = commandStream.getReader();
+    // Create PTY for terminal display
+    this.#ptyProcess = await this.newBoltShellProcess(sandbox, terminal);
 
-    // Start background Expo URL watcher immediately
-    this._watchExpoUrlInBackground(expoUrlStream);
-
-    await this.waitTillOscCode('interactive');
+    // E2B PTY is ready immediately
     this.#initialized?.();
   }
 
-  async newBoltShellProcess(webcontainer: WebContainer, terminal: ITerminal) {
-    const args: string[] = [];
-    const process = await webcontainer.spawn('/bin/jsh', ['--osc', ...args], {
-      terminal: {
-        cols: terminal.cols ?? 80,
-        rows: terminal.rows ?? 15,
+  async newBoltShellProcess(sandbox: Sandbox, terminal: ITerminal) {
+    // Create PTY process in E2B
+    const ptyProcess = await sandbox.pty.create({
+      cols: terminal.cols ?? 80,
+      rows: terminal.rows ?? 15,
+      onData: (data) => {
+        try {
+          terminal.write(new TextDecoder().decode(data));
+        } catch (error) {
+          console.warn('Failed to decode PTY data:', error);
+        }
       },
     });
 
-    const input = process.input.getWriter();
-    this.#shellInputStream = input;
-
-    // Tee the output so we can have three independent readers
-    const [streamA, streamB] = process.output.tee();
-    const [streamC, streamD] = streamB.tee();
-
-    const jshReady = withResolvers<void>();
-    let isInteractive = false;
-    streamA.pipeTo(
-      new WritableStream({
-        write(data) {
-          if (!isInteractive) {
-            const [, osc] = data.match(/\x1b\]654;([^\x07]+)\x07/) || [];
-
-            if (osc === 'interactive') {
-              isInteractive = true;
-              jshReady.resolve();
-            }
-          }
-
-          terminal.write(data);
-        },
-      }),
-    );
-
+    // E2B PTY handles input differently
     terminal.onData((data) => {
-      if (isInteractive) {
-        input.write(data);
+      try {
+        sandbox.pty.sendInput(ptyProcess.pid, new TextEncoder().encode(data));
+      } catch (error) {
+        console.warn('Failed to send input to PTY:', error);
       }
     });
 
-    await jshReady.promise;
-
-    // Return all streams for use in init
-    return { process, terminalStream: streamA, commandStream: streamC, expoUrlStream: streamD };
-  }
-
-  // Dedicated background watcher for Expo URL
-  private async _watchExpoUrlInBackground(stream: ReadableStream<string>) {
-    const reader = stream.getReader();
-    let buffer = '';
-    const expoUrlRegex = /(exp:\/\/[^\s]+)/;
-
-    while (true) {
-      const { value, done } = await reader.read();
-
-      if (done) {
-        break;
-      }
-
-      buffer += value || '';
-
-      const expoUrlMatch = buffer.match(expoUrlRegex);
-
-      if (expoUrlMatch) {
-        const cleanUrl = expoUrlMatch[1]
-          .replace(/[\u001b\u009b][[()#;?]*(?:[0-9]{1,4}(?:;[0-9]{0,4})*)?[0-9A-ORZcf-nqry=><]/g, '')
-          .replace(/[^\x20-\x7E]+$/g, '');
-        expoUrlAtom.set(cleanUrl);
-        buffer = buffer.slice(buffer.indexOf(expoUrlMatch[1]) + expoUrlMatch[1].length);
-      }
-
-      if (buffer.length > 2048) {
-        buffer = buffer.slice(-2048);
-      }
-    }
+    return ptyProcess;
   }
 
   get terminal() {
@@ -176,11 +93,11 @@ export class BoltShell {
   }
 
   get process() {
-    return this.#process;
+    return this.#ptyProcess;
   }
 
-  async executeCommand(sessionId: string, command: string, abort?: () => void): Promise<ExecutionResult> {
-    if (!this.process || !this.terminal) {
+  async executeCommand(sessionId: string, command: string, _abort?: () => void): Promise<ExecutionResult> {
+    if (!this.#sandbox) {
       return undefined;
     }
 
@@ -190,97 +107,47 @@ export class BoltShell {
       state.abort();
     }
 
-    /*
-     * interrupt the current execution
-     *  this.#shellInputStream?.write('\x03');
-     */
-    this.terminal.input('\x03');
-    await this.waitTillOscCode('prompt');
+    try {
+      // Use E2B commands API for actual command execution
+      const terminal = this.#terminal;
+      const result = await this.#sandbox.commands.run(command.trim(), {
+        background: false,
+        timeoutMs: 0,
+        cwd: '/home/project',
+        onStdout(data) {
+          logger.debug('Command stdout:', data);
+          terminal?.write(data);
+        },
+        onStderr(data) {
+          logger.debug('Command stderr:', data);
+          terminal?.write(data);
+        },
+      });
 
-    if (state && state.executionPrms) {
-      await state.executionPrms;
+      // Also show the command in the terminal for user feedback
+      if (this.#terminal) {
+        this.#terminal.write(`\r\n$ ${command.trim()}\r\n`);
+
+        if (result.stdout) {
+          this.#terminal.write(result.stdout);
+        }
+
+        if (result.stderr) {
+          this.#terminal.write(result.stderr);
+        }
+      }
+
+      return {
+        output: result.stdout + result.stderr,
+        exitCode: result.exitCode,
+      };
+    } catch (error) {
+      console.error('Command execution failed:', error);
+      return {
+        output: error instanceof Error ? error.message : 'Command execution failed',
+        exitCode: 1,
+      };
     }
-
-    //start a new execution
-    this.terminal.input(command.trim() + '\n');
-
-    //wait for the execution to finish
-    const executionPromise = this.getCurrentExecutionResult();
-    this.executionState.set({ sessionId, active: true, executionPrms: executionPromise, abort });
-
-    const resp = await executionPromise;
-    this.executionState.set({ sessionId, active: false });
-
-    if (resp) {
-      try {
-        resp.output = cleanTerminalOutput(resp.output);
-      } catch (error) {
-        console.log('failed to format terminal output', error);
-      }
-    }
-
-    return resp;
-  }
-
-  async getCurrentExecutionResult(): Promise<ExecutionResult> {
-    const { output, exitCode } = await this.waitTillOscCode('exit');
-    return { output, exitCode };
-  }
-
-  onQRCodeDetected?: (qrCode: string) => void;
-
-  async waitTillOscCode(waitCode: string) {
-    let fullOutput = '';
-    let exitCode: number = 0;
-    let buffer = ''; // <-- Add a buffer to accumulate output
-
-    if (!this.#outputStream) {
-      return { output: fullOutput, exitCode };
-    }
-
-    const tappedStream = this.#outputStream;
-
-    // Regex for Expo URL
-    const expoUrlRegex = /(exp:\/\/[^\s]+)/;
-
-    while (true) {
-      const { value, done } = await tappedStream.read();
-
-      if (done) {
-        break;
-      }
-
-      const text = value || '';
-      fullOutput += text;
-      buffer += text; // <-- Accumulate in buffer
-
-      // Extract Expo URL from buffer and set store
-      const expoUrlMatch = buffer.match(expoUrlRegex);
-
-      if (expoUrlMatch) {
-        // Remove any trailing ANSI escape codes or non-printable characters
-        const cleanUrl = expoUrlMatch[1]
-          .replace(/[\u001b\u009b][[()#;?]*(?:[0-9]{1,4}(?:;[0-9]{0,4})*)?[0-9A-ORZcf-nqry=><]/g, '')
-          .replace(/[^\x20-\x7E]+$/g, '');
-        expoUrlAtom.set(cleanUrl);
-
-        // Remove everything up to and including the URL from the buffer to avoid duplicate matches
-        buffer = buffer.slice(buffer.indexOf(expoUrlMatch[1]) + expoUrlMatch[1].length);
-      }
-
-      // Check if command completion signal with exit code
-      const [, osc, , , code] = text.match(/\x1b\]654;([^\x07=]+)=?((-?\d+):(\d+))?\x07/) || [];
-
-      if (osc === 'exit') {
-        exitCode = parseInt(code, 10);
-      }
-
-      if (osc === waitCode) {
-        break;
-      }
-    }
-
-    return { output: fullOutput, exitCode };
   }
 }
 

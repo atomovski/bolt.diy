@@ -1,23 +1,25 @@
-import type { WebContainer, WebContainerProcess } from '@webcontainer/api';
+import type { Sandbox } from 'e2b';
+import type { CommandHandle } from 'e2b';
 import { atom, type WritableAtom } from 'nanostores';
 import type { ITerminal } from '~/types/terminal';
 import { newBoltShellProcess, newShellProcess } from '~/utils/shell';
 import { coloredText } from '~/utils/terminal';
 
 export class TerminalStore {
-  #webcontainer: Promise<WebContainer>;
-  #terminals: Array<{ terminal: ITerminal; process: WebContainerProcess }> = [];
+  #sandbox: Promise<Sandbox>;
+  #terminals: Array<{ terminal: ITerminal; process: CommandHandle }> = [];
   #boltTerminal = newBoltShellProcess();
 
   showTerminal: WritableAtom<boolean> = import.meta.hot?.data.showTerminal ?? atom(true);
 
-  constructor(webcontainerPromise: Promise<WebContainer>) {
-    this.#webcontainer = webcontainerPromise;
+  constructor(sandboxPromise: Promise<Sandbox>) {
+    this.#sandbox = sandboxPromise;
 
     if (import.meta.hot) {
       import.meta.hot.data.showTerminal = this.showTerminal;
     }
   }
+
   get boltTerminal() {
     return this.#boltTerminal;
   }
@@ -25,10 +27,11 @@ export class TerminalStore {
   toggleTerminal(value?: boolean) {
     this.showTerminal.set(value !== undefined ? value : !this.showTerminal.get());
   }
+
   async attachBoltTerminal(terminal: ITerminal) {
     try {
-      const wc = await this.#webcontainer;
-      await this.#boltTerminal.init(wc, terminal);
+      const sandbox = await this.#sandbox;
+      await this.#boltTerminal.init(sandbox, terminal);
     } catch (error: any) {
       terminal.write(coloredText.red('Failed to spawn bolt shell\n\n') + error.message);
       return;
@@ -37,7 +40,7 @@ export class TerminalStore {
 
   async attachTerminal(terminal: ITerminal) {
     try {
-      const shellProcess = await newShellProcess(await this.#webcontainer, terminal);
+      const shellProcess = await newShellProcess(await this.#sandbox, terminal);
       this.#terminals.push({ terminal, process: shellProcess });
     } catch (error: any) {
       terminal.write(coloredText.red('Failed to spawn shell\n\n') + error.message);
@@ -46,8 +49,20 @@ export class TerminalStore {
   }
 
   onTerminalResize(cols: number, rows: number) {
+    // E2B terminal resize handling
     for (const { process } of this.#terminals) {
-      process.resize({ cols, rows });
+      try {
+        // For E2B, we need to use the sandbox to resize PTY
+        this.#sandbox
+          .then((sandbox) => {
+            sandbox.pty.resize(process.pid, { cols, rows });
+          })
+          .catch((error) => {
+            console.warn('Failed to resize terminal:', error);
+          });
+      } catch (error) {
+        console.warn('Failed to resize terminal process:', error);
+      }
     }
   }
 
@@ -58,7 +73,7 @@ export class TerminalStore {
       const { process } = this.#terminals[terminalIndex];
 
       try {
-        process.kill();
+        await process.kill();
       } catch (error) {
         console.warn('Failed to kill terminal process:', error);
       }

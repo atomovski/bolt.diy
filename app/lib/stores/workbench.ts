@@ -2,7 +2,7 @@ import { atom, map, type MapStore, type ReadableAtom, type WritableAtom } from '
 import type { EditorDocument, ScrollPosition } from '~/components/editor/codemirror/CodeMirrorEditor';
 import { ActionRunner } from '~/lib/runtime/action-runner';
 import type { ActionCallbackData, ArtifactCallbackData } from '~/lib/runtime/message-parser';
-import { webcontainer } from '~/lib/webcontainer';
+import { sandbox } from '~/lib/e2b';
 import type { ITerminal } from '~/types/terminal';
 import { unreachable } from '~/utils/unreachable';
 import { EditorStore } from './editor';
@@ -36,10 +36,10 @@ type Artifacts = MapStore<Record<string, ArtifactState>>;
 export type WorkbenchViewType = 'code' | 'diff' | 'preview';
 
 export class WorkbenchStore {
-  #previewsStore = new PreviewsStore(webcontainer);
-  #filesStore = new FilesStore(webcontainer);
+  #previewsStore = new PreviewsStore(sandbox);
+  #filesStore = new FilesStore(sandbox);
   #editorStore = new EditorStore(this.#filesStore);
-  #terminalStore = new TerminalStore(webcontainer);
+  #terminalStore = new TerminalStore(sandbox);
 
   #reloadedMessages = new Set<string>();
 
@@ -482,7 +482,7 @@ export class WorkbenchStore {
       closed: false,
       type,
       runner: new ActionRunner(
-        webcontainer,
+        sandbox,
         () => this.boltTerminal,
         (alert) => {
           if (this.#reloadedMessages.has(messageId)) {
@@ -536,12 +536,29 @@ export class WorkbenchStore {
   }
 
   runAction(data: ActionCallbackData, isStreaming: boolean = false) {
+    if (isStreaming && data.action.type === 'file') {
+      this._updateEditorOnly(data);
+      return;
+    }
+
     if (isStreaming) {
       this.actionStreamSampler(data, isStreaming);
     } else {
       this.addToExecutionQueue(() => this._runAction(data, isStreaming));
     }
   }
+
+  private _updateEditorOnly(data: ActionCallbackData) {
+    if (data.action.type !== 'file') {
+      return;
+    }
+
+    const fullPath = path.join('/home/project', data.action.filePath);
+    this.#editorStore.updateFile(fullPath, data.action.content);
+
+    // Don't save to filesystem - just update editor for real-time preview
+  }
+
   async _runAction(data: ActionCallbackData, isStreaming: boolean = false) {
     const { messageId } = data;
 
@@ -558,8 +575,8 @@ export class WorkbenchStore {
     }
 
     if (data.action.type === 'file') {
-      const wc = await webcontainer;
-      const fullPath = path.join(wc.workdir, data.action.filePath);
+      // E2B uses fixed working directory
+      const fullPath = path.join('/home/project', data.action.filePath);
 
       /*
        * For scoped locks, we would need to implement diff checking here

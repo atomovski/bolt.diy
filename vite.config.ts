@@ -56,6 +56,7 @@ export default defineConfig((config) => {
     ],
     envPrefix: [
       'VITE_',
+      'E2B_',
       'OPENAI_LIKE_API_BASE_URL',
       'OLLAMA_API_BASE_URL',
       'LMSTUDIO_API_BASE_URL',

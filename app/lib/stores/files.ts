@@ -1,10 +1,8 @@
-import type { PathWatcherEvent, WebContainer } from '@webcontainer/api';
-import { getEncoding } from 'istextorbinary';
+import { FilesystemEventType, FileType, type FilesystemEvent, type Sandbox } from 'e2b';
 import { map, type MapStore } from 'nanostores';
 import { Buffer } from 'node:buffer';
 import { path } from '~/utils/path';
-import { bufferWatchEvents } from '~/utils/buffer';
-import { WORK_DIR } from '~/utils/constants';
+import { toSandboxPath } from '~/utils/paths';
 import { computeFileModifications } from '~/utils/diff';
 import { createScopedLogger } from '~/utils/logger';
 import { unreachable } from '~/utils/unreachable';
@@ -24,7 +22,7 @@ import { getCurrentChatId } from '~/utils/fileLocks';
 
 const logger = createScopedLogger('FilesStore');
 
-const utf8TextDecoder = new TextDecoder('utf8', { fatal: true });
+//const utf8TextDecoder = new TextDecoder('utf8', { fatal: true });
 
 export interface File {
   type: 'file';
@@ -45,7 +43,7 @@ type Dirent = File | Folder;
 export type FileMap = Record<string, Dirent | undefined>;
 
 export class FilesStore {
-  #webcontainer: Promise<WebContainer>;
+  #sandbox: Promise<Sandbox>;
 
   /**
    * Tracks the number of files without folders.
@@ -64,8 +62,10 @@ export class FilesStore {
    */
   #deletedPaths: Set<string> = import.meta.hot?.data.deletedPaths ?? new Set();
 
+  #ignorePaths: Array<string> = ['node_modules'];
+
   /**
-   * Map of files that matches the state of WebContainer.
+   * Map of files that matches the state of E2B Sandbox.
    */
   files: MapStore<FileMap> = import.meta.hot?.data.files ?? map({});
 
@@ -73,8 +73,8 @@ export class FilesStore {
     return this.#size;
   }
 
-  constructor(webcontainerPromise: Promise<WebContainer>) {
-    this.#webcontainer = webcontainerPromise;
+  constructor(sandboxPromise: Promise<Sandbox>) {
+    this.#sandbox = sandboxPromise;
 
     // Load deleted paths from localStorage if available
     try {
@@ -519,6 +519,7 @@ export class FilesStore {
   getFileModifications() {
     return computeFileModifications(this.files.get(), this.#modifiedFiles);
   }
+
   getModifiedFiles() {
     let modifiedFiles: { [path: string]: File } | undefined = undefined;
 
@@ -548,14 +549,10 @@ export class FilesStore {
   }
 
   async saveFile(filePath: string, content: string) {
-    const webcontainer = await this.#webcontainer;
+    const sandbox = await this.#sandbox;
 
     try {
-      const relativePath = path.relative(webcontainer.workdir, filePath);
-
-      if (!relativePath) {
-        throw new Error(`EINVAL: invalid file path, write '${relativePath}'`);
-      }
+      const relativePath = toSandboxPath(filePath);
 
       const oldContent = this.getFile(filePath)?.content;
 
@@ -563,7 +560,7 @@ export class FilesStore {
         unreachable('Expected content to be defined');
       }
 
-      await webcontainer.fs.writeFile(relativePath, content);
+      await sandbox.files.write(relativePath, content);
 
       if (!this.#modifiedFiles.has(filePath)) {
         this.#modifiedFiles.set(filePath, oldContent);
@@ -573,7 +570,7 @@ export class FilesStore {
       const currentFile = this.files.get()[filePath];
       const isLocked = currentFile?.type === 'file' ? currentFile.isLocked : false;
 
-      // we immediately update the file and don't rely on the `change` event coming from the watcher
+      // we immediately update the file and don't rely on file watching
       this.files.setKey(filePath, {
         type: 'file',
         content,
@@ -584,26 +581,285 @@ export class FilesStore {
       logger.info('File updated');
     } catch (error) {
       logger.error('Failed to update file content\n\n', error);
-
       throw error;
     }
   }
 
-  async #init() {
-    const webcontainer = await this.#webcontainer;
+  async #setupDirectoryWatch() {
+    try {
+      const sandbox = await this.#sandbox;
 
+      const basePath = '/home/project';
+
+      // Set up watcher for the project directory
+      await sandbox.files.watchDir(
+        basePath,
+        async (event: FilesystemEvent) => {
+          if (this.#ignorePaths.some((path) => event.name.includes(path))) {
+            return;
+          }
+
+          const path = event.name.startsWith(basePath) ? event.name : `${basePath}/${event.name}`;
+
+          const isDirectory = event.type !== FilesystemEventType.WRITE && (await this.#isDirectory(sandbox, path));
+
+          switch (event.type) {
+            case FilesystemEventType.CREATE:
+              if (isDirectory) {
+                this.#handleDirCreate(path);
+              } else {
+                this.#handleFileCreate(path);
+              }
+
+              break;
+
+            case FilesystemEventType.REMOVE:
+              if (isDirectory) {
+                this.#handleDirRemove(path);
+              } else {
+                this.#handleFileRemove(path);
+              }
+
+              break;
+          }
+        },
+        {
+          recursive: true,
+          timeoutMs: 0,
+        },
+      );
+
+      logger.info('Directory watcher set up for /home/project');
+    } catch (error) {
+      logger.error('Failed to set up directory watcher:', error);
+    }
+  }
+
+  async #isDirectory(sandbox: Sandbox, path: string): Promise<boolean> {
+    try {
+      const info = await sandbox.files.getInfo(path);
+      return info.type === FileType.DIR;
+    } catch {
+      return false;
+    }
+  }
+
+  #wasDirectory(path: string): boolean {
+    const item = this.files.get()[path];
+    return item?.type === 'folder';
+  }
+
+  async #handleFileCreate(sandboxPath: string) {
+    const filePath = this.#sandboxPathToStorePath(sandboxPath);
+    await this.#loadSingleFile(filePath, sandboxPath);
+    logger.debug(`File created: ${filePath}`);
+  }
+
+  async #handleFileWrite(sandboxPath: string) {
+    const filePath = this.#sandboxPathToStorePath(sandboxPath);
+    await this.#loadSingleFile(filePath, sandboxPath);
+    logger.debug(`File updated: ${filePath}`);
+  }
+
+  #handleFileRemove(sandboxPath: string) {
+    const filePath = this.#sandboxPathToStorePath(sandboxPath);
+
+    const currentFile = this.files.get()[filePath];
+
+    if (currentFile?.type === 'file') {
+      this.#size--;
+    }
+
+    this.files.setKey(filePath, undefined);
+
+    if (this.#modifiedFiles.has(filePath)) {
+      this.#modifiedFiles.delete(filePath);
+    }
+
+    logger.debug(`File removed: ${filePath}`);
+  }
+
+  #handleDirCreate(sandboxPath: string) {
+    const folderPath = this.#sandboxPathToStorePath(sandboxPath);
+    this.files.setKey(folderPath, { type: 'folder' });
+    logger.debug(`Directory created: ${folderPath}`);
+  }
+
+  #handleDirRemove(sandboxPath: string) {
+    const folderPath = this.#sandboxPathToStorePath(sandboxPath);
+
+    // Remove the folder and all its contents
+    const allFiles = this.files.get();
+    const updates: FileMap = {};
+
+    updates[folderPath] = undefined;
+
+    for (const [path, dirent] of Object.entries(allFiles)) {
+      if (path.startsWith(folderPath + '/')) {
+        updates[path] = undefined;
+
+        if (dirent?.type === 'file') {
+          this.#size--;
+
+          if (this.#modifiedFiles.has(path)) {
+            this.#modifiedFiles.delete(path);
+          }
+        }
+      }
+    }
+
+    this.files.set({ ...allFiles, ...updates });
+    logger.debug(`Directory removed: ${folderPath}`);
+  }
+
+  #sandboxPathToStorePath(sandboxPath: string): string {
+    return sandboxPath;
+  }
+
+  async #loadSingleFile(filePath: string, sandboxPath: string) {
+    try {
+      const sandbox = await this.#sandbox;
+
+      // Try to read as text first
+      let content: string;
+      let isBinary = false;
+
+      try {
+        content = await sandbox.files.read(sandboxPath);
+        isBinary = this.#isBinaryContent(content);
+      } catch (error) {
+        // If text read fails, try as bytes
+        try {
+          const binaryContent = await sandbox.files.read(sandboxPath, { format: 'bytes' });
+          content = Buffer.from(binaryContent).toString('base64');
+          isBinary = true;
+        } catch {
+          // If both fail, skip this file
+          logger.error(`Failed to read file ${filePath}:`, error);
+          return;
+        }
+      }
+
+      const currentFile = this.files.get()[filePath];
+      const isLocked = currentFile?.type === 'file' ? currentFile.isLocked : false;
+
+      // Check if this is a new file
+      const wasNewFile = !currentFile;
+
+      this.files.setKey(filePath, {
+        type: 'file',
+        content: isBinary ? content : content,
+        isBinary,
+        isLocked,
+      });
+
+      if (wasNewFile) {
+        this.#size++;
+      }
+    } catch (error) {
+      logger.error(`Failed to load file ${filePath}:`, error);
+    }
+  }
+
+  async #loadFilesFromSandbox() {
+    try {
+      const sandbox = await this.#sandbox;
+      await this.#scanDirectory(sandbox, '/home/project', '/home/project');
+      logger.info(`Initial load: ${this.#size} files from sandbox`);
+    } catch (error) {
+      logger.error('Failed to load files from sandbox:', error);
+    }
+  }
+
+  async #scanDirectory(sandbox: Sandbox, dirPath: string, basePath: string) {
+    try {
+      const entries = await sandbox.files.list(dirPath);
+
+      for (const entry of entries) {
+        const fullPath = path.join(dirPath, entry.name);
+        const relativePath = fullPath.replace(basePath, '').replace(/^\//, '');
+
+        if (!relativePath) {
+          continue;
+        } // Skip root
+
+        // Convert to the expected file path format
+        const filePath = path.join('/home/project', relativePath);
+
+        if (entry.type === FileType.DIR) {
+          // Add folder to store
+          this.files.setKey(filePath, { type: 'folder' });
+
+          // Recursively scan subdirectory
+          await this.#scanDirectory(sandbox, fullPath, basePath);
+        } else {
+          // Try to read file content
+          let content: string;
+          let isBinary = false;
+
+          try {
+            content = await sandbox.files.read(fullPath);
+            isBinary = this.#isBinaryContent(content);
+          } catch (error) {
+            // If text read fails, try as bytes
+            try {
+              const binaryContent = await sandbox.files.read(fullPath, { format: 'bytes' });
+              content = Buffer.from(binaryContent).toString('base64');
+              isBinary = true;
+            } catch {
+              // Skip files we can't read
+              logger.warn(`Failed to read file ${fullPath}:`, error);
+              continue;
+            }
+          }
+
+          this.files.setKey(filePath, {
+            type: 'file',
+            content,
+            isBinary,
+          });
+
+          this.#size++;
+        }
+      }
+    } catch (error) {
+      logger.error(`Failed to scan directory ${dirPath}:`, error);
+    }
+  }
+
+  #isBinaryContent(content: string): boolean {
+    if (typeof content !== 'string') {
+      return true;
+    }
+
+    // Check for null bytes (strong indicator of binary)
+    if (content.includes('\0')) {
+      return true;
+    }
+
+    // Check for high percentage of non-printable characters
+    let printableCount = 0;
+    const totalChars = Math.min(content.length, 8192); // Check first 8KB only for performance
+
+    for (let i = 0; i < totalChars; i++) {
+      const code = content.charCodeAt(i);
+
+      // Printable ASCII (32-126) + common whitespace (9,10,13)
+      if ((code >= 32 && code <= 126) || code === 9 || code === 10 || code === 13) {
+        printableCount++;
+      }
+    }
+
+    // If less than 70% printable characters, consider it binary
+    return printableCount / totalChars < 0.7;
+  }
+
+  async #init() {
     // Clean up any files that were previously deleted
     this.#cleanupDeletedFiles();
 
-    // Set up file watcher
-    webcontainer.internal.watchPaths(
-      {
-        include: [`${WORK_DIR}/**`],
-        exclude: ['**/node_modules', '.git', '**/package-lock.json'],
-        includeContent: true,
-      },
-      bufferWatchEvents(100, this.#processEventBuffer.bind(this)),
-    );
+    // Set up directory watching for real-time file updates
+    await this.#setupDirectoryWatch();
 
     // Get the current chat ID
     const currentChatId = getCurrentChatId();
@@ -693,102 +949,28 @@ export class FilesStore {
     }
   }
 
-  #processEventBuffer(events: Array<[events: PathWatcherEvent[]]>) {
-    const watchEvents = events.flat(2);
-
-    for (const { type, path, buffer } of watchEvents) {
-      // remove any trailing slashes
-      const sanitizedPath = path.replace(/\/+$/g, '');
-
-      switch (type) {
-        case 'add_dir': {
-          // we intentionally add a trailing slash so we can distinguish files from folders in the file tree
-          this.files.setKey(sanitizedPath, { type: 'folder' });
-          break;
-        }
-        case 'remove_dir': {
-          this.files.setKey(sanitizedPath, undefined);
-
-          for (const [direntPath] of Object.entries(this.files)) {
-            if (direntPath.startsWith(sanitizedPath)) {
-              this.files.setKey(direntPath, undefined);
-            }
-          }
-
-          break;
-        }
-        case 'add_file':
-        case 'change': {
-          if (type === 'add_file') {
-            this.#size++;
-          }
-
-          let content = '';
-
-          /**
-           * @note This check is purely for the editor. The way we detect this is not
-           * bullet-proof and it's a best guess so there might be false-positives.
-           * The reason we do this is because we don't want to display binary files
-           * in the editor nor allow to edit them.
-           */
-          const isBinary = isBinaryFile(buffer);
-
-          if (!isBinary) {
-            content = this.#decodeFileContent(buffer);
-          }
-
-          this.files.setKey(sanitizedPath, { type: 'file', content, isBinary });
-
-          break;
-        }
-        case 'remove_file': {
-          this.#size--;
-          this.files.setKey(sanitizedPath, undefined);
-          break;
-        }
-        case 'update_directory': {
-          // we don't care about these events
-          break;
-        }
-      }
-    }
-  }
-
-  #decodeFileContent(buffer?: Uint8Array) {
-    if (!buffer || buffer.byteLength === 0) {
-      return '';
-    }
-
-    try {
-      return utf8TextDecoder.decode(buffer);
-    } catch (error) {
-      console.log(error);
-      return '';
-    }
-  }
-
   async createFile(filePath: string, content: string | Uint8Array = '') {
-    const webcontainer = await this.#webcontainer;
+    const sandbox = await this.#sandbox;
 
     try {
-      const relativePath = path.relative(webcontainer.workdir, filePath);
+      console.log('Creating file: ', filePath);
 
-      if (!relativePath) {
-        throw new Error(`EINVAL: invalid file path, create '${relativePath}'`);
-      }
-
+      const relativePath = toSandboxPath(filePath);
       const dirPath = path.dirname(relativePath);
 
       if (dirPath !== '.') {
-        await webcontainer.fs.mkdir(dirPath, { recursive: true });
+        await sandbox.files.makeDir(dirPath);
       }
 
       const isBinary = content instanceof Uint8Array;
 
       if (isBinary) {
-        await webcontainer.fs.writeFile(relativePath, Buffer.from(content));
+        // E2B handles binary content differently
+        const buffer = Buffer.from(content);
+        console.log('Writing binary file: ', relativePath);
+        await sandbox.files.write(relativePath, buffer.buffer);
 
-        const base64Content = Buffer.from(content).toString('base64');
+        const base64Content = buffer.toString('base64');
         this.files.setKey(filePath, {
           type: 'file',
           content: base64Content,
@@ -799,7 +981,8 @@ export class FilesStore {
         this.#modifiedFiles.set(filePath, base64Content);
       } else {
         const contentToWrite = (content as string).length === 0 ? ' ' : content;
-        await webcontainer.fs.writeFile(relativePath, contentToWrite);
+        console.log('Writing text file: ', relativePath);
+        await sandbox.files.write(relativePath, contentToWrite);
 
         this.files.setKey(filePath, {
           type: 'file',
@@ -821,16 +1004,11 @@ export class FilesStore {
   }
 
   async createFolder(folderPath: string) {
-    const webcontainer = await this.#webcontainer;
+    const sandbox = await this.#sandbox;
 
     try {
-      const relativePath = path.relative(webcontainer.workdir, folderPath);
-
-      if (!relativePath) {
-        throw new Error(`EINVAL: invalid folder path, create '${relativePath}'`);
-      }
-
-      await webcontainer.fs.mkdir(relativePath, { recursive: true });
+      const relativePath = toSandboxPath(folderPath);
+      await sandbox.files.makeDir(relativePath);
 
       this.files.setKey(folderPath, { type: 'folder' });
 
@@ -844,16 +1022,11 @@ export class FilesStore {
   }
 
   async deleteFile(filePath: string) {
-    const webcontainer = await this.#webcontainer;
+    const sandbox = await this.#sandbox;
 
     try {
-      const relativePath = path.relative(webcontainer.workdir, filePath);
-
-      if (!relativePath) {
-        throw new Error(`EINVAL: invalid file path, delete '${relativePath}'`);
-      }
-
-      await webcontainer.fs.rm(relativePath);
+      const relativePath = toSandboxPath(filePath);
+      await sandbox.files.remove(relativePath);
 
       this.#deletedPaths.add(filePath);
 
@@ -876,16 +1049,11 @@ export class FilesStore {
   }
 
   async deleteFolder(folderPath: string) {
-    const webcontainer = await this.#webcontainer;
+    const sandbox = await this.#sandbox;
 
     try {
-      const relativePath = path.relative(webcontainer.workdir, folderPath);
-
-      if (!relativePath) {
-        throw new Error(`EINVAL: invalid folder path, delete '${relativePath}'`);
-      }
-
-      await webcontainer.fs.rm(relativePath, { recursive: true });
+      const relativePath = toSandboxPath(folderPath);
+      await sandbox.files.remove(relativePath);
 
       this.#deletedPaths.add(folderPath);
 
@@ -930,22 +1098,4 @@ export class FilesStore {
       logger.error('Failed to persist deleted paths to localStorage', error);
     }
   }
-}
-
-function isBinaryFile(buffer: Uint8Array | undefined) {
-  if (buffer === undefined) {
-    return false;
-  }
-
-  return getEncoding(convertToBuffer(buffer), { chunkLength: 100 }) === 'binary';
-}
-
-/**
- * Converts a `Uint8Array` into a Node.js `Buffer` by copying the prototype.
- * The goal is to  avoid expensive copies. It does create a new typed array
- * but that's generally cheap as long as it uses the same underlying
- * array buffer.
- */
-function convertToBuffer(view: Uint8Array): Buffer {
-  return Buffer.from(view.buffer, view.byteOffset, view.byteLength);
 }
