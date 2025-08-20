@@ -36,33 +36,31 @@ export function UserMessage({ content, parts }: UserMessageProps) {
     const textContent = stripMetadata(textItem?.text || '');
 
     return (
-      <div className="overflow-hidden flex flex-col gap-3 items-center ">
-        <div className="flex flex-row items-start justify-center overflow-hidden shrink-0 self-start">
+      <div className="flex flex-col items-center gap-3 overflow-hidden">
+        <div className="flex shrink-0 flex-row items-start justify-center self-start overflow-hidden">
           {profile?.avatar || profile?.username ? (
             <div className="flex items-end gap-2">
               <img
                 src={profile.avatar}
                 alt={profile?.username || 'User'}
-                className="w-[25px] h-[25px] object-cover rounded-full"
+                className="h-[25px] w-[25px] rounded-full object-cover"
                 loading="eager"
                 decoding="sync"
               />
-              <span className="text-bolt-elements-textPrimary text-sm">
-                {profile?.username ? profile.username : ''}
-              </span>
+              <span className="text-sm text-black">{profile?.username ? profile.username : ''}</span>
             </div>
           ) : (
             <div className="i-ph:user-fill text-accent-500 text-2xl" />
           )}
         </div>
-        <div className="flex flex-col gap-4 bg-accent-500/10 backdrop-blur-sm p-3 py-3 w-auto rounded-lg mr-auto">
+        <div className="bg-accent-500/10 mr-auto flex w-auto flex-col gap-4 rounded-lg p-3 py-3 backdrop-blur-xs">
           {textContent && <Markdown html>{textContent}</Markdown>}
           {images.map((item, index) => (
             <img
               key={index}
               src={`data:${item.mimeType};base64,${item.data}`}
               alt={`Image ${index + 1}`}
-              className="max-w-full h-auto rounded-lg"
+              className="h-auto max-w-full rounded-lg"
               style={{ maxHeight: '512px', objectFit: 'contain' }}
             />
           ))}
@@ -74,11 +72,11 @@ export function UserMessage({ content, parts }: UserMessageProps) {
   const textContent = stripMetadata(content);
 
   return (
-    <div className="flex flex-col bg-accent-500/10 backdrop-blur-sm px-5 p-3.5 w-auto rounded-lg ml-auto">
-      <div className="flex gap-3.5 mb-4">
+    <div className="bg-darken-100 ml-auto flex w-auto flex-col gap-2 rounded-xl p-3">
+      <div className="flex gap-3.5">
         {images.map((item, index) => (
-          <div className="relative flex rounded-lg border border-bolt-elements-borderColor overflow-hidden">
-            <div className="h-16 w-16 bg-transparent outline-none">
+          <div className="border-bolt-elements-border-color relative flex overflow-hidden rounded-lg border">
+            <div className="h-16 w-16 bg-transparent outline-hidden">
               <img
                 key={index}
                 src={`data:${item.mimeType};base64,${item.data}`}

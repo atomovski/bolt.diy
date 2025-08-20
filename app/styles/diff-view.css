@@ -31,7 +31,7 @@
   scrollbar-width: none;
 }
 
-/* Estilos para as linhas de diff */
+/* Estilos para as linhas de diff
 .diff-block-added {
   @apply bg-green-500/20 border-l-4 border-green-500;
 }
@@ -41,17 +41,17 @@
 }
 
 /* Melhorar contraste para mudanças */
-.diff-panel-content .group:hover .diff-block-added {
+/* .diff-panel-content .group:hover .diff-block-added {
   @apply bg-green-500/30;
 }
 
 .diff-panel-content .group:hover .diff-block-removed {
   @apply bg-red-500/30;
-}
+} */
 
 /* Estilos unificados para ambas as visualizações */
-.diff-line {
-  @apply flex group min-w-fit transition-colors duration-150;
+/* .diff-line {
+  @apply flex min-w-fit transition-colors duration-150;
 }
 
 .diff-line-number {
@@ -60,13 +60,13 @@
 
 .diff-line-content {
   @apply px-4 py-0.5 font-mono whitespace-pre flex-1 group-hover:bg-bolt-elements-background-depth-2 text-bolt-elements-textPrimary;
-}
+} */
 
 /* Cores específicas para adições/remoções */
-.diff-added {
+/* .diff-added {
   @apply bg-green-500/20 border-l-4 border-green-500;
 }
 
 .diff-removed {
   @apply bg-red-500/20 border-l-4 border-red-500;
-}
+} */

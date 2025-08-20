@@ -18,7 +18,7 @@ export const defaultDesignScheme: DesignScheme = {
     warning: '#f59e0b',
     error: '#ef4444',
   },
-  features: ['rounded'],
+  features: ['rounded-sm'],
   font: ['sans-serif'],
 };
 
@@ -77,10 +77,10 @@ export const paletteRoles = [
 ];
 
 export const designFeatures = [
-  { key: 'rounded', label: 'Rounded Corners' },
+  { key: 'rounded-sm', label: 'Rounded Corners' },
   { key: 'border', label: 'Subtle Border' },
   { key: 'gradient', label: 'Gradient Accent' },
-  { key: 'shadow', label: 'Soft Shadow' },
+  { key: 'shadow-sm', label: 'Soft Shadow' },
   { key: 'frosted-glass', label: 'Frosted Glass' },
 ];
 

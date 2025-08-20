@@ -2,7 +2,7 @@ import React, { useState } from 'react';
 import { toast } from 'react-toastify';
 import { Button } from '~/components/ui/Button';
 import { Badge } from '~/components/ui/Badge';
-import { classNames } from '~/utils/classNames';
+import { cn } from '~/utils/cn';
 import { Collapsible, CollapsibleTrigger, CollapsibleContent } from '~/components/ui/Collapsible';
 import { CodeBracketIcon, ChevronDownIcon } from '@heroicons/react/24/outline';
 
@@ -243,20 +243,18 @@ export default function ConnectionDiagnostics() {
   return (
     <div className="flex flex-col gap-6">
       {/* Connection Status Cards */}
-      <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+      <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
         {/* GitHub Connection Card */}
-        <div className="p-4 rounded-lg bg-bolt-elements-background dark:bg-bolt-elements-background-depth-2 border border-bolt-elements-borderColor dark:border-bolt-elements-borderColor hover:border-bolt-elements-borderColorActive/70 dark:hover:border-bolt-elements-borderColorActive/70 transition-all duration-200 h-[180px] flex flex-col">
+        <div className="bg-bolt-elements-background dark:bg-bolt-elements-background-depth-2 border-bolt-elements-border-color dark:border-bolt-elements-border-color hover:border-bolt-elements-border-color-active/70 dark:hover:border-bolt-elements-border-color-active/70 flex h-[180px] flex-col rounded-lg border p-4 transition-all duration-200">
           <div className="flex items-center gap-2">
-            <div className="i-ph:github-logo text-bolt-elements-item-contentAccent dark:text-bolt-elements-item-contentAccent w-4 h-4" />
-            <div className="text-sm font-medium text-bolt-elements-textPrimary dark:text-bolt-elements-textPrimary">
-              GitHub Connection
-            </div>
+            <div className="i-ph:github-logo text-bolt-elements-item-contentAccent dark:text-bolt-elements-item-contentAccent h-4 w-4" />
+            <div className="text-sm font-medium text-black dark:text-black">GitHub Connection</div>
           </div>
           {diagnosticResults ? (
             <>
-              <div className="flex items-center gap-2 mt-2">
+              <div className="mt-2 flex items-center gap-2">
                 <span
-                  className={classNames(
+                  className={cn(
                     'text-xl font-semibold',
                     diagnosticResults.localStorage.hasGithubConnection
                       ? 'text-green-500 dark:text-green-400'
@@ -268,12 +266,12 @@ export default function ConnectionDiagnostics() {
               </div>
               {diagnosticResults.localStorage.hasGithubConnection && (
                 <>
-                  <div className="text-xs text-bolt-elements-textSecondary dark:text-bolt-elements-textSecondary mt-2 flex items-center gap-1.5">
-                    <div className="i-ph:user w-3.5 h-3.5 text-bolt-elements-item-contentAccent dark:text-bolt-elements-item-contentAccent" />
+                  <div className="text-bolt-elements-text-secondary dark:text-bolt-elements-text-secondary mt-2 flex items-center gap-1.5 text-xs">
+                    <div className="i-ph:user text-bolt-elements-item-contentAccent dark:text-bolt-elements-item-contentAccent h-3.5 w-3.5" />
                     User: {diagnosticResults.localStorage.githubConnectionParsed?.user?.login || 'N/A'}
                   </div>
-                  <div className="text-xs text-bolt-elements-textSecondary dark:text-bolt-elements-textSecondary mt-2 flex items-center gap-1.5">
-                    <div className="i-ph:check-circle w-3.5 h-3.5 text-bolt-elements-item-contentAccent dark:text-bolt-elements-item-contentAccent" />
+                  <div className="text-bolt-elements-text-secondary dark:text-bolt-elements-text-secondary mt-2 flex items-center gap-1.5 text-xs">
+                    <div className="i-ph:check-circle text-bolt-elements-item-contentAccent dark:text-bolt-elements-item-contentAccent h-3.5 w-3.5" />
                     API Status:{' '}
                     <Badge
                       variant={
@@ -293,17 +291,17 @@ export default function ConnectionDiagnostics() {
                   onClick={() => window.location.reload()}
                   variant="outline"
                   size="sm"
-                  className="mt-auto self-start hover:bg-bolt-elements-item-backgroundActive/10 hover:text-bolt-elements-textPrimary dark:hover:bg-bolt-elements-item-backgroundActive/10 dark:hover:text-bolt-elements-textPrimary transition-colors"
+                  className="hover:bg-bolt-elements-item-backgroundActive/10 dark:hover:bg-bolt-elements-item-backgroundActive/10 mt-auto self-start transition-colors hover:text-black dark:hover:text-black"
                 >
-                  <div className="i-ph:plug w-3.5 h-3.5 mr-1" />
+                  <div className="i-ph:plug mr-1 h-3.5 w-3.5" />
                   Connect Now
                 </Button>
               )}
             </>
           ) : (
-            <div className="flex items-center justify-center h-full">
-              <div className="text-sm text-bolt-elements-textSecondary dark:text-bolt-elements-textSecondary flex items-center gap-2">
-                <div className="i-ph:info w-4 h-4" />
+            <div className="flex h-full items-center justify-center">
+              <div className="text-bolt-elements-text-secondary dark:text-bolt-elements-text-secondary flex items-center gap-2 text-sm">
+                <div className="i-ph:info h-4 w-4" />
                 Run diagnostics to check connection status
               </div>
             </div>
@@ -311,18 +309,16 @@ export default function ConnectionDiagnostics() {
         </div>
 
         {/* Netlify Connection Card */}
-        <div className="p-4 rounded-lg bg-bolt-elements-background dark:bg-bolt-elements-background-depth-2 border border-bolt-elements-borderColor dark:border-bolt-elements-borderColor hover:border-bolt-elements-borderColorActive/70 dark:hover:border-bolt-elements-borderColorActive/70 transition-all duration-200 h-[180px] flex flex-col">
+        <div className="bg-bolt-elements-background dark:bg-bolt-elements-background-depth-2 border-bolt-elements-border-color dark:border-bolt-elements-border-color hover:border-bolt-elements-border-color-active/70 dark:hover:border-bolt-elements-border-color-active/70 flex h-[180px] flex-col rounded-lg border p-4 transition-all duration-200">
           <div className="flex items-center gap-2">
-            <div className="i-bolt:netlify text-bolt-elements-item-contentAccent dark:text-bolt-elements-item-contentAccent w-4 h-4" />
-            <div className="text-sm font-medium text-bolt-elements-textPrimary dark:text-bolt-elements-textPrimary">
-              Netlify Connection
-            </div>
+            <div className="i-bolt:netlify text-bolt-elements-item-contentAccent dark:text-bolt-elements-item-contentAccent h-4 w-4" />
+            <div className="text-sm font-medium text-black dark:text-black">Netlify Connection</div>
           </div>
           {diagnosticResults ? (
             <>
-              <div className="flex items-center gap-2 mt-2">
+              <div className="mt-2 flex items-center gap-2">
                 <span
-                  className={classNames(
+                  className={cn(
                     'text-xl font-semibold',
                     diagnosticResults.localStorage.hasNetlifyConnection
                       ? 'text-green-500 dark:text-green-400'
@@ -334,15 +330,15 @@ export default function ConnectionDiagnostics() {
               </div>
               {diagnosticResults.localStorage.hasNetlifyConnection && (
                 <>
-                  <div className="text-xs text-bolt-elements-textSecondary dark:text-bolt-elements-textSecondary mt-2 flex items-center gap-1.5">
-                    <div className="i-ph:user w-3.5 h-3.5 text-bolt-elements-item-contentAccent dark:text-bolt-elements-item-contentAccent" />
+                  <div className="text-bolt-elements-text-secondary dark:text-bolt-elements-text-secondary mt-2 flex items-center gap-1.5 text-xs">
+                    <div className="i-ph:user text-bolt-elements-item-contentAccent dark:text-bolt-elements-item-contentAccent h-3.5 w-3.5" />
                     User:{' '}
                     {diagnosticResults.localStorage.netlifyConnectionParsed?.user?.full_name ||
                       diagnosticResults.localStorage.netlifyConnectionParsed?.user?.email ||
                       'N/A'}
                   </div>
-                  <div className="text-xs text-bolt-elements-textSecondary dark:text-bolt-elements-textSecondary mt-2 flex items-center gap-1.5">
-                    <div className="i-ph:check-circle w-3.5 h-3.5 text-bolt-elements-item-contentAccent dark:text-bolt-elements-item-contentAccent" />
+                  <div className="text-bolt-elements-text-secondary dark:text-bolt-elements-text-secondary mt-2 flex items-center gap-1.5 text-xs">
+                    <div className="i-ph:check-circle text-bolt-elements-item-contentAccent dark:text-bolt-elements-item-contentAccent h-3.5 w-3.5" />
                     API Status:{' '}
                     <Badge
                       variant={diagnosticResults.apiEndpoints.netlify?.ok ? 'default' : 'destructive'}
@@ -358,17 +354,17 @@ export default function ConnectionDiagnostics() {
                   onClick={() => window.location.reload()}
                   variant="outline"
                   size="sm"
-                  className="mt-auto self-start hover:bg-bolt-elements-item-backgroundActive/10 hover:text-bolt-elements-textPrimary dark:hover:bg-bolt-elements-item-backgroundActive/10 dark:hover:text-bolt-elements-textPrimary transition-colors"
+                  className="hover:bg-bolt-elements-item-backgroundActive/10 dark:hover:bg-bolt-elements-item-backgroundActive/10 mt-auto self-start transition-colors hover:text-black dark:hover:text-black"
                 >
-                  <div className="i-ph:plug w-3.5 h-3.5 mr-1" />
+                  <div className="i-ph:plug mr-1 h-3.5 w-3.5" />
                   Connect Now
                 </Button>
               )}
             </>
           ) : (
-            <div className="flex items-center justify-center h-full">
-              <div className="text-sm text-bolt-elements-textSecondary dark:text-bolt-elements-textSecondary flex items-center gap-2">
-                <div className="i-ph:info w-4 h-4" />
+            <div className="flex h-full items-center justify-center">
+              <div className="text-bolt-elements-text-secondary dark:text-bolt-elements-text-secondary flex items-center gap-2 text-sm">
+                <div className="i-ph:info h-4 w-4" />
                 Run diagnostics to check connection status
               </div>
             </div>
@@ -376,18 +372,16 @@ export default function ConnectionDiagnostics() {
         </div>
 
         {/* Vercel Connection Card */}
-        <div className="p-4 rounded-lg bg-bolt-elements-background dark:bg-bolt-elements-background-depth-2 border border-bolt-elements-borderColor dark:border-bolt-elements-borderColor hover:border-bolt-elements-borderColorActive/70 dark:hover:border-bolt-elements-borderColorActive/70 transition-all duration-200 h-[180px] flex flex-col">
+        <div className="bg-bolt-elements-background dark:bg-bolt-elements-background-depth-2 border-bolt-elements-border-color dark:border-bolt-elements-border-color hover:border-bolt-elements-border-color-active/70 dark:hover:border-bolt-elements-border-color-active/70 flex h-[180px] flex-col rounded-lg border p-4 transition-all duration-200">
           <div className="flex items-center gap-2">
-            <div className="i-si:vercel text-bolt-elements-item-contentAccent dark:text-bolt-elements-item-contentAccent w-4 h-4" />
-            <div className="text-sm font-medium text-bolt-elements-textPrimary dark:text-bolt-elements-textPrimary">
-              Vercel Connection
-            </div>
+            <div className="i-si:vercel text-bolt-elements-item-contentAccent dark:text-bolt-elements-item-contentAccent h-4 w-4" />
+            <div className="text-sm font-medium text-black dark:text-black">Vercel Connection</div>
           </div>
           {diagnosticResults ? (
             <>
-              <div className="flex items-center gap-2 mt-2">
+              <div className="mt-2 flex items-center gap-2">
                 <span
-                  className={classNames(
+                  className={cn(
                     'text-xl font-semibold',
                     diagnosticResults.localStorage.hasVercelConnection
                       ? 'text-green-500 dark:text-green-400'
@@ -399,15 +393,15 @@ export default function ConnectionDiagnostics() {
               </div>
               {diagnosticResults.localStorage.hasVercelConnection && (
                 <>
-                  <div className="text-xs text-bolt-elements-textSecondary dark:text-bolt-elements-textSecondary mt-2 flex items-center gap-1.5">
-                    <div className="i-ph:user w-3.5 h-3.5 text-bolt-elements-item-contentAccent dark:text-bolt-elements-item-contentAccent" />
+                  <div className="text-bolt-elements-text-secondary dark:text-bolt-elements-text-secondary mt-2 flex items-center gap-1.5 text-xs">
+                    <div className="i-ph:user text-bolt-elements-item-contentAccent dark:text-bolt-elements-item-contentAccent h-3.5 w-3.5" />
                     User:{' '}
                     {diagnosticResults.localStorage.vercelConnectionParsed?.user?.username ||
                       diagnosticResults.localStorage.vercelConnectionParsed?.user?.user?.username ||
                       'N/A'}
                   </div>
-                  <div className="text-xs text-bolt-elements-textSecondary dark:text-bolt-elements-textSecondary mt-2 flex items-center gap-1.5">
-                    <div className="i-ph:check-circle w-3.5 h-3.5 text-bolt-elements-item-contentAccent dark:text-bolt-elements-item-contentAccent" />
+                  <div className="text-bolt-elements-text-secondary dark:text-bolt-elements-text-secondary mt-2 flex items-center gap-1.5 text-xs">
+                    <div className="i-ph:check-circle text-bolt-elements-item-contentAccent dark:text-bolt-elements-item-contentAccent h-3.5 w-3.5" />
                     API Status:{' '}
                     <Badge
                       variant={diagnosticResults.apiEndpoints.vercel?.ok ? 'default' : 'destructive'}
@@ -423,17 +417,17 @@ export default function ConnectionDiagnostics() {
                   onClick={() => window.location.reload()}
                   variant="outline"
                   size="sm"
-                  className="mt-auto self-start hover:bg-bolt-elements-item-backgroundActive/10 hover:text-bolt-elements-textPrimary dark:hover:bg-bolt-elements-item-backgroundActive/10 dark:hover:text-bolt-elements-textPrimary transition-colors"
+                  className="hover:bg-bolt-elements-item-backgroundActive/10 dark:hover:bg-bolt-elements-item-backgroundActive/10 mt-auto self-start transition-colors hover:text-black dark:hover:text-black"
                 >
-                  <div className="i-ph:plug w-3.5 h-3.5 mr-1" />
+                  <div className="i-ph:plug mr-1 h-3.5 w-3.5" />
                   Connect Now
                 </Button>
               )}
             </>
           ) : (
-            <div className="flex items-center justify-center h-full">
-              <div className="text-sm text-bolt-elements-textSecondary dark:text-bolt-elements-textSecondary flex items-center gap-2">
-                <div className="i-ph:info w-4 h-4" />
+            <div className="flex h-full items-center justify-center">
+              <div className="text-bolt-elements-text-secondary dark:text-bolt-elements-text-secondary flex items-center gap-2 text-sm">
+                <div className="i-ph:info h-4 w-4" />
                 Run diagnostics to check connection status
               </div>
             </div>
@@ -441,18 +435,16 @@ export default function ConnectionDiagnostics() {
         </div>
 
         {/* Supabase Connection Card */}
-        <div className="p-4 rounded-lg bg-bolt-elements-background dark:bg-bolt-elements-background-depth-2 border border-bolt-elements-borderColor dark:border-bolt-elements-borderColor hover:border-bolt-elements-borderColorActive/70 dark:hover:border-bolt-elements-borderColorActive/70 transition-all duration-200 h-[180px] flex flex-col">
+        <div className="bg-bolt-elements-background dark:bg-bolt-elements-background-depth-2 border-bolt-elements-border-color dark:border-bolt-elements-border-color hover:border-bolt-elements-border-color-active/70 dark:hover:border-bolt-elements-border-color-active/70 flex h-[180px] flex-col rounded-lg border p-4 transition-all duration-200">
           <div className="flex items-center gap-2">
-            <div className="i-si:supabase text-bolt-elements-item-contentAccent dark:text-bolt-elements-item-contentAccent w-4 h-4" />
-            <div className="text-sm font-medium text-bolt-elements-textPrimary dark:text-bolt-elements-textPrimary">
-              Supabase Connection
-            </div>
+            <div className="i-si:supabase text-bolt-elements-item-contentAccent dark:text-bolt-elements-item-contentAccent h-4 w-4" />
+            <div className="text-sm font-medium text-black dark:text-black">Supabase Connection</div>
           </div>
           {diagnosticResults ? (
             <>
-              <div className="flex items-center gap-2 mt-2">
+              <div className="mt-2 flex items-center gap-2">
                 <span
-                  className={classNames(
+                  className={cn(
                     'text-xl font-semibold',
                     diagnosticResults.localStorage.hasSupabaseConnection
                       ? 'text-green-500 dark:text-green-400'
@@ -464,12 +456,12 @@ export default function ConnectionDiagnostics() {
               </div>
               {diagnosticResults.localStorage.hasSupabaseConnection && (
                 <>
-                  <div className="text-xs text-bolt-elements-textSecondary dark:text-bolt-elements-textSecondary mt-2 flex items-center gap-1.5 truncate">
-                    <div className="i-ph:link w-3.5 h-3.5 text-bolt-elements-item-contentAccent dark:text-bolt-elements-item-contentAccent flex-shrink-0" />
+                  <div className="text-bolt-elements-text-secondary dark:text-bolt-elements-text-secondary mt-2 flex items-center gap-1.5 truncate text-xs">
+                    <div className="i-ph:link text-bolt-elements-item-contentAccent dark:text-bolt-elements-item-contentAccent h-3.5 w-3.5 shrink-0" />
                     Project URL: {diagnosticResults.localStorage.supabaseConnectionParsed?.projectUrl || 'N/A'}
                   </div>
-                  <div className="text-xs text-bolt-elements-textSecondary dark:text-bolt-elements-textSecondary mt-2 flex items-center gap-1.5">
-                    <div className="i-ph:check-circle w-3.5 h-3.5 text-bolt-elements-item-contentAccent dark:text-bolt-elements-item-contentAccent" />
+                  <div className="text-bolt-elements-text-secondary dark:text-bolt-elements-text-secondary mt-2 flex items-center gap-1.5 text-xs">
+                    <div className="i-ph:check-circle text-bolt-elements-item-contentAccent dark:text-bolt-elements-item-contentAccent h-3.5 w-3.5" />
                     Config Status:{' '}
                     <Badge
                       variant={diagnosticResults.apiEndpoints.supabase?.ok ? 'default' : 'destructive'}
@@ -485,17 +477,17 @@ export default function ConnectionDiagnostics() {
                   onClick={() => window.location.reload()}
                   variant="outline"
                   size="sm"
-                  className="mt-auto self-start hover:bg-bolt-elements-item-backgroundActive/10 hover:text-bolt-elements-textPrimary dark:hover:bg-bolt-elements-item-backgroundActive/10 dark:hover:text-bolt-elements-textPrimary transition-colors"
+                  className="hover:bg-bolt-elements-item-backgroundActive/10 dark:hover:bg-bolt-elements-item-backgroundActive/10 mt-auto self-start transition-colors hover:text-black dark:hover:text-black"
                 >
-                  <div className="i-ph:plug w-3.5 h-3.5 mr-1" />
+                  <div className="i-ph:plug mr-1 h-3.5 w-3.5" />
                   Configure Now
                 </Button>
               )}
             </>
           ) : (
-            <div className="flex items-center justify-center h-full">
-              <div className="text-sm text-bolt-elements-textSecondary dark:text-bolt-elements-textSecondary flex items-center gap-2">
-                <div className="i-ph:info w-4 h-4" />
+            <div className="flex h-full items-center justify-center">
+              <div className="text-bolt-elements-text-secondary dark:text-bolt-elements-text-secondary flex items-center gap-2 text-sm">
+                <div className="i-ph:info h-4 w-4" />
                 Run diagnostics to check connection status
               </div>
             </div>
@@ -509,12 +501,12 @@ export default function ConnectionDiagnostics() {
           onClick={runDiagnostics}
           disabled={isRunning}
           variant="outline"
-          className="flex items-center gap-2 hover:bg-bolt-elements-item-backgroundActive/10 hover:text-bolt-elements-textPrimary dark:hover:bg-bolt-elements-item-backgroundActive/10 dark:hover:text-bolt-elements-textPrimary transition-colors"
+          className="hover:bg-bolt-elements-item-backgroundActive/10 dark:hover:bg-bolt-elements-item-backgroundActive/10 flex items-center gap-2 transition-colors hover:text-black dark:hover:text-black"
         >
           {isRunning ? (
-            <div className="i-ph:spinner-gap w-4 h-4 animate-spin" />
+            <div className="i-ph:spinner-gap h-4 w-4 animate-spin" />
           ) : (
-            <div className="i-ph:activity w-4 h-4" />
+            <div className="i-ph:activity h-4 w-4" />
           )}
           {isRunning ? 'Running Diagnostics...' : 'Run Diagnostics'}
         </Button>
@@ -523,9 +515,9 @@ export default function ConnectionDiagnostics() {
           onClick={resetGitHubConnection}
           disabled={isRunning || !diagnosticResults?.localStorage.hasGithubConnection}
           variant="outline"
-          className="flex items-center gap-2 hover:bg-bolt-elements-item-backgroundActive/10 hover:text-bolt-elements-textPrimary dark:hover:bg-bolt-elements-item-backgroundActive/10 dark:hover:text-bolt-elements-textPrimary transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+          className="hover:bg-bolt-elements-item-backgroundActive/10 dark:hover:bg-bolt-elements-item-backgroundActive/10 flex items-center gap-2 transition-colors hover:text-black disabled:cursor-not-allowed disabled:opacity-50 dark:hover:text-black"
         >
-          <div className="i-ph:github-logo w-4 h-4" />
+          <div className="i-ph:github-logo h-4 w-4" />
           Reset GitHub
         </Button>
 
@@ -533,9 +525,9 @@ export default function ConnectionDiagnostics() {
           onClick={resetNetlifyConnection}
           disabled={isRunning || !diagnosticResults?.localStorage.hasNetlifyConnection}
           variant="outline"
-          className="flex items-center gap-2 hover:bg-bolt-elements-item-backgroundActive/10 hover:text-bolt-elements-textPrimary dark:hover:bg-bolt-elements-item-backgroundActive/10 dark:hover:text-bolt-elements-textPrimary transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+          className="hover:bg-bolt-elements-item-backgroundActive/10 dark:hover:bg-bolt-elements-item-backgroundActive/10 flex items-center gap-2 transition-colors hover:text-black disabled:cursor-not-allowed disabled:opacity-50 dark:hover:text-black"
         >
-          <div className="i-si:netlify w-4 h-4" />
+          <div className="i-si:netlify h-4 w-4" />
           Reset Netlify
         </Button>
 
@@ -543,9 +535,9 @@ export default function ConnectionDiagnostics() {
           onClick={resetVercelConnection}
           disabled={isRunning || !diagnosticResults?.localStorage.hasVercelConnection}
           variant="outline"
-          className="flex items-center gap-2 hover:bg-bolt-elements-item-backgroundActive/10 hover:text-bolt-elements-textPrimary dark:hover:bg-bolt-elements-item-backgroundActive/10 dark:hover:text-bolt-elements-textPrimary transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+          className="hover:bg-bolt-elements-item-backgroundActive/10 dark:hover:bg-bolt-elements-item-backgroundActive/10 flex items-center gap-2 transition-colors hover:text-black disabled:cursor-not-allowed disabled:opacity-50 dark:hover:text-black"
         >
-          <div className="i-si:vercel w-4 h-4" />
+          <div className="i-si:vercel h-4 w-4" />
           Reset Vercel
         </Button>
 
@@ -553,9 +545,9 @@ export default function ConnectionDiagnostics() {
           onClick={resetSupabaseConnection}
           disabled={isRunning || !diagnosticResults?.localStorage.hasSupabaseConnection}
           variant="outline"
-          className="flex items-center gap-2 hover:bg-bolt-elements-item-backgroundActive/10 hover:text-bolt-elements-textPrimary dark:hover:bg-bolt-elements-item-backgroundActive/10 dark:hover:text-bolt-elements-textPrimary transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+          className="hover:bg-bolt-elements-item-backgroundActive/10 dark:hover:bg-bolt-elements-item-backgroundActive/10 flex items-center gap-2 transition-colors hover:text-black disabled:cursor-not-allowed disabled:opacity-50 dark:hover:text-black"
         >
-          <div className="i-si:supabase w-4 h-4" />
+          <div className="i-si:supabase h-4 w-4" />
           Reset Supabase
         </Button>
       </div>
@@ -565,24 +557,22 @@ export default function ConnectionDiagnostics() {
         <div className="mt-4">
           <Collapsible open={showDetails} onOpenChange={setShowDetails} className="w-full">
             <CollapsibleTrigger className="w-full">
-              <div className="flex items-center justify-between p-4 rounded-lg bg-bolt-elements-background dark:bg-bolt-elements-background-depth-2 border border-bolt-elements-borderColor dark:border-bolt-elements-borderColor hover:border-bolt-elements-borderColorActive/70 dark:hover:border-bolt-elements-borderColorActive/70 transition-all duration-200">
+              <div className="bg-bolt-elements-background dark:bg-bolt-elements-background-depth-2 border-bolt-elements-border-color dark:border-bolt-elements-border-color hover:border-bolt-elements-border-color-active/70 dark:hover:border-bolt-elements-border-color-active/70 flex items-center justify-between rounded-lg border p-4 transition-all duration-200">
                 <div className="flex items-center gap-2">
-                  <CodeBracketIcon className="w-4 h-4 text-blue-500" />
-                  <span className="text-sm font-medium text-bolt-elements-textPrimary dark:text-bolt-elements-textPrimary">
-                    Diagnostic Details
-                  </span>
+                  <CodeBracketIcon className="h-4 w-4 text-blue-500" />
+                  <span className="text-sm font-medium text-black dark:text-black">Diagnostic Details</span>
                 </div>
                 <ChevronDownIcon
-                  className={classNames(
-                    'w-4 h-4 transform transition-transform duration-200 text-bolt-elements-textSecondary dark:text-bolt-elements-textSecondary',
+                  className={cn(
+                    'text-bolt-elements-text-secondary dark:text-bolt-elements-text-secondary h-4 w-4 transform transition-transform duration-200',
                     showDetails ? 'rotate-180' : '',
                   )}
                 />
               </div>
             </CollapsibleTrigger>
             <CollapsibleContent className="overflow-hidden">
-              <div className="p-4 mt-2 rounded-lg bg-bolt-elements-background-depth-2 dark:bg-bolt-elements-background-depth-1 border border-bolt-elements-borderColor dark:border-bolt-elements-borderColor">
-                <pre className="text-xs overflow-auto max-h-96 text-bolt-elements-textSecondary dark:text-bolt-elements-textSecondary">
+              <div className="bg-bolt-elements-background-depth-2 dark:bg-bolt-elements-background-depth-1 border-bolt-elements-border-color dark:border-bolt-elements-border-color mt-2 rounded-lg border p-4">
+                <pre className="text-bolt-elements-text-secondary dark:text-bolt-elements-text-secondary max-h-96 overflow-auto text-xs">
                   {JSON.stringify(diagnosticResults, null, 2)}
                 </pre>
               </div>

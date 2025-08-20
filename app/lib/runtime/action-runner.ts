@@ -1,5 +1,6 @@
-import type { WebContainer } from '@webcontainer/api';
+import type { Sandbox } from 'e2b';
 import { path as nodePath } from '~/utils/path';
+import { toSandboxPath } from '~/utils/paths';
 import { atom, map, type MapStore } from 'nanostores';
 import type { ActionAlert, BoltAction, DeployAlert, FileHistory, SupabaseAction, SupabaseAlert } from '~/types/actions';
 import { createScopedLogger } from '~/utils/logger';
@@ -64,9 +65,10 @@ class ActionCommandError extends Error {
 }
 
 export class ActionRunner {
-  #webcontainer: Promise<WebContainer>;
+  #sandbox: Promise<Sandbox>;
   #currentExecutionPromise: Promise<void> = Promise.resolve();
   #shellTerminal: () => BoltShell;
+  #createdDirectories = new Set<string>();
   runnerId = atom<string>(`${Date.now()}`);
   actions: ActionsMap = map({});
   onAlert?: (alert: ActionAlert) => void;
@@ -75,13 +77,13 @@ export class ActionRunner {
   buildOutput?: { path: string; exitCode: number; output: string };
 
   constructor(
-    webcontainerPromise: Promise<WebContainer>,
+    sandboxPromise: Promise<Sandbox>,
     getShellTerminal: () => BoltShell,
     onAlert?: (alert: ActionAlert) => void,
     onSupabaseAlert?: (alert: SupabaseAlert) => void,
     onDeployAlert?: (alert: DeployAlert) => void,
   ) {
-    this.#webcontainer = webcontainerPromise;
+    this.#sandbox = sandboxPromise;
     this.#shellTerminal = getShellTerminal;
     this.onAlert = onAlert;
     this.onSupabaseAlert = onSupabaseAlert;
@@ -304,25 +306,32 @@ export class ActionRunner {
       unreachable('Expected file action');
     }
 
-    const webcontainer = await this.#webcontainer;
-    const relativePath = nodePath.relative(webcontainer.workdir, action.filePath);
+    const sandbox = await this.#sandbox;
+    const relativePath = toSandboxPath(action.filePath);
 
     let folder = nodePath.dirname(relativePath);
 
     // remove trailing slashes
     folder = folder.replace(/\/+$/g, '');
 
-    if (folder !== '.') {
+    if (folder !== '.' && !this.#createdDirectories.has(folder)) {
       try {
-        await webcontainer.fs.mkdir(folder, { recursive: true });
+        await sandbox.files.makeDir(folder);
+        this.#createdDirectories.add(folder);
+
         logger.debug('Created folder', folder);
-      } catch (error) {
-        logger.error('Failed to create folder\n\n', error);
+      } catch (error: any) {
+        if (error?.status === 409 || error?.message?.includes('409')) {
+          this.#createdDirectories.add(folder);
+          logger.debug('Folder already exists', folder);
+        } else {
+          logger.error('Failed to create folder\n\n', error);
+        }
       }
     }
 
     try {
-      await webcontainer.fs.writeFile(relativePath, action.content);
+      await sandbox.files.write(relativePath, action.content);
       logger.debug(`File written ${relativePath}`);
     } catch (error) {
       logger.error('Failed to write file\n\n', error);
@@ -337,9 +346,10 @@ export class ActionRunner {
 
   async getFileHistory(filePath: string): Promise<FileHistory | null> {
     try {
-      const webcontainer = await this.#webcontainer;
+      const sandbox = await this.#sandbox;
       const historyPath = this.#getHistoryPath(filePath);
-      const content = await webcontainer.fs.readFile(historyPath, 'utf-8');
+      const relativePath = toSandboxPath(historyPath);
+      const content = await sandbox.files.read(relativePath);
 
       return JSON.parse(content);
     } catch (error) {
@@ -380,21 +390,15 @@ export class ActionRunner {
       source: 'netlify',
     });
 
-    const webcontainer = await this.#webcontainer;
+    const sandbox = await this.#sandbox;
 
-    // Create a new terminal specifically for the build
-    const buildProcess = await webcontainer.spawn('npm', ['run', 'build']);
+    // Create a new command for the build
+    const result = await sandbox.commands.run('npm run build', {
+      background: false,
+    });
 
-    let output = '';
-    buildProcess.output.pipeTo(
-      new WritableStream({
-        write(data) {
-          output += data;
-        },
-      }),
-    );
-
-    const exitCode = await buildProcess.exit;
+    const output = result.stdout + result.stderr;
+    const exitCode = result.exitCode;
 
     if (exitCode !== 0) {
       // Trigger build failed alert
@@ -430,11 +434,9 @@ export class ActionRunner {
 
     // Try to find the first existing build directory
     for (const dir of commonBuildDirs) {
-      const dirPath = nodePath.join(webcontainer.workdir, dir);
-
       try {
-        await webcontainer.fs.readdir(dirPath);
-        buildDir = dirPath;
+        await sandbox.files.list(dir);
+        buildDir = nodePath.join('/home/project', dir);
         break;
       } catch {
         continue;
@@ -443,7 +445,7 @@ export class ActionRunner {
 
     // If no build directory was found, use the default (dist)
     if (!buildDir) {
-      buildDir = nodePath.join(webcontainer.workdir, 'dist');
+      buildDir = nodePath.join('/home/project', 'dist');
     }
 
     return {

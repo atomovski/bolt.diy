@@ -23,7 +23,7 @@ import { FileTree } from './FileTree';
 import { DEFAULT_TERMINAL_SIZE, TerminalTabs } from './terminal/TerminalTabs';
 import { workbenchStore } from '~/lib/stores/workbench';
 import { Search } from './Search'; // <-- Ensure Search is imported
-import { classNames } from '~/utils/classNames'; // <-- Import classNames if not already present
+import { cn } from '~/utils/cn'; // <-- Import classNames if not already present
 import { LockManager } from './LockManager'; // <-- Import LockManager
 
 interface EditorPanelProps {
@@ -84,32 +84,32 @@ export const EditorPanel = memo(
       <PanelGroup direction="vertical">
         <Panel defaultSize={showTerminal ? DEFAULT_EDITOR_SIZE : 100} minSize={20}>
           <PanelGroup direction="horizontal">
-            <Panel defaultSize={20} minSize={15} collapsible className="border-r border-bolt-elements-borderColor">
+            <Panel defaultSize={20} minSize={15} collapsible className="border-bolt-elements-border-color border-r">
               <div className="h-full">
-                <Tabs.Root defaultValue="files" className="flex flex-col h-full">
-                  <PanelHeader className="w-full text-sm font-medium text-bolt-elements-textSecondary px-1">
-                    <div className="h-full flex-shrink-0 flex items-center justify-between w-full">
-                      <Tabs.List className="h-full flex-shrink-0 flex items-center">
+                <Tabs.Root defaultValue="files" className="flex h-full flex-col">
+                  <PanelHeader className="text-secondary w-full px-1 text-sm font-medium">
+                    <div className="flex h-full w-full shrink-0 items-center justify-between">
+                      <Tabs.List className="flex h-full shrink-0 items-center">
                         <Tabs.Trigger
                           value="files"
-                          className={classNames(
-                            'h-full bg-transparent hover:bg-bolt-elements-background-depth-3 py-0.5 px-2 rounded-lg text-sm font-medium text-bolt-elements-textTertiary hover:text-bolt-elements-textPrimary data-[state=active]:text-bolt-elements-textPrimary',
+                          className={cn(
+                            'hover:bg-darken-50 text-bolt-elements-text-tertiary h-full rounded-lg bg-transparent px-2 py-0.5 text-sm font-medium hover:text-black data-[state=active]:text-black',
                           )}
                         >
                           Files
                         </Tabs.Trigger>
                         <Tabs.Trigger
                           value="search"
-                          className={classNames(
-                            'h-full bg-transparent hover:bg-bolt-elements-background-depth-3 py-0.5 px-2 rounded-lg text-sm font-medium text-bolt-elements-textTertiary hover:text-bolt-elements-textPrimary data-[state=active]:text-bolt-elements-textPrimary',
+                          className={cn(
+                            'hover:bg-darken-50 text-bolt-elements-text-tertiary h-full rounded-lg bg-transparent px-2 py-0.5 text-sm font-medium hover:text-black data-[state=active]:text-black',
                           )}
                         >
                           Search
                         </Tabs.Trigger>
                         <Tabs.Trigger
                           value="locks"
-                          className={classNames(
-                            'h-full bg-transparent hover:bg-bolt-elements-background-depth-3 py-0.5 px-2 rounded-lg text-sm font-medium text-bolt-elements-textTertiary hover:text-bolt-elements-textPrimary data-[state=active]:text-bolt-elements-textPrimary',
+                          className={cn(
+                            'hover:bg-darken-50 text-bolt-elements-text-tertiary h-full rounded-lg bg-transparent px-2 py-0.5 text-sm font-medium hover:text-black data-[state=active]:text-black',
                           )}
                         >
                           Locks
@@ -118,7 +118,7 @@ export const EditorPanel = memo(
                     </div>
                   </PanelHeader>
 
-                  <Tabs.Content value="files" className="flex-grow overflow-auto focus-visible:outline-none">
+                  <Tabs.Content value="files" className="bg-darken-50 grow overflow-auto focus-visible:outline-hidden">
                     <FileTree
                       className="h-full"
                       files={files}
@@ -131,11 +131,11 @@ export const EditorPanel = memo(
                     />
                   </Tabs.Content>
 
-                  <Tabs.Content value="search" className="flex-grow overflow-auto focus-visible:outline-none">
+                  <Tabs.Content value="search" className="bg-darken-50 grow overflow-auto focus-visible:outline-hidden">
                     <Search />
                   </Tabs.Content>
 
-                  <Tabs.Content value="locks" className="flex-grow overflow-auto focus-visible:outline-none">
+                  <Tabs.Content value="locks" className="bg-darken-50 grow overflow-auto focus-visible:outline-hidden">
                     <LockManager />
                   </Tabs.Content>
                 </Tabs.Root>
@@ -146,10 +146,10 @@ export const EditorPanel = memo(
             <Panel className="flex flex-col" defaultSize={80} minSize={20}>
               <PanelHeader className="overflow-x-auto">
                 {activeFileSegments?.length && (
-                  <div className="flex items-center flex-1 text-sm">
+                  <div className="flex flex-1 items-center text-sm">
                     <FileBreadcrumb pathSegments={activeFileSegments} files={files} onFileSelect={onFileSelect} />
                     {activeFileUnsaved && (
-                      <div className="flex gap-1 ml-auto -mr-1.5">
+                      <div className="-mr-1.5 ml-auto flex gap-1">
                         <PanelHeaderButton onClick={onFileSave}>
                           <div className="i-ph:floppy-disk-duotone" />
                           Save
@@ -163,7 +163,7 @@ export const EditorPanel = memo(
                   </div>
                 )}
               </PanelHeader>
-              <div className="h-full flex-1 overflow-hidden modern-scrollbar">
+              <div className="modern-scrollbar h-full flex-1 overflow-hidden">
                 <CodeMirrorEditor
                   theme={theme}
                   editable={!isStreaming && editorDocument !== undefined}

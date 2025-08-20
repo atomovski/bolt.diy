@@ -1,5 +1,5 @@
 import React from 'react';
-import { classNames } from '~/utils/classNames';
+import { cn } from '~/utils/cn';
 import { motion } from 'framer-motion';
 
 interface BreadcrumbItem {
@@ -36,12 +36,12 @@ export function Breadcrumbs({
   const defaultRenderItem = (item: BreadcrumbItem, index: number, isLast: boolean) => {
     const content = (
       <div className="flex items-center gap-1.5">
-        {item.icon && <span className={classNames(item.icon, 'w-3.5 h-3.5')} />}
+        {item.icon && <span className={cn(item.icon, 'h-3.5 w-3.5')} />}
         <span
-          className={classNames(
+          className={cn(
             isLast
-              ? 'font-medium text-bolt-elements-textPrimary dark:text-bolt-elements-textPrimary-dark'
-              : 'text-bolt-elements-textSecondary dark:text-bolt-elements-textSecondary-dark hover:text-bolt-elements-textPrimary dark:hover:text-bolt-elements-textPrimary-dark',
+              ? 'dark:text-bolt-elements-textPrimary-dark font-medium text-black'
+              : 'text-bolt-elements-text-secondary dark:text-bolt-elements-textSecondary-dark dark:hover:text-bolt-elements-textPrimary-dark hover:text-black',
             item.onClick || item.href ? 'cursor-pointer' : '',
           )}
         >
@@ -76,7 +76,7 @@ export function Breadcrumbs({
   };
 
   return (
-    <nav className={classNames('flex items-center', className)} aria-label="Breadcrumbs">
+    <nav className={cn('flex items-center', className)} aria-label="Breadcrumbs">
       <ol className="flex items-center gap-1.5">
         {displayItems.map((item, index) => {
           const isLast = index === displayItems.length - 1;
@@ -86,9 +86,9 @@ export function Breadcrumbs({
               {renderItem ? renderItem(item, index, isLast) : defaultRenderItem(item, index, isLast)}
               {!isLast && (
                 <span
-                  className={classNames(
+                  className={cn(
                     separator,
-                    'w-3 h-3 mx-1 text-bolt-elements-textTertiary dark:text-bolt-elements-textTertiary-dark',
+                    'text-bolt-elements-text-tertiary dark:text-bolt-elements-textTertiary-dark mx-1 h-3 w-3',
                   )}
                 />
               )}

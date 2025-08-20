@@ -1,4 +1,5 @@
 // Export all UI components for easier imports
+export * as Icon from 'iconoir-react';
 
 // Core components
 export * from './Badge';
@@ -19,20 +20,26 @@ export * from './ThemeSwitch';
 export * from './LoadingDots';
 export * from './LoadingOverlay';
 
+// Sidebar components
+export * from './sidebar';
+
 // New components
 export * from './Breadcrumbs';
 export * from './CloseButton';
 export * from './CodeBlock';
+export * from './dropdown-menu';
 export * from './EmptyState';
 export * from './FileIcon';
 export * from './FilterChip';
 export * from './GradientCard';
+export * from './Popover';
 export * from './RepositoryStats';
 export * from './SearchInput';
 export * from './SearchResultItem';
+export * from './select';
 export * from './StatusIndicator';
 export * from './TabsWithSlider';
+export * from './Toggle';
 
 // Tooltip components
-export { default as WithTooltip } from './Tooltip';
-export { Tooltip } from './Tooltip';
+export { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from './tooltip';

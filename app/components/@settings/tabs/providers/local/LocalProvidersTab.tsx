@@ -5,7 +5,7 @@ import { LOCAL_PROVIDERS, URL_CONFIGURABLE_PROVIDERS } from '~/lib/stores/settin
 import type { IProviderConfig } from '~/types/model';
 import { logStore } from '~/lib/stores/logs';
 import { motion, AnimatePresence } from 'framer-motion';
-import { classNames } from '~/utils/classNames';
+import { cn } from '~/utils/cn';
 import { BsRobot } from 'react-icons/bs';
 import type { IconType } from 'react-icons';
 import { BiChip } from 'react-icons/bi';
@@ -303,7 +303,7 @@ export default function LocalProvidersTab() {
 
   // Update model details display
   const ModelDetails = ({ model }: { model: OllamaModel }) => (
-    <div className="flex items-center gap-3 text-xs text-bolt-elements-textSecondary">
+    <div className="text-bolt-elements-text-secondary flex items-center gap-3 text-xs">
       <div className="flex items-center gap-1">
         <div className="i-ph:code text-purple-500" />
         <span>{model.digest.substring(0, 7)}</span>
@@ -337,12 +337,12 @@ export default function LocalProvidersTab() {
       <motion.button
         onClick={onUpdate}
         disabled={model.status === 'updating'}
-        className={classNames(
+        className={cn(
           'rounded-lg p-2',
           'bg-purple-500/10 text-purple-500',
           'hover:bg-purple-500/20',
           'transition-all duration-200',
-          { 'opacity-50 cursor-not-allowed': model.status === 'updating' },
+          { 'cursor-not-allowed opacity-50': model.status === 'updating' },
         )}
         whileHover={{ scale: 1.05 }}
         whileTap={{ scale: 0.95 }}
@@ -350,7 +350,7 @@ export default function LocalProvidersTab() {
       >
         {model.status === 'updating' ? (
           <div className="flex items-center gap-2">
-            <div className="i-ph:spinner-gap-bold animate-spin w-4 h-4" />
+            <div className="i-ph:spinner-gap-bold h-4 w-4 animate-spin" />
             <span className="text-sm">Updating...</span>
           </div>
         ) : (
@@ -360,12 +360,12 @@ export default function LocalProvidersTab() {
       <motion.button
         onClick={onDelete}
         disabled={model.status === 'updating'}
-        className={classNames(
+        className={cn(
           'rounded-lg p-2',
           'bg-red-500/10 text-red-500',
           'hover:bg-red-500/20',
           'transition-all duration-200',
-          { 'opacity-50 cursor-not-allowed': model.status === 'updating' },
+          { 'cursor-not-allowed opacity-50': model.status === 'updating' },
         )}
         whileHover={{ scale: 1.05 }}
         whileTap={{ scale: 0.95 }}
@@ -378,8 +378,8 @@ export default function LocalProvidersTab() {
 
   return (
     <div
-      className={classNames(
-        'rounded-lg bg-bolt-elements-background text-bolt-elements-textPrimary shadow-sm p-4',
+      className={cn(
+        'bg-bolt-elements-background rounded-lg p-4 text-black shadow-xs',
         'hover:bg-bolt-elements-background-depth-2',
         'transition-all duration-200',
       )}
@@ -393,27 +393,27 @@ export default function LocalProvidersTab() {
         transition={{ duration: 0.3 }}
       >
         {/* Header section */}
-        <div className="flex items-center justify-between gap-4 border-b border-bolt-elements-borderColor pb-4">
+        <div className="border-bolt-elements-border-color flex items-center justify-between gap-4 border-b pb-4">
           <div className="flex items-center gap-3">
             <motion.div
-              className={classNames(
-                'w-10 h-10 flex items-center justify-center rounded-xl',
+              className={cn(
+                'flex h-10 w-10 items-center justify-center rounded-xl',
                 'bg-purple-500/10 text-purple-500',
               )}
               whileHover={{ scale: 1.05 }}
             >
-              <BiChip className="w-6 h-6" />
+              <BiChip className="h-6 w-6" />
             </motion.div>
             <div>
               <div className="flex items-center gap-2">
-                <h2 className="text-lg font-semibold text-bolt-elements-textPrimary">Local AI Models</h2>
+                <h2 className="text-lg font-semibold text-black">Local AI Models</h2>
               </div>
-              <p className="text-sm text-bolt-elements-textSecondary">Configure and manage your local AI providers</p>
+              <p className="text-bolt-elements-text-secondary text-sm">Configure and manage your local AI providers</p>
             </div>
           </div>
 
           <div className="flex items-center gap-2">
-            <span className="text-sm text-bolt-elements-textSecondary">Enable All</span>
+            <span className="text-bolt-elements-text-secondary text-sm">Enable All</span>
             <Switch
               checked={categoryEnabled}
               onCheckedChange={handleToggleCategory}
@@ -428,11 +428,11 @@ export default function LocalProvidersTab() {
           .map((provider) => (
             <motion.div
               key={provider.name}
-              className={classNames(
+              className={cn(
                 'bg-bolt-elements-background-depth-2 rounded-xl',
-                'hover:bg-bolt-elements-background-depth-3',
-                'transition-all duration-200 p-5',
-                'relative overflow-hidden group',
+                'hover:bg-darken-50',
+                'p-5 transition-all duration-200',
+                'group relative overflow-hidden',
               )}
               initial={{ opacity: 0, y: 20 }}
               animate={{ opacity: 1, y: 0 }}
@@ -442,10 +442,10 @@ export default function LocalProvidersTab() {
               <div className="flex items-start justify-between gap-4">
                 <div className="flex items-start gap-4">
                   <motion.div
-                    className={classNames(
-                      'w-12 h-12 flex items-center justify-center rounded-xl',
-                      'bg-bolt-elements-background-depth-3',
-                      provider.settings.enabled ? 'text-purple-500' : 'text-bolt-elements-textSecondary',
+                    className={cn(
+                      'flex h-12 w-12 items-center justify-center rounded-xl',
+                      'bg-darken-50',
+                      provider.settings.enabled ? 'text-purple-500' : 'text-bolt-elements-text-secondary',
                     )}
                     whileHover={{ scale: 1.1, rotate: 5 }}
                   >
@@ -456,10 +456,10 @@ export default function LocalProvidersTab() {
                   </motion.div>
                   <div>
                     <div className="flex items-center gap-2">
-                      <h3 className="text-md font-semibold text-bolt-elements-textPrimary">{provider.name}</h3>
-                      <span className="px-2 py-0.5 text-xs rounded-full bg-green-500/10 text-green-500">Local</span>
+                      <h3 className="text-md font-semibold text-black">{provider.name}</h3>
+                      <span className="rounded-full bg-green-500/10 px-2 py-0.5 text-xs text-green-500">Local</span>
                     </div>
-                    <p className="text-sm text-bolt-elements-textSecondary mt-1">
+                    <p className="text-bolt-elements-text-secondary mt-1 text-sm">
                       {PROVIDER_DESCRIPTIONS[provider.name as ProviderName]}
                     </p>
                   </div>
@@ -481,17 +481,17 @@ export default function LocalProvidersTab() {
                     className="mt-4"
                   >
                     <div className="flex flex-col gap-2">
-                      <label className="text-sm text-bolt-elements-textSecondary">API Endpoint</label>
+                      <label className="text-bolt-elements-text-secondary text-sm">API Endpoint</label>
                       {editingProvider === provider.name ? (
                         <input
                           type="text"
                           defaultValue={provider.settings.baseUrl || OLLAMA_API_URL}
                           placeholder="Enter Ollama base URL"
-                          className={classNames(
-                            'w-full px-3 py-2 rounded-lg text-sm',
-                            'bg-bolt-elements-background-depth-3 border border-bolt-elements-borderColor',
-                            'text-bolt-elements-textPrimary placeholder-bolt-elements-textTertiary',
-                            'focus:outline-none focus:ring-2 focus:ring-purple-500/30',
+                          className={cn(
+                            'w-full rounded-lg px-3 py-2 text-sm',
+                            'bg-darken-50 border-bolt-elements-border-color border',
+                            'placeholder-bolt-elements-text-tertiary text-black',
+                            'focus:ring-2 focus:ring-purple-500/30 focus:outline-hidden',
                             'transition-all duration-200',
                           )}
                           onKeyDown={(e) => {
@@ -507,14 +507,14 @@ export default function LocalProvidersTab() {
                       ) : (
                         <div
                           onClick={() => setEditingProvider(provider.name)}
-                          className={classNames(
-                            'w-full px-3 py-2 rounded-lg text-sm cursor-pointer',
-                            'bg-bolt-elements-background-depth-3 border border-bolt-elements-borderColor',
-                            'hover:border-purple-500/30 hover:bg-bolt-elements-background-depth-4',
+                          className={cn(
+                            'w-full cursor-pointer rounded-lg px-3 py-2 text-sm',
+                            'bg-darken-50 border-bolt-elements-border-color border',
+                            'hover:bg-bolt-elements-background-depth-4 hover:border-purple-500/30',
                             'transition-all duration-200',
                           )}
                         >
-                          <div className="flex items-center gap-2 text-bolt-elements-textSecondary">
+                          <div className="text-bolt-elements-text-secondary flex items-center gap-2">
                             <div className="i-ph:link text-sm" />
                             <span>{provider.settings.baseUrl || OLLAMA_API_URL}</span>
                           </div>
@@ -531,15 +531,15 @@ export default function LocalProvidersTab() {
                   <div className="flex items-center justify-between">
                     <div className="flex items-center gap-2">
                       <div className="i-ph:cube-duotone text-purple-500" />
-                      <h4 className="text-sm font-medium text-bolt-elements-textPrimary">Installed Models</h4>
+                      <h4 className="text-sm font-medium text-black">Installed Models</h4>
                     </div>
                     {isLoadingModels ? (
                       <div className="flex items-center gap-2">
-                        <div className="i-ph:spinner-gap-bold animate-spin w-4 h-4" />
-                        <span className="text-sm text-bolt-elements-textSecondary">Loading models...</span>
+                        <div className="i-ph:spinner-gap-bold h-4 w-4 animate-spin" />
+                        <span className="text-bolt-elements-text-secondary text-sm">Loading models...</span>
                       </div>
                     ) : (
-                      <span className="text-sm text-bolt-elements-textSecondary">
+                      <span className="text-bolt-elements-text-secondary text-sm">
                         {ollamaModels.length} models available
                       </span>
                     )}
@@ -549,23 +549,20 @@ export default function LocalProvidersTab() {
                     {isLoadingModels ? (
                       <div className="space-y-3">
                         {Array.from({ length: 3 }).map((_, i) => (
-                          <div
-                            key={i}
-                            className="h-20 w-full bg-bolt-elements-background-depth-3 rounded-lg animate-pulse"
-                          />
+                          <div key={i} className="bg-darken-50 h-20 w-full animate-pulse rounded-lg" />
                         ))}
                       </div>
                     ) : ollamaModels.length === 0 ? (
-                      <div className="text-center py-8 text-bolt-elements-textSecondary">
-                        <div className="i-ph:cube-transparent text-4xl mx-auto mb-2" />
+                      <div className="text-bolt-elements-text-secondary py-8 text-center">
+                        <div className="i-ph:cube-transparent mx-auto mb-2 text-4xl" />
                         <p>No models installed yet</p>
-                        <p className="text-sm text-bolt-elements-textTertiary px-1">
+                        <p className="text-bolt-elements-text-tertiary px-1 text-sm">
                           Browse models at{' '}
                           <a
                             href="https://ollama.com/library"
                             target="_blank"
                             rel="noopener noreferrer"
-                            className="text-purple-500 hover:underline inline-flex items-center gap-0.5 text-base font-medium"
+                            className="inline-flex items-center gap-0.5 text-base font-medium text-purple-500 hover:underline"
                           >
                             ollama.com/library
                             <div className="i-ph:arrow-square-out text-xs" />
@@ -577,9 +574,9 @@ export default function LocalProvidersTab() {
                       ollamaModels.map((model) => (
                         <motion.div
                           key={model.name}
-                          className={classNames(
-                            'p-4 rounded-xl',
-                            'bg-bolt-elements-background-depth-3',
+                          className={cn(
+                            'rounded-xl p-4',
+                            'bg-darken-50',
                             'hover:bg-bolt-elements-background-depth-4',
                             'transition-all duration-200',
                           )}
@@ -588,7 +585,7 @@ export default function LocalProvidersTab() {
                           <div className="flex items-center justify-between">
                             <div className="space-y-2">
                               <div className="flex items-center gap-2">
-                                <h5 className="text-sm font-medium text-bolt-elements-textPrimary">{model.name}</h5>
+                                <h5 className="text-sm font-medium text-black">{model.name}</h5>
                                 <ModelStatusBadge status={model.status} />
                               </div>
                               <ModelDetails model={model} />
@@ -609,7 +606,7 @@ export default function LocalProvidersTab() {
                                 value={Math.round((model.progress.current / model.progress.total) * 100)}
                                 className="h-1"
                               />
-                              <div className="flex justify-between mt-1 text-xs text-bolt-elements-textSecondary">
+                              <div className="text-bolt-elements-text-secondary mt-1 flex justify-between text-xs">
                                 <span>{model.progress.status}</span>
                                 <span>{Math.round((model.progress.current / model.progress.total) * 100)}%</span>
                               </div>
@@ -628,19 +625,19 @@ export default function LocalProvidersTab() {
           ))}
 
         {/* Other Providers Section */}
-        <div className="border-t border-bolt-elements-borderColor pt-6 mt-8">
-          <h3 className="text-lg font-semibold text-bolt-elements-textPrimary mb-4">Other Local Providers</h3>
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+        <div className="border-bolt-elements-border-color mt-8 border-t pt-6">
+          <h3 className="mb-4 text-lg font-semibold text-black">Other Local Providers</h3>
+          <div className="grid grid-cols-1 gap-6 md:grid-cols-2">
             {filteredProviders
               .filter((provider) => provider.name !== 'Ollama')
               .map((provider, index) => (
                 <motion.div
                   key={provider.name}
-                  className={classNames(
+                  className={cn(
                     'bg-bolt-elements-background-depth-2 rounded-xl',
-                    'hover:bg-bolt-elements-background-depth-3',
-                    'transition-all duration-200 p-5',
-                    'relative overflow-hidden group',
+                    'hover:bg-darken-50',
+                    'p-5 transition-all duration-200',
+                    'group relative overflow-hidden',
                   )}
                   initial={{ opacity: 0, y: 20 }}
                   animate={{ opacity: 1, y: 0 }}
@@ -651,10 +648,10 @@ export default function LocalProvidersTab() {
                   <div className="flex items-start justify-between gap-4">
                     <div className="flex items-start gap-4">
                       <motion.div
-                        className={classNames(
-                          'w-12 h-12 flex items-center justify-center rounded-xl',
-                          'bg-bolt-elements-background-depth-3',
-                          provider.settings.enabled ? 'text-purple-500' : 'text-bolt-elements-textSecondary',
+                        className={cn(
+                          'flex h-12 w-12 items-center justify-center rounded-xl',
+                          'bg-darken-50',
+                          provider.settings.enabled ? 'text-purple-500' : 'text-bolt-elements-text-secondary',
                         )}
                         whileHover={{ scale: 1.1, rotate: 5 }}
                       >
@@ -665,19 +662,19 @@ export default function LocalProvidersTab() {
                       </motion.div>
                       <div>
                         <div className="flex items-center gap-2">
-                          <h3 className="text-md font-semibold text-bolt-elements-textPrimary">{provider.name}</h3>
+                          <h3 className="text-md font-semibold text-black">{provider.name}</h3>
                           <div className="flex gap-1">
-                            <span className="px-2 py-0.5 text-xs rounded-full bg-green-500/10 text-green-500">
+                            <span className="rounded-full bg-green-500/10 px-2 py-0.5 text-xs text-green-500">
                               Local
                             </span>
                             {URL_CONFIGURABLE_PROVIDERS.includes(provider.name) && (
-                              <span className="px-2 py-0.5 text-xs rounded-full bg-purple-500/10 text-purple-500">
+                              <span className="rounded-full bg-purple-500/10 px-2 py-0.5 text-xs text-purple-500">
                                 Configurable
                               </span>
                             )}
                           </div>
                         </div>
-                        <p className="text-sm text-bolt-elements-textSecondary mt-1">
+                        <p className="text-bolt-elements-text-secondary mt-1 text-sm">
                           {PROVIDER_DESCRIPTIONS[provider.name as ProviderName]}
                         </p>
                       </div>
@@ -699,17 +696,17 @@ export default function LocalProvidersTab() {
                         className="mt-4"
                       >
                         <div className="flex flex-col gap-2">
-                          <label className="text-sm text-bolt-elements-textSecondary">API Endpoint</label>
+                          <label className="text-bolt-elements-text-secondary text-sm">API Endpoint</label>
                           {editingProvider === provider.name ? (
                             <input
                               type="text"
                               defaultValue={provider.settings.baseUrl}
                               placeholder={`Enter ${provider.name} base URL`}
-                              className={classNames(
-                                'w-full px-3 py-2 rounded-lg text-sm',
-                                'bg-bolt-elements-background-depth-3 border border-bolt-elements-borderColor',
-                                'text-bolt-elements-textPrimary placeholder-bolt-elements-textTertiary',
-                                'focus:outline-none focus:ring-2 focus:ring-purple-500/30',
+                              className={cn(
+                                'w-full rounded-lg px-3 py-2 text-sm',
+                                'bg-darken-50 border-bolt-elements-border-color border',
+                                'placeholder-bolt-elements-text-tertiary text-black',
+                                'focus:ring-2 focus:ring-purple-500/30 focus:outline-hidden',
                                 'transition-all duration-200',
                               )}
                               onKeyDown={(e) => {
@@ -725,14 +722,14 @@ export default function LocalProvidersTab() {
                           ) : (
                             <div
                               onClick={() => setEditingProvider(provider.name)}
-                              className={classNames(
-                                'w-full px-3 py-2 rounded-lg text-sm cursor-pointer',
-                                'bg-bolt-elements-background-depth-3 border border-bolt-elements-borderColor',
-                                'hover:border-purple-500/30 hover:bg-bolt-elements-background-depth-4',
+                              className={cn(
+                                'w-full cursor-pointer rounded-lg px-3 py-2 text-sm',
+                                'bg-darken-50 border-bolt-elements-border-color border',
+                                'hover:bg-bolt-elements-background-depth-4 hover:border-purple-500/30',
                                 'transition-all duration-200',
                               )}
                             >
-                              <div className="flex items-center gap-2 text-bolt-elements-textSecondary">
+                              <div className="text-bolt-elements-text-secondary flex items-center gap-2">
                                 <div className="i-ph:link text-sm" />
                                 <span>{provider.settings.baseUrl || 'Click to set base URL'}</span>
                               </div>
@@ -770,8 +767,6 @@ function ModelStatusBadge({ status }: { status?: string }) {
   }
 
   return (
-    <span className={classNames('px-2 py-0.5 rounded-full text-xs font-medium', config.bg, config.text)}>
-      {config.label}
-    </span>
+    <span className={cn('rounded-full px-2 py-0.5 text-xs font-medium', config.bg, config.text)}>{config.label}</span>
   );
 }

@@ -1,0 +1,264 @@
+@import url('https://fonts.googleapis.com/css2?family=Gabarito:wght@400..900&family=Inter:ital,opsz,wght@0,14..32,100..900;1,14..32,100..900&display=swap');
+@import 'tailwindcss';
+
+html {
+  line-height: 1.5;
+  -webkit-text-size-adjust: 100%;
+  -moz-tab-size: 4;
+  tab-size: 4;
+}
+
+body {
+  font-family: var(--font-sans);
+  color: var(--color-foreground);
+  background-color: var(--color-background);
+}
+
+@theme {
+  /* Font Families */
+  --font-sans:
+    'Inter', ui-sans-serif, system-ui, sans-serif, 'Apple Color Emoji', 'Segoe UI Emoji', 'Segoe UI Symbol',
+    'Noto Color Emoji';
+  --font-heading: 'Gabarito', 'Inter';
+  --font-serif: 'RhetorikSerif', ui-serif, Georgia, Cambria, 'Times New Roman', Times, serif;
+  --font-mono:
+    sohne-book, ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, 'Liberation Mono', 'Courier New', monospace;
+
+  --header-height: 3.5rem;
+  --chat-max-width: 33rem;
+  --chat-min-width: 23rem;
+  --workbench-width: min(calc(100% - var(--chat-min-width)), 2536px);
+  --workbench-inner-width: var(--workbench-width);
+  --workbench-left: calc(100% - var(--workbench-width));
+
+  --text-xs: calc(10 / 16 * 1rem);
+  --text-sm: calc(12 / 16 * 1rem);
+  --text-base: calc(13 / 16 * 1rem);
+  --text-lg: calc(15 / 16 * 1rem);
+  --text-xl: 1rem;
+  --text-2xl: 1.125rem;
+  --text-3xl: 1.25rem;
+  --text-4xl: 1.5rem;
+  --text-5xl: 1.75rem;
+  --text-6xl: 2rem;
+  --text-7xl: 2.25rem;
+
+  --spacing-gutter-mobile: 1rem;
+  --spacing-gutter-desktop: 2rem;
+
+  --shadow-md: 0px 0px 0.5px rgba(0, 0, 0, 0.18), 0px 3px 8px rgba(0, 0, 0, 0.1), 0px 1px 3px rgba(0, 0, 0, 0.1);
+
+  --inset-shadow-sm: inset -4px 0px 6px -4px rgba(0, 0, 0, 0.04);
+
+  --container-8xl: 90rem;
+  --container-9xl: 100rem;
+
+  --color-white: #fff;
+
+  --color-black: hsl(14, 100%, 3%);
+
+  --color-gray-100: hsl(210 20% 98%);
+  --color-gray-200: hsl(220 13% 91%);
+  --color-gray-900: hsl(0, 0%, 12%);
+
+  --color-highlight-red-100: hsl(0 19% 88%);
+  --color-highlight-red-500: hsl(0 11% 73%);
+  --color-highlight-red-900: hsl(0 30% 14%);
+
+  --color-highlight-orange-100: hsl(30 19% 88%);
+  --color-highlight-orange-500: hsl(28 11% 73%);
+  --color-highlight-orange-900: hsl(32 30% 14%);
+
+  --color-highlight-yellow-100: hsl(64 19% 88%);
+  --color-highlight-yellow-500: hsl(62 11% 73%);
+  --color-highlight-yellow-900: hsl(58 30% 14%);
+
+  --color-highlight-green-100: hsl(127 19% 88%);
+  --color-highlight-green-500: hsl(120 11% 73%);
+  --color-highlight-green-900: hsl(120 30% 14%);
+
+  --color-highlight-teal-100: hsl(177 19% 88%);
+  --color-highlight-teal-500: hsl(177 11% 73%);
+  --color-highlight-teal-900: hsl(180 30% 14%);
+
+  --color-highlight-blue-100: hsl(228 19% 88%);
+  --color-highlight-blue-500: hsl(232 11% 73%);
+  --color-highlight-blue-900: hsl(221 30% 14%);
+
+  --color-highlight-purple-100: hsl(281 19% 88%);
+  --color-highlight-purple-500: hsl(285 11% 73%);
+  --color-highlight-purple-900: hsl(285 30% 14%);
+
+  --color-blue-500: hsl(227, 67%, 62%);
+
+  --color-green-900: rgba(0, 100, 0, 1);
+
+  --color-purple-500: hsl(282, 60%, 56%);
+
+  --color-orange-50: hsl(34, 100%, 96%);
+  --color-orange-100: hsl(34, 100%, 92%);
+  --color-orange-300: hsl(32, 98%, 83%);
+  --color-orange-500: hsl(31, 97%, 72%);
+  --color-orange-700: hsl(29, 93%, 54%);
+  --color-orange-900: hsl(15, 97%, 58%);
+
+  --color-red-500: hsl(3, 80%, 61%);
+
+  --color-lighten-50: rgba(254, 254, 255, 0.05);
+  --color-lighten-100: rgba(243, 243, 255, 0.088);
+  --color-lighten-200: rgba(241, 241, 255, 0.151);
+  --color-lighten-300: rgba(231, 231, 255, 0.265);
+  --color-lighten-400: rgba(231, 231, 255, 0.349);
+  --color-lighten-500: rgba(237, 237, 255, 0.471);
+  --color-lighten-600: rgba(243, 243, 255, 0.66);
+  --color-lighten-700: rgba(251, 251, 255, 0.845);
+  --color-lighten-800: rgba(252, 252, 255, 0.903);
+  --color-lighten-900: rgba(254, 254, 255, 0.958);
+  --color-lighten-950: hsla(0, 0%, 100%, 0.978);
+
+  --color-darken-50: rgba(0, 0, 0, 0.02);
+  --color-darken-100: rgba(0, 0, 23, 0.043);
+  --color-darken-200: rgba(0, 0, 29, 0.102);
+  --color-darken-300: rgba(0, 0, 25, 0.161);
+  --color-darken-400: rgba(0, 0, 23, 0.349);
+  --color-darken-500: rgba(0, 0, 17, 0.529);
+  --color-darken-600: rgba(0, 0, 14, 0.643);
+  --color-darken-700: rgba(0, 0, 10, 0.714);
+  --color-darken-800: rgba(0, 0, 4, 0.804);
+  --color-darken-900: rgba(0, 0, 2, 0.859);
+  --color-darken-950: rgba(0, 0, 1, 0.89);
+
+  --radius-xs: 0.125rem;
+  --radius-sm: 0.25rem;
+  --radius-md: 0.375rem;
+  --radius-lg: 0.5rem;
+  --radius-xl: 0.75rem;
+  --radius-2xl: 1rem;
+  --radius-3xl: 1.5rem;
+  --radius-4xl: 2rem;
+
+  --shadow-sm: 0 1px 2px 0 rgba(0, 0, 0, 0.1);
+  --shadow-md: 0 4px 8px rgba(0, 0, 0, 0.1);
+  --shadow-lg: 0 10px 15px -3px rgb(0 0 0 / 0.1), 0 4px 6px -4px rgb(0 0 0 / 0.1);
+
+  --container-chat: var(--chat-max-width);
+}
+
+/*
+  The default border color has changed to `currentcolor` in Tailwind CSS v4,
+  so we've added these compatibility styles to make sure everything still
+  looks the same as it did with Tailwind CSS v3.
+
+  If we ever want to remove these styles, we need to add an explicit border
+  color utility to any element that depends on these defaults.
+*/
+@layer base {
+  *,
+  ::after,
+  ::before,
+  ::backdrop,
+  ::file-selector-button {
+    border-color: var(--color-border, currentcolor);
+  }
+}
+
+@utility transition-theme {
+  transition-property: background-color, border-color, color;
+  transition-duration: 150ms;
+  transition-timing-function: cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+@utility bolt-ease-cubic-bezier {
+  transition-timing-function: cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+@utility kdb {
+  background-color: var(--bolt-elements-code-background);
+  color: var(--bolt-elements-code-text);
+  padding: 0.25rem 0.375rem;
+  border-radius: 0.375rem;
+}
+
+@theme {
+  /* Secondary use */
+  --color-primary: var(--color-orange-900);
+  --color-accent: var(--color-darken-950);
+  --color-success: var(--color-green-500);
+  --color-warning: var(--color-yellow-500);
+  --color-danger: var(--color-red-500);
+
+  /* Primarily use */
+  --color-background: var(--color-white);
+  --color-foreground: var(--color-black);
+  --color-card: var(--color-white);
+  --color-card-foreground: var(--color-primary);
+  --color-popover: var(--color-white);
+  --color-popover-foreground: var(--color-black);
+  --color-primary-foreground: var(--color-white);
+  --color-secondary: var(--color-darken-500);
+  --color-secondary-foreground: var(--color-black);
+  --color-muted: var(--color-white-100);
+  --color-muted-foreground: var(--color-gray-100);
+  --color-accent-foreground: var(--color-white);
+  --color-destructive: var(--color-danger);
+  --color-destructive-foreground: var(--color-white);
+  --color-border: var(--color-darken-200);
+  --color-input: var(--color-gray-200);
+  --color-focus: var(--color-orange-100);
+  --color-ring: var(--color-primary);
+  --color-surface: var(--color-white);
+  --color-menu: var(--color-gray-900);
+
+  --color-sidebar: var(--color-white);
+  --color-sidebar-foreground: var(--color-foreground);
+  --color-sidebar-primary: var(--color-primary);
+  --color-sidebar-primary-foreground: var(--color-primary-foreground);
+  --color-sidebar-accent: var(--color-darken-100);
+  --color-sidebar-accent-foreground: var(--color-black);
+  --color-sidebar-border: var(--color-border);
+  --color-sidebar-ring: var(--color-ring);
+
+  --color-chart-1: var(--color-accent);
+  --color-chart-2: #519bcd;
+  --color-chart-3: #245c4e;
+  --color-chart-4: #e7fa3e;
+  --color-chart-5: #fb8569;
+}
+
+@layer base {
+  [data-theme='dark'] {
+    --bolt-elements-bg-depth-1: #0a0a0a;
+    --bolt-elements-bg-depth-2: #171717;
+    --bolt-elements-bg-depth-3: #262626;
+    --bolt-elements-bg-depth-4: #404040;
+
+    --bolt-elements-textPrimary: #fafafa;
+    --bolt-elements-textSecondary: #d4d4d4;
+    --bolt-elements-textTertiary: #a3a3a3;
+
+    --bolt-elements-borderColor: #404040;
+    --bolt-elements-borderColorActive: #737373;
+
+    --bolt-elements-code-background: #262626;
+    --bolt-elements-code-text: #fafafa;
+
+    --bolt-elements-button-secondary-background: #262626;
+    --bolt-elements-button-secondary-backgroundHover: #404040;
+    --bolt-elements-button-secondary-text: #fafafa;
+  }
+}
+
+@layer utilities {
+  .chat-input-wrapper {
+    @apply border shadow-xs backdrop-blur-2xl;
+    background-color: rgba(255, 255, 255, 0.66);
+  }
+
+  .no-scrollbar::-webkit-scrollbar {
+    display: none;
+  }
+  .no-scrollbar {
+    -ms-overflow-style: none;
+    scrollbar-width: none;
+  }
+}

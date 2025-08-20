@@ -1,6 +1,6 @@
 import { motion } from 'framer-motion';
 import React, { Suspense, useState } from 'react';
-import { classNames } from '~/utils/classNames';
+import { cn } from '~/utils/cn';
 import ConnectionDiagnostics from './ConnectionDiagnostics';
 import { Button } from '~/components/ui/Button';
 import VercelConnection from './VercelConnection';
@@ -11,9 +11,9 @@ const NetlifyConnection = React.lazy(() => import('./NetlifyConnection'));
 
 // Loading fallback component
 const LoadingFallback = () => (
-  <div className="p-4 bg-bolt-elements-background-depth-1 dark:bg-bolt-elements-background-depth-1 rounded-lg border border-bolt-elements-borderColor dark:border-bolt-elements-borderColor">
-    <div className="flex items-center justify-center gap-2 text-bolt-elements-textSecondary dark:text-bolt-elements-textSecondary">
-      <div className="i-ph:spinner-gap w-4 h-4 animate-spin" />
+  <div className="bg-bolt-elements-background-depth-1 dark:bg-bolt-elements-background-depth-1 border-bolt-elements-border-color dark:border-bolt-elements-border-color rounded-lg border p-4">
+    <div className="text-bolt-elements-text-secondary dark:text-bolt-elements-text-secondary flex items-center justify-center gap-2">
+      <div className="i-ph:spinner-gap h-4 w-4 animate-spin" />
       <span>Loading connection...</span>
     </div>
   </div>
@@ -33,30 +33,28 @@ export default function ConnectionsTab() {
         transition={{ delay: 0.1 }}
       >
         <div className="flex items-center gap-2">
-          <div className="i-ph:plugs-connected w-5 h-5 text-bolt-elements-item-contentAccent dark:text-bolt-elements-item-contentAccent" />
-          <h2 className="text-lg font-medium text-bolt-elements-textPrimary dark:text-bolt-elements-textPrimary">
-            Connection Settings
-          </h2>
+          <div className="i-ph:plugs-connected text-bolt-elements-item-contentAccent dark:text-bolt-elements-item-contentAccent h-5 w-5" />
+          <h2 className="text-lg font-medium text-black dark:text-black">Connection Settings</h2>
         </div>
         <Button
           onClick={() => setShowDiagnostics(!showDiagnostics)}
           variant="outline"
-          className="flex items-center gap-2 hover:bg-bolt-elements-item-backgroundActive/10 hover:text-bolt-elements-textPrimary dark:hover:bg-bolt-elements-item-backgroundActive/10 dark:hover:text-bolt-elements-textPrimary transition-colors"
+          className="hover:bg-bolt-elements-item-backgroundActive/10 dark:hover:bg-bolt-elements-item-backgroundActive/10 flex items-center gap-2 transition-colors hover:text-black dark:hover:text-black"
         >
           {showDiagnostics ? (
             <>
-              <div className="i-ph:eye-slash w-4 h-4" />
+              <div className="i-ph:eye-slash h-4 w-4" />
               Hide Diagnostics
             </>
           ) : (
             <>
-              <div className="i-ph:wrench w-4 h-4" />
+              <div className="i-ph:wrench h-4 w-4" />
               Troubleshoot Connections
             </>
           )}
         </Button>
       </motion.div>
-      <p className="text-sm text-bolt-elements-textSecondary dark:text-bolt-elements-textSecondary">
+      <p className="text-bolt-elements-text-secondary dark:text-bolt-elements-text-secondary text-sm">
         Manage your external service connections and integrations
       </p>
 
@@ -65,7 +63,7 @@ export default function ConnectionsTab() {
 
       {/* Environment Variables Info - Collapsible */}
       <motion.div
-        className="bg-bolt-elements-background dark:bg-bolt-elements-background rounded-lg border border-bolt-elements-borderColor dark:border-bolt-elements-borderColor"
+        className="bg-bolt-elements-background dark:bg-bolt-elements-background border-bolt-elements-border-color dark:border-bolt-elements-border-color rounded-lg border"
         initial={{ opacity: 0, y: 20 }}
         animate={{ opacity: 1, y: 0 }}
         transition={{ delay: 0.2 }}
@@ -73,22 +71,20 @@ export default function ConnectionsTab() {
         <div className="p-6">
           <button
             onClick={() => setIsEnvVarsExpanded(!isEnvVarsExpanded)}
-            className={classNames(
-              'w-full bg-transparent flex items-center justify-between',
-              'hover:bg-bolt-elements-item-backgroundActive/10 hover:text-bolt-elements-textPrimary',
-              'dark:hover:bg-bolt-elements-item-backgroundActive/10 dark:hover:text-bolt-elements-textPrimary',
-              'rounded-md p-2 -m-2 transition-colors',
+            className={cn(
+              'flex w-full items-center justify-between bg-transparent',
+              'hover:bg-bolt-elements-item-backgroundActive/10 hover:text-black',
+              'dark:hover:bg-bolt-elements-item-backgroundActive/10 dark:hover:text-black',
+              '-m-2 rounded-md p-2 transition-colors',
             )}
           >
             <div className="flex items-center gap-2">
-              <div className="i-ph:info w-5 h-5 text-bolt-elements-item-contentAccent dark:text-bolt-elements-item-contentAccent" />
-              <h3 className="text-base font-medium text-bolt-elements-textPrimary dark:text-bolt-elements-textPrimary">
-                Environment Variables
-              </h3>
+              <div className="i-ph:info text-bolt-elements-item-contentAccent dark:text-bolt-elements-item-contentAccent h-5 w-5" />
+              <h3 className="text-base font-medium text-black dark:text-black">Environment Variables</h3>
             </div>
             <div
-              className={classNames(
-                'i-ph:caret-down w-4 h-4 text-bolt-elements-textSecondary dark:text-bolt-elements-textSecondary transition-transform',
+              className={cn(
+                'i-ph:caret-down text-bolt-elements-text-secondary dark:text-bolt-elements-text-secondary h-4 w-4 transition-transform',
                 isEnvVarsExpanded ? 'rotate-180' : '',
               )}
             />
@@ -96,41 +92,35 @@ export default function ConnectionsTab() {
 
           {isEnvVarsExpanded && (
             <div className="mt-4">
-              <p className="text-sm text-bolt-elements-textSecondary dark:text-bolt-elements-textSecondary mb-2">
+              <p className="text-bolt-elements-text-secondary dark:text-bolt-elements-text-secondary mb-2 text-sm">
                 You can configure connections using environment variables in your{' '}
-                <code className="px-1 py-0.5 bg-bolt-elements-background-depth-2 dark:bg-bolt-elements-background-depth-2 rounded">
+                <code className="bg-bolt-elements-background-depth-2 dark:bg-bolt-elements-background-depth-2 rounded-sm px-1 py-0.5">
                   .env.local
                 </code>{' '}
                 file:
               </p>
-              <div className="bg-bolt-elements-background-depth-2 dark:bg-bolt-elements-background-depth-2 p-3 rounded-md text-xs font-mono overflow-x-auto">
-                <div className="text-bolt-elements-textSecondary dark:text-bolt-elements-textSecondary">
+              <div className="bg-bolt-elements-background-depth-2 dark:bg-bolt-elements-background-depth-2 overflow-x-auto rounded-md p-3 font-mono text-xs">
+                <div className="text-bolt-elements-text-secondary dark:text-bolt-elements-text-secondary">
                   # GitHub Authentication
                 </div>
-                <div className="text-bolt-elements-textPrimary dark:text-bolt-elements-textPrimary">
-                  VITE_GITHUB_ACCESS_TOKEN=your_token_here
-                </div>
-                <div className="text-bolt-elements-textSecondary dark:text-bolt-elements-textSecondary">
+                <div className="text-black dark:text-black">VITE_GITHUB_ACCESS_TOKEN=your_token_here</div>
+                <div className="text-bolt-elements-text-secondary dark:text-bolt-elements-text-secondary">
                   # Optional: Specify token type (defaults to 'classic' if not specified)
                 </div>
-                <div className="text-bolt-elements-textPrimary dark:text-bolt-elements-textPrimary">
-                  VITE_GITHUB_TOKEN_TYPE=classic|fine-grained
-                </div>
-                <div className="text-bolt-elements-textSecondary dark:text-bolt-elements-textSecondary mt-2">
+                <div className="text-black dark:text-black">VITE_GITHUB_TOKEN_TYPE=classic|fine-grained</div>
+                <div className="text-bolt-elements-text-secondary dark:text-bolt-elements-text-secondary mt-2">
                   # Netlify Authentication
                 </div>
-                <div className="text-bolt-elements-textPrimary dark:text-bolt-elements-textPrimary">
-                  VITE_NETLIFY_ACCESS_TOKEN=your_token_here
-                </div>
+                <div className="text-black dark:text-black">VITE_NETLIFY_ACCESS_TOKEN=your_token_here</div>
               </div>
-              <div className="mt-3 text-xs text-bolt-elements-textSecondary dark:text-bolt-elements-textSecondary space-y-1">
+              <div className="text-bolt-elements-text-secondary dark:text-bolt-elements-text-secondary mt-3 space-y-1 text-xs">
                 <p>
                   <span className="font-medium">Token types:</span>
                 </p>
-                <ul className="list-disc list-inside pl-2 space-y-1">
+                <ul className="list-inside list-disc space-y-1 pl-2">
                   <li>
                     <span className="font-medium">classic</span> - Personal Access Token with{' '}
-                    <code className="px-1 py-0.5 bg-bolt-elements-background-depth-2 dark:bg-bolt-elements-background-depth-2 rounded">
+                    <code className="bg-bolt-elements-background-depth-2 dark:bg-bolt-elements-background-depth-2 rounded-sm px-1 py-0.5">
                       repo, read:org, read:user
                     </code>{' '}
                     scopes
@@ -162,9 +152,9 @@ export default function ConnectionsTab() {
       </div>
 
       {/* Additional help text */}
-      <div className="text-sm text-bolt-elements-textSecondary dark:text-bolt-elements-textSecondary bg-bolt-elements-background-depth-2 dark:bg-bolt-elements-background-depth-2 p-4 rounded-lg">
-        <p className="flex items-center gap-1 mb-2">
-          <span className="i-ph:lightbulb w-4 h-4 text-bolt-elements-icon-success dark:text-bolt-elements-icon-success" />
+      <div className="text-bolt-elements-text-secondary dark:text-bolt-elements-text-secondary bg-bolt-elements-background-depth-2 dark:bg-bolt-elements-background-depth-2 rounded-lg p-4 text-sm">
+        <p className="mb-2 flex items-center gap-1">
+          <span className="i-ph:lightbulb text-bolt-elements-icon-success dark:text-bolt-elements-icon-success h-4 w-4" />
           <span className="font-medium">Troubleshooting Tip:</span>
         </p>
         <p className="mb-2">
@@ -172,7 +162,7 @@ export default function ConnectionsTab() {
           help diagnose and fix common connection issues.
         </p>
         <p>For persistent issues:</p>
-        <ol className="list-decimal list-inside pl-4 mt-1">
+        <ol className="mt-1 list-inside list-decimal pl-4">
           <li>Check your browser console for errors</li>
           <li>Verify that your tokens have the correct permissions</li>
           <li>Try clearing your browser cache and cookies</li>

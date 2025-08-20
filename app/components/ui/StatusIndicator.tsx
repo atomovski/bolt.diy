@@ -1,5 +1,5 @@
 import React from 'react';
-import { classNames } from '~/utils/classNames';
+import { cn } from '~/utils/cn';
 
 // Status types supported by the component
 type StatusType = 'online' | 'offline' | 'away' | 'busy' | 'success' | 'warning' | 'error' | 'info' | 'loading';
@@ -67,20 +67,17 @@ export function StatusIndicator({ status, size = 'md', pulse = false, label, cla
   const textSizeClass = TEXT_SIZE_CLASSES[size];
 
   return (
-    <div className={classNames('flex items-center gap-2', className)}>
+    <div className={cn('flex items-center gap-2', className)}>
       {/* Status indicator dot */}
-      <span className={classNames('rounded-full relative', colorClass, sizeClass)}>
+      <span className={cn('relative rounded-full', colorClass, sizeClass)}>
         {/* Pulse animation */}
-        {pulse && <span className={classNames('absolute inset-0 rounded-full animate-ping opacity-75', colorClass)} />}
+        {pulse && <span className={cn('absolute inset-0 animate-ping rounded-full opacity-75', colorClass)} />}
       </span>
 
       {/* Optional label */}
       {label && (
         <span
-          className={classNames(
-            'text-bolt-elements-textSecondary dark:text-bolt-elements-textSecondary-dark',
-            textSizeClass,
-          )}
+          className={cn('text-bolt-elements-text-secondary dark:text-bolt-elements-textSecondary-dark', textSizeClass)}
         >
           {label}
         </span>

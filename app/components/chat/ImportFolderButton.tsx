@@ -5,7 +5,7 @@ import { MAX_FILES, isBinaryFile, shouldIncludeFile } from '~/utils/fileUtils';
 import { createChatFromFolder } from '~/utils/folderImport';
 import { logStore } from '~/lib/stores/logs'; // Assuming logStore is imported from this location
 import { Button } from '~/components/ui/Button';
-import { classNames } from '~/utils/classNames';
+import { cn } from '~/utils/cn';
 
 interface ImportFolderButtonProps {
   className?: string;
@@ -120,20 +120,20 @@ export const ImportFolderButton: React.FC<ImportFolderButtonProps> = ({ classNam
           input?.click();
         }}
         title="Import Folder"
-        variant="default"
+        variant="primary"
         size="lg"
-        className={classNames(
-          'gap-2 bg-bolt-elements-background-depth-1',
-          'text-bolt-elements-textPrimary',
+        className={cn(
+          'bg-bolt-elements-background-depth-1 gap-2',
+          'text-black',
           'hover:bg-bolt-elements-background-depth-2',
-          'border border-bolt-elements-borderColor',
-          'h-10 px-4 py-2 min-w-[120px] justify-center',
+          'border-bolt-elements-border-color border',
+          'h-10 min-w-[120px] justify-center px-4 py-2',
           'transition-all duration-200 ease-in-out',
           className,
         )}
         disabled={isLoading}
       >
-        <span className="i-ph:upload-simple w-4 h-4" />
+        <span className="i-ph:upload-simple h-4 w-4" />
         {isLoading ? 'Importing...' : 'Import Folder'}
       </Button>
     </>

@@ -105,7 +105,7 @@ export const Inspector = ({ isActive, iframeRef, onElementSelect }: InspectorPro
       {isActive && hoveredElement && (
         <div
           ref={overlayRef}
-          className="fixed pointer-events-none z-50 border-2 border-blue-500 bg-blue-500/10"
+          className="pointer-events-none fixed z-50 border-2 border-blue-500 bg-blue-500/10"
           style={{
             left: hoveredElement.rect.x,
             top: hoveredElement.rect.y,
@@ -114,7 +114,7 @@ export const Inspector = ({ isActive, iframeRef, onElementSelect }: InspectorPro
           }}
         >
           {/* Element info tooltip */}
-          <div className="absolute -top-8 left-0 bg-gray-900 text-white text-xs px-2 py-1 rounded whitespace-nowrap">
+          <div className="absolute -top-8 left-0 rounded-sm bg-gray-900 px-2 py-1 text-xs whitespace-nowrap text-white">
             {hoveredElement.tagName.toLowerCase()}
             {hoveredElement.id && `#${hoveredElement.id}`}
             {hoveredElement.className && `.${hoveredElement.className.split(' ')[0]}`}

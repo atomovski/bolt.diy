@@ -1,6 +1,6 @@
 import React from 'react';
 import { Badge } from './Badge';
-import { classNames } from '~/utils/classNames';
+import { cn } from '~/utils/cn';
 import { formatSize } from '~/utils/formatSize';
 
 interface RepositoryStatsProps {
@@ -19,24 +19,24 @@ export function RepositoryStats({ stats, className, compact = false }: Repositor
   const { totalFiles, totalSize, languages, hasPackageJson, hasDependencies } = stats;
 
   return (
-    <div className={classNames('space-y-3', className)}>
+    <div className={cn('space-y-3', className)}>
       {!compact && (
-        <p className="text-sm font-medium text-bolt-elements-textPrimary dark:text-bolt-elements-textPrimary-dark">
+        <p className="dark:text-bolt-elements-textPrimary-dark text-sm font-medium text-black">
           Repository Statistics:
         </p>
       )}
 
-      <div className={classNames('grid gap-3', compact ? 'grid-cols-2' : 'grid-cols-2 md:grid-cols-3')}>
+      <div className={cn('grid gap-3', compact ? 'grid-cols-2' : 'grid-cols-2 md:grid-cols-3')}>
         {totalFiles !== undefined && (
-          <div className="flex items-center gap-2 text-bolt-elements-textPrimary dark:text-bolt-elements-textPrimary-dark">
-            <span className="i-ph:files text-purple-500 w-4 h-4" />
+          <div className="dark:text-bolt-elements-textPrimary-dark flex items-center gap-2 text-black">
+            <span className="i-ph:files h-4 w-4 text-purple-500" />
             <span className={compact ? 'text-xs' : 'text-sm'}>Total Files: {totalFiles.toLocaleString()}</span>
           </div>
         )}
 
         {totalSize !== undefined && (
-          <div className="flex items-center gap-2 text-bolt-elements-textPrimary dark:text-bolt-elements-textPrimary-dark">
-            <span className="i-ph:database text-purple-500 w-4 h-4" />
+          <div className="dark:text-bolt-elements-textPrimary-dark flex items-center gap-2 text-black">
+            <span className="i-ph:database h-4 w-4 text-purple-500" />
             <span className={compact ? 'text-xs' : 'text-sm'}>Total Size: {formatSize(totalSize)}</span>
           </div>
         )}
@@ -44,8 +44,8 @@ export function RepositoryStats({ stats, className, compact = false }: Repositor
 
       {languages && Object.keys(languages).length > 0 && (
         <div className={compact ? 'pt-1' : 'pt-2'}>
-          <div className="flex items-center gap-2 text-bolt-elements-textPrimary dark:text-bolt-elements-textPrimary-dark mb-2">
-            <span className="i-ph:code text-purple-500 w-4 h-4" />
+          <div className="dark:text-bolt-elements-textPrimary-dark mb-2 flex items-center gap-2 text-black">
+            <span className="i-ph:code h-4 w-4 text-purple-500" />
             <span className={compact ? 'text-xs' : 'text-sm'}>Languages:</span>
           </div>
           <div className="flex flex-wrap gap-2">

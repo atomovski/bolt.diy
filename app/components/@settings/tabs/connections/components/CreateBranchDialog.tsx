@@ -1,6 +1,6 @@
 import { useState } from 'react';
 import * as Dialog from '@radix-ui/react-dialog';
-import { classNames } from '~/utils/classNames';
+import { cn } from '~/utils/cn';
 import type { GitHubRepoInfo } from '~/components/@settings/tabs/connections/types/GitHub';
 import { GitBranch } from '@phosphor-icons/react';
 
@@ -33,21 +33,22 @@ export function CreateBranchDialog({ isOpen, onClose, onConfirm, repository, bra
       <Dialog.Portal>
         <Dialog.Overlay className="fixed inset-0 bg-black/50 dark:bg-black/80" />
         <Dialog.Content
-          className={classNames(
+          className={cn(
             'fixed top-[50%] left-[50%] translate-x-[-50%] translate-y-[-50%]',
-            'w-full max-w-md p-6 rounded-xl shadow-lg',
+            'w-full max-w-md rounded-xl p-6 shadow-lg',
             'bg-white dark:bg-[#0A0A0A]',
             'border border-[#E5E5E5] dark:border-[#1A1A1A]',
           )}
         >
-          <Dialog.Title className="text-lg font-medium text-bolt-elements-textPrimary mb-4">
-            Create New Branch
-          </Dialog.Title>
+          <Dialog.Title className="mb-4 text-lg font-medium text-black">Create New Branch</Dialog.Title>
 
           <form onSubmit={handleSubmit}>
             <div className="space-y-4">
               <div>
-                <label htmlFor="branchName" className="block text-sm font-medium text-bolt-elements-textSecondary mb-2">
+                <label
+                  htmlFor="branchName"
+                  className="text-bolt-elements-text-secondary mb-2 block text-sm font-medium"
+                >
                   Branch Name
                 </label>
                 <input
@@ -56,12 +57,12 @@ export function CreateBranchDialog({ isOpen, onClose, onConfirm, repository, bra
                   value={branchName}
                   onChange={(e) => setBranchName(e.target.value)}
                   placeholder="feature/my-new-branch"
-                  className={classNames(
-                    'w-full px-3 py-2 rounded-lg',
+                  className={cn(
+                    'w-full rounded-lg px-3 py-2',
                     'bg-[#F5F5F5] dark:bg-[#1A1A1A]',
                     'border border-[#E5E5E5] dark:border-[#1A1A1A]',
-                    'text-bolt-elements-textPrimary placeholder:text-bolt-elements-textTertiary',
-                    'focus:outline-none focus:ring-2 focus:ring-purple-500/50',
+                    'placeholder:text-bolt-elements-text-tertiary text-black',
+                    'focus:ring-2 focus:ring-purple-500/50 focus:outline-hidden',
                   )}
                   required
                 />
@@ -70,7 +71,7 @@ export function CreateBranchDialog({ isOpen, onClose, onConfirm, repository, bra
               <div>
                 <label
                   htmlFor="sourceBranch"
-                  className="block text-sm font-medium text-bolt-elements-textSecondary mb-2"
+                  className="text-bolt-elements-text-secondary mb-2 block text-sm font-medium"
                 >
                   Source Branch
                 </label>
@@ -78,12 +79,12 @@ export function CreateBranchDialog({ isOpen, onClose, onConfirm, repository, bra
                   id="sourceBranch"
                   value={sourceBranch}
                   onChange={(e) => setSourceBranch(e.target.value)}
-                  className={classNames(
-                    'w-full px-3 py-2 rounded-lg',
+                  className={cn(
+                    'w-full rounded-lg px-3 py-2',
                     'bg-[#F5F5F5] dark:bg-[#1A1A1A]',
                     'border border-[#E5E5E5] dark:border-[#1A1A1A]',
-                    'text-bolt-elements-textPrimary',
-                    'focus:outline-none focus:ring-2 focus:ring-purple-500/50',
+                    'text-black',
+                    'focus:ring-2 focus:ring-purple-500/50 focus:outline-hidden',
                   )}
                 >
                   {branches?.map((branch) => (
@@ -94,9 +95,9 @@ export function CreateBranchDialog({ isOpen, onClose, onConfirm, repository, bra
                 </select>
               </div>
 
-              <div className="mt-4 p-3 bg-[#F5F5F5] dark:bg-[#1A1A1A] rounded-lg">
-                <h4 className="text-sm font-medium text-bolt-elements-textSecondary mb-2">Branch Overview</h4>
-                <ul className="space-y-2 text-sm text-bolt-elements-textSecondary">
+              <div className="mt-4 rounded-lg bg-[#F5F5F5] p-3 dark:bg-[#1A1A1A]">
+                <h4 className="text-bolt-elements-text-secondary mb-2 text-sm font-medium">Branch Overview</h4>
+                <ul className="text-bolt-elements-text-secondary space-y-2 text-sm">
                   <li className="flex items-center gap-2">
                     <GitBranch className="text-lg" />
                     Repository: {repository.name}
@@ -119,9 +120,9 @@ export function CreateBranchDialog({ isOpen, onClose, onConfirm, repository, bra
               <button
                 type="button"
                 onClick={onClose}
-                className={classNames(
-                  'px-4 py-2 rounded-lg text-sm font-medium',
-                  'text-bolt-elements-textPrimary',
+                className={cn(
+                  'rounded-lg px-4 py-2 text-sm font-medium',
+                  'text-black',
                   'bg-[#F5F5F5] dark:bg-[#1A1A1A]',
                   'hover:bg-purple-500/10 hover:text-purple-500',
                   'dark:hover:bg-purple-500/20 dark:hover:text-purple-500',
@@ -132,9 +133,9 @@ export function CreateBranchDialog({ isOpen, onClose, onConfirm, repository, bra
               </button>
               <button
                 type="submit"
-                className={classNames(
-                  'px-4 py-2 rounded-lg text-sm font-medium',
-                  'text-white bg-purple-500',
+                className={cn(
+                  'rounded-lg px-4 py-2 text-sm font-medium',
+                  'bg-purple-500 text-white',
                   'hover:bg-purple-600',
                   'transition-colors',
                 )}

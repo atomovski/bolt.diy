@@ -4,12 +4,13 @@ import { netlifyConnection } from '~/lib/stores/netlify';
 import { vercelConnection } from '~/lib/stores/vercel';
 import { workbenchStore } from '~/lib/stores/workbench';
 import { streamingState } from '~/lib/stores/streaming';
-import { classNames } from '~/utils/classNames';
+import { cn } from '~/utils/cn';
 import { useState } from 'react';
 import { NetlifyDeploymentLink } from '~/components/chat/NetlifyDeploymentLink.client';
 import { VercelDeploymentLink } from '~/components/chat/VercelDeploymentLink.client';
 import { useVercelDeploy } from '~/components/deploy/VercelDeploy.client';
 import { useNetlifyDeploy } from '~/components/deploy/NetlifyDeploy.client';
+import { Button, Icon } from '~/components/ui';
 
 interface DeployButtonProps {
   onVercelDeploy?: () => Promise<void>;
@@ -61,21 +62,20 @@ export const DeployButton = ({ onVercelDeploy, onNetlifyDeploy }: DeployButtonPr
   };
 
   return (
-    <div className="flex border border-bolt-elements-borderColor rounded-md overflow-hidden text-sm">
+    <div>
       <DropdownMenu.Root>
-        <DropdownMenu.Trigger
-          disabled={isDeploying || !activePreview || isStreaming}
-          className="rounded-md items-center justify-center [&:is(:disabled,.disabled)]:cursor-not-allowed [&:is(:disabled,.disabled)]:opacity-60 px-3 py-1.5 text-xs bg-accent-500 text-white hover:text-bolt-elements-item-contentAccent [&:not(:disabled,.disabled)]:hover:bg-bolt-elements-button-primary-backgroundHover outline-accent-500 flex gap-1.7"
-        >
-          {isDeploying ? `Deploying to ${deployingTo}...` : 'Deploy'}
-          <span className={classNames('i-ph:caret-down transition-transform')} />
+        <DropdownMenu.Trigger disabled={isDeploying || !activePreview || isStreaming} asChild>
+          <Button variant="primary" size="sm" className="flex items-center gap-1">
+            {isDeploying ? `Deploying to ${deployingTo}...` : 'Deploy'}
+            <Icon.NavArrowDown />
+          </Button>
         </DropdownMenu.Trigger>
         <DropdownMenu.Content
-          className={classNames(
-            'z-[250]',
+          className={cn(
+            'z-250',
             'bg-bolt-elements-background-depth-2',
             'rounded-lg shadow-lg',
-            'border border-bolt-elements-borderColor',
+            'border-bolt-elements-border-color border',
             'animate-in fade-in-0 zoom-in-95',
             'py-1',
           )}
@@ -83,17 +83,17 @@ export const DeployButton = ({ onVercelDeploy, onNetlifyDeploy }: DeployButtonPr
           align="end"
         >
           <DropdownMenu.Item
-            className={classNames(
-              'cursor-pointer flex items-center w-full px-4 py-2 text-sm text-bolt-elements-textPrimary hover:bg-bolt-elements-item-backgroundActive gap-2 rounded-md group relative',
+            className={cn(
+              'hover:bg-bolt-elements-item-backgroundActive group relative flex w-full cursor-pointer items-center gap-2 rounded-md px-4 py-2 text-sm text-black',
               {
-                'opacity-60 cursor-not-allowed': isDeploying || !activePreview || !netlifyConn.user,
+                'cursor-not-allowed opacity-60': isDeploying || !activePreview || !netlifyConn.user,
               },
             )}
             disabled={isDeploying || !activePreview || !netlifyConn.user}
             onClick={handleNetlifyDeployClick}
           >
             <img
-              className="w-5 h-5"
+              className="h-5 w-5"
               height="24"
               width="24"
               crossOrigin="anonymous"
@@ -104,17 +104,17 @@ export const DeployButton = ({ onVercelDeploy, onNetlifyDeploy }: DeployButtonPr
           </DropdownMenu.Item>
 
           <DropdownMenu.Item
-            className={classNames(
-              'cursor-pointer flex items-center w-full px-4 py-2 text-sm text-bolt-elements-textPrimary hover:bg-bolt-elements-item-backgroundActive gap-2 rounded-md group relative',
+            className={cn(
+              'hover:bg-bolt-elements-item-backgroundActive group relative flex w-full cursor-pointer items-center gap-2 rounded-md px-4 py-2 text-sm text-black',
               {
-                'opacity-60 cursor-not-allowed': isDeploying || !activePreview || !vercelConn.user,
+                'cursor-not-allowed opacity-60': isDeploying || !activePreview || !vercelConn.user,
               },
             )}
             disabled={isDeploying || !activePreview || !vercelConn.user}
             onClick={handleVercelDeployClick}
           >
             <img
-              className="w-5 h-5 bg-black p-1 rounded"
+              className="h-5 w-5 rounded-sm bg-black p-1"
               height="24"
               width="24"
               crossOrigin="anonymous"
@@ -127,10 +127,10 @@ export const DeployButton = ({ onVercelDeploy, onNetlifyDeploy }: DeployButtonPr
 
           <DropdownMenu.Item
             disabled
-            className="flex items-center w-full rounded-md px-4 py-2 text-sm text-bolt-elements-textTertiary gap-2 opacity-60 cursor-not-allowed"
+            className="text-bolt-elements-text-tertiary flex w-full cursor-not-allowed items-center gap-2 rounded-md px-4 py-2 text-sm opacity-60"
           >
             <img
-              className="w-5 h-5"
+              className="h-5 w-5"
               height="24"
               width="24"
               crossOrigin="anonymous"

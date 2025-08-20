@@ -1,6 +1,5 @@
 import { defineConfig } from 'vite';
 import { vitePlugin as remixVitePlugin } from '@remix-run/dev';
-import UnoCSS from 'unocss/vite';
 import { nodePolyfills } from 'vite-plugin-node-polyfills';
 import { optimizeCssModules } from 'vite-plugin-optimize-css-modules';
 import tsconfigPaths from 'vite-tsconfig-paths';
@@ -38,7 +37,6 @@ export default defineConfig((config) => {
         },
         serverModuleFormat: 'esm',
       }),
-      UnoCSS(),
       tsconfigPaths(),
       config.mode === 'production' && optimizeCssModules({ apply: 'build' }),
       {

@@ -86,25 +86,25 @@ export const APIKeyManager: React.FC<APIKeyManagerProps> = ({ provider, apiKey, 
   };
 
   return (
-    <div className="flex items-center justify-between py-3 px-1">
-      <div className="flex items-center gap-2 flex-1">
+    <div className="flex items-center justify-between px-1 py-3">
+      <div className="flex flex-1 items-center gap-2">
         <div className="flex items-center gap-2">
-          <span className="text-sm font-medium text-bolt-elements-textSecondary">{provider?.name} API Key:</span>
+          <span className="text-bolt-elements-text-secondary text-sm font-medium">{provider?.name} API Key:</span>
           {!isEditing && (
             <div className="flex items-center gap-2">
               {apiKey ? (
                 <>
-                  <div className="i-ph:check-circle-fill text-green-500 w-4 h-4" />
+                  <div className="i-ph:check-circle-fill h-4 w-4 text-green-500" />
                   <span className="text-xs text-green-500">Set via UI</span>
                 </>
               ) : isEnvKeySet ? (
                 <>
-                  <div className="i-ph:check-circle-fill text-green-500 w-4 h-4" />
+                  <div className="i-ph:check-circle-fill h-4 w-4 text-green-500" />
                   <span className="text-xs text-green-500">Set via environment variable</span>
                 </>
               ) : (
                 <>
-                  <div className="i-ph:x-circle-fill text-red-500 w-4 h-4" />
+                  <div className="i-ph:x-circle-fill h-4 w-4 text-red-500" />
                   <span className="text-xs text-red-500">Not Set (Please set via UI or ENV_VAR)</span>
                 </>
               )}
@@ -113,7 +113,7 @@ export const APIKeyManager: React.FC<APIKeyManagerProps> = ({ provider, apiKey, 
         </div>
       </div>
 
-      <div className="flex items-center gap-2 shrink-0">
+      <div className="flex shrink-0 items-center gap-2">
         {isEditing ? (
           <div className="flex items-center gap-2">
             <input
@@ -121,23 +121,21 @@ export const APIKeyManager: React.FC<APIKeyManagerProps> = ({ provider, apiKey, 
               value={tempKey}
               placeholder="Enter API Key"
               onChange={(e) => setTempKey(e.target.value)}
-              className="w-[300px] px-3 py-1.5 text-sm rounded border border-bolt-elements-borderColor 
-                        bg-bolt-elements-prompt-background text-bolt-elements-textPrimary 
-                        focus:outline-none focus:ring-2 focus:ring-bolt-elements-focus"
+              className="border-bolt-elements-border-color bg-bolt-elements-prompt-background focus:ring-bolt-elements-focus w-[300px] rounded border px-3 py-1.5 text-sm text-black focus:ring-2 focus:outline-hidden"
             />
             <IconButton
               onClick={handleSave}
               title="Save API Key"
-              className="bg-green-500/10 hover:bg-green-500/20 text-green-500"
+              className="bg-green-500/10 text-green-500 hover:bg-green-500/20"
             >
-              <div className="i-ph:check w-4 h-4" />
+              <div className="i-ph:check h-4 w-4" />
             </IconButton>
             <IconButton
               onClick={() => setIsEditing(false)}
               title="Cancel"
-              className="bg-red-500/10 hover:bg-red-500/20 text-red-500"
+              className="bg-red-500/10 text-red-500 hover:bg-red-500/20"
             >
-              <div className="i-ph:x w-4 h-4" />
+              <div className="i-ph:x h-4 w-4" />
             </IconButton>
           </div>
         ) : (
@@ -146,19 +144,19 @@ export const APIKeyManager: React.FC<APIKeyManagerProps> = ({ provider, apiKey, 
               <IconButton
                 onClick={() => setIsEditing(true)}
                 title="Edit API Key"
-                className="bg-blue-500/10 hover:bg-blue-500/20 text-blue-500"
+                className="bg-blue-500/10 text-blue-500 hover:bg-blue-500/20"
               >
-                <div className="i-ph:pencil-simple w-4 h-4" />
+                <div className="i-ph:pencil-simple h-4 w-4" />
               </IconButton>
             }
             {provider?.getApiKeyLink && !apiKey && (
               <IconButton
                 onClick={() => window.open(provider?.getApiKeyLink)}
                 title="Get API Key"
-                className="bg-purple-500/10 hover:bg-purple-500/20 text-purple-500 flex items-center gap-2"
+                className="flex items-center gap-2 bg-purple-500/10 text-purple-500 hover:bg-purple-500/20"
               >
                 <span className="text-xs whitespace-nowrap">{provider?.labelForGetApiKey || 'Get API Key'}</span>
-                <div className={`${provider?.icon || 'i-ph:key'} w-4 h-4`} />
+                <div className={`${provider?.icon || 'i-ph:key'} h-4 w-4`} />
               </IconButton>
             )}
           </>
