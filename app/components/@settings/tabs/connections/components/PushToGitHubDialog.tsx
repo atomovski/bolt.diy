@@ -6,7 +6,7 @@ import { Octokit } from '@octokit/rest';
 
 // Internal imports
 import { getLocalStorage } from '~/lib/persistence';
-import { classNames } from '~/utils/classNames';
+import { cn } from '~/utils/cn';
 import type { GitHubUserResponse } from '~/types/GitHub';
 import { logStore } from '~/lib/stores/logs';
 import { workbenchStore } from '~/lib/stores/workbench';
@@ -271,32 +271,32 @@ export function PushToGitHubDialog({ isOpen, onClose, onPush }: PushToGitHubDial
     return (
       <Dialog.Root open={isOpen} onOpenChange={(open) => !open && handleClose()}>
         <Dialog.Portal>
-          <Dialog.Overlay className="fixed inset-0 bg-black/50 backdrop-blur-sm z-[9999]" />
-          <div className="fixed inset-0 flex items-center justify-center z-[9999]">
+          <Dialog.Overlay className="fixed inset-0 z-9999 bg-black/50 backdrop-blur-xs" />
+          <div className="fixed inset-0 z-9999 flex items-center justify-center">
             <motion.div
               initial={{ opacity: 0, scale: 0.95 }}
               animate={{ opacity: 1, scale: 1 }}
               exit={{ opacity: 0, scale: 0.95 }}
               transition={{ duration: 0.2 }}
-              className="w-[90vw] md:w-[600px] max-h-[85vh] overflow-y-auto"
+              className="max-h-[85vh] w-[90vw] overflow-y-auto md:w-[600px]"
             >
               <Dialog.Content
-                className="bg-white dark:bg-bolt-elements-background-depth-1 rounded-lg border border-bolt-elements-borderColor dark:border-bolt-elements-borderColor-dark shadow-xl"
+                className="dark:bg-bolt-elements-background-depth-1 border-bolt-elements-border-color dark:border-bolt-elements-borderColor-dark rounded-lg border bg-white shadow-xl"
                 aria-describedby="success-dialog-description"
               >
-                <div className="p-6 space-y-4">
+                <div className="space-y-4 p-6">
                   <div className="flex items-center justify-between">
                     <div className="flex items-center gap-3">
-                      <div className="w-10 h-10 rounded-xl bg-green-500/10 flex items-center justify-center text-green-500">
-                        <div className="i-ph:check-circle w-5 h-5" />
+                      <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-green-500/10 text-green-500">
+                        <div className="i-ph:check-circle h-5 w-5" />
                       </div>
                       <div>
-                        <h3 className="text-lg font-medium text-bolt-elements-textPrimary dark:text-bolt-elements-textPrimary-dark">
+                        <h3 className="dark:text-bolt-elements-textPrimary-dark text-lg font-medium text-black">
                           Successfully pushed to GitHub
                         </h3>
                         <p
                           id="success-dialog-description"
-                          className="text-sm text-bolt-elements-textSecondary dark:text-bolt-elements-textSecondary-dark"
+                          className="text-bolt-elements-text-secondary dark:text-bolt-elements-textSecondary-dark text-sm"
                         >
                           Your code is now available on GitHub
                         </p>
@@ -305,21 +305,21 @@ export function PushToGitHubDialog({ isOpen, onClose, onPush }: PushToGitHubDial
                     <Dialog.Close asChild>
                       <button
                         onClick={handleClose}
-                        className="p-2 rounded-lg transition-all duration-200 ease-in-out bg-transparent text-bolt-elements-textTertiary hover:text-bolt-elements-textPrimary dark:text-bolt-elements-textTertiary-dark dark:hover:text-bolt-elements-textPrimary-dark hover:bg-bolt-elements-background-depth-2 dark:hover:bg-bolt-elements-background-depth-3 focus:outline-none focus:ring-2 focus:ring-bolt-elements-borderColor dark:focus:ring-bolt-elements-borderColor-dark"
+                        className="text-bolt-elements-text-tertiary dark:text-bolt-elements-textTertiary-dark dark:hover:text-bolt-elements-textPrimary-dark hover:bg-bolt-elements-background-depth-2 dark:hover:bg-darken-50 focus:ring-bolt-elements-border-color dark:focus:ring-bolt-elements-borderColor-dark rounded-lg bg-transparent p-2 transition-all duration-200 ease-in-out hover:text-black focus:ring-2 focus:outline-hidden"
                       >
-                        <span className="i-ph:x block w-5 h-5" aria-hidden="true" />
+                        <span className="i-ph:x block h-5 w-5" aria-hidden="true" />
                         <span className="sr-only">Close dialog</span>
                       </button>
                     </Dialog.Close>
                   </div>
 
-                  <div className="bg-bolt-elements-background-depth-2 dark:bg-bolt-elements-background-depth-3 rounded-lg p-4 text-left border border-bolt-elements-borderColor dark:border-bolt-elements-borderColor-dark">
-                    <p className="text-sm font-medium text-bolt-elements-textPrimary dark:text-bolt-elements-textPrimary-dark mb-2 flex items-center gap-2">
-                      <span className="i-ph:github-logo w-4 h-4 text-purple-500" />
+                  <div className="bg-bolt-elements-background-depth-2 dark:bg-darken-50 border-bolt-elements-border-color dark:border-bolt-elements-borderColor-dark rounded-lg border p-4 text-left">
+                    <p className="dark:text-bolt-elements-textPrimary-dark mb-2 flex items-center gap-2 text-sm font-medium text-black">
+                      <span className="i-ph:github-logo h-4 w-4 text-purple-500" />
                       Repository URL
                     </p>
                     <div className="flex items-center gap-2">
-                      <code className="flex-1 text-sm bg-bolt-elements-background-depth-1 dark:bg-bolt-elements-background-depth-4 px-3 py-2 rounded border border-bolt-elements-borderColor dark:border-bolt-elements-borderColor-dark text-bolt-elements-textPrimary dark:text-bolt-elements-textPrimary-dark font-mono">
+                      <code className="bg-bolt-elements-background-depth-1 dark:bg-bolt-elements-background-depth-4 border-bolt-elements-border-color dark:border-bolt-elements-borderColor-dark dark:text-bolt-elements-textPrimary-dark flex-1 rounded-sm border px-3 py-2 font-mono text-sm text-black">
                         {createdRepoUrl}
                       </code>
                       <motion.button
@@ -327,28 +327,28 @@ export function PushToGitHubDialog({ isOpen, onClose, onPush }: PushToGitHubDial
                           navigator.clipboard.writeText(createdRepoUrl);
                           toast.success('URL copied to clipboard');
                         }}
-                        className="p-2 text-bolt-elements-textSecondary hover:text-bolt-elements-textPrimary dark:text-bolt-elements-textSecondary-dark dark:hover:text-bolt-elements-textPrimary-dark bg-bolt-elements-background-depth-1 dark:bg-bolt-elements-background-depth-4 rounded-lg border border-bolt-elements-borderColor dark:border-bolt-elements-borderColor-dark"
+                        className="text-bolt-elements-text-secondary dark:text-bolt-elements-textSecondary-dark dark:hover:text-bolt-elements-textPrimary-dark bg-bolt-elements-background-depth-1 dark:bg-bolt-elements-background-depth-4 border-bolt-elements-border-color dark:border-bolt-elements-borderColor-dark rounded-lg border p-2 hover:text-black"
                         whileHover={{ scale: 1.05 }}
                         whileTap={{ scale: 0.95 }}
                       >
-                        <div className="i-ph:copy w-4 h-4" />
+                        <div className="i-ph:copy h-4 w-4" />
                       </motion.button>
                     </div>
                   </div>
 
-                  <div className="bg-bolt-elements-background-depth-2 dark:bg-bolt-elements-background-depth-3 rounded-lg p-4 border border-bolt-elements-borderColor dark:border-bolt-elements-borderColor-dark">
-                    <p className="text-sm font-medium text-bolt-elements-textPrimary dark:text-bolt-elements-textPrimary-dark mb-2 flex items-center gap-2">
-                      <span className="i-ph:files w-4 h-4 text-purple-500" />
+                  <div className="bg-bolt-elements-background-depth-2 dark:bg-darken-50 border-bolt-elements-border-color dark:border-bolt-elements-borderColor-dark rounded-lg border p-4">
+                    <p className="dark:text-bolt-elements-textPrimary-dark mb-2 flex items-center gap-2 text-sm font-medium text-black">
+                      <span className="i-ph:files h-4 w-4 text-purple-500" />
                       Pushed Files ({pushedFiles.length})
                     </p>
-                    <div className="max-h-[200px] overflow-y-auto custom-scrollbar pr-2">
+                    <div className="custom-scrollbar max-h-[200px] overflow-y-auto pr-2">
                       {pushedFiles.map((file) => (
                         <div
                           key={file.path}
-                          className="flex items-center justify-between py-1.5 text-sm text-bolt-elements-textPrimary dark:text-bolt-elements-textPrimary-dark border-b border-bolt-elements-borderColor/30 dark:border-bolt-elements-borderColor-dark/30 last:border-0"
+                          className="dark:text-bolt-elements-textPrimary-dark border-bolt-elements-border-color/30 dark:border-bolt-elements-borderColor-dark/30 flex items-center justify-between border-b py-1.5 text-sm text-black last:border-0"
                         >
-                          <span className="font-mono truncate flex-1 text-xs">{file.path}</span>
-                          <span className="text-xs px-2 py-0.5 rounded-full bg-bolt-elements-background-depth-3 dark:bg-bolt-elements-background-depth-4 text-bolt-elements-textSecondary dark:text-bolt-elements-textSecondary-dark ml-2">
+                          <span className="flex-1 truncate font-mono text-xs">{file.path}</span>
+                          <span className="bg-darken-50 dark:bg-bolt-elements-background-depth-4 text-bolt-elements-text-secondary dark:text-bolt-elements-textSecondary-dark ml-2 rounded-full px-2 py-0.5 text-xs">
                             {formatSize(file.size)}
                           </span>
                         </div>
@@ -361,11 +361,11 @@ export function PushToGitHubDialog({ isOpen, onClose, onPush }: PushToGitHubDial
                       href={createdRepoUrl}
                       target="_blank"
                       rel="noopener noreferrer"
-                      className="px-4 py-2 rounded-lg bg-purple-500 text-white hover:bg-purple-600 text-sm inline-flex items-center gap-2"
+                      className="inline-flex items-center gap-2 rounded-lg bg-purple-500 px-4 py-2 text-sm text-white hover:bg-purple-600"
                       whileHover={{ scale: 1.02 }}
                       whileTap={{ scale: 0.98 }}
                     >
-                      <div className="i-ph:github-logo w-4 h-4" />
+                      <div className="i-ph:github-logo h-4 w-4" />
                       View Repository
                     </motion.a>
                     <motion.button
@@ -373,16 +373,16 @@ export function PushToGitHubDialog({ isOpen, onClose, onPush }: PushToGitHubDial
                         navigator.clipboard.writeText(createdRepoUrl);
                         toast.success('URL copied to clipboard');
                       }}
-                      className="px-4 py-2 rounded-lg bg-bolt-elements-background-depth-2 dark:bg-bolt-elements-background-depth-3 text-bolt-elements-textSecondary dark:text-bolt-elements-textSecondary-dark hover:bg-bolt-elements-background-depth-3 dark:hover:bg-bolt-elements-background-depth-4 text-sm inline-flex items-center gap-2 border border-bolt-elements-borderColor dark:border-bolt-elements-borderColor-dark"
+                      className="bg-bolt-elements-background-depth-2 dark:bg-darken-50 text-bolt-elements-text-secondary dark:text-bolt-elements-textSecondary-dark hover:bg-darken-50 dark:hover:bg-bolt-elements-background-depth-4 border-bolt-elements-border-color dark:border-bolt-elements-borderColor-dark inline-flex items-center gap-2 rounded-lg border px-4 py-2 text-sm"
                       whileHover={{ scale: 1.02 }}
                       whileTap={{ scale: 0.98 }}
                     >
-                      <div className="i-ph:copy w-4 h-4" />
+                      <div className="i-ph:copy h-4 w-4" />
                       Copy URL
                     </motion.button>
                     <motion.button
                       onClick={handleClose}
-                      className="px-4 py-2 rounded-lg bg-bolt-elements-background-depth-2 dark:bg-bolt-elements-background-depth-3 text-bolt-elements-textSecondary dark:text-bolt-elements-textSecondary-dark hover:bg-bolt-elements-background-depth-3 dark:hover:bg-bolt-elements-background-depth-4 text-sm border border-bolt-elements-borderColor dark:border-bolt-elements-borderColor-dark"
+                      className="bg-bolt-elements-background-depth-2 dark:bg-darken-50 text-bolt-elements-text-secondary dark:text-bolt-elements-textSecondary-dark hover:bg-darken-50 dark:hover:bg-bolt-elements-background-depth-4 border-bolt-elements-border-color dark:border-bolt-elements-borderColor-dark rounded-lg border px-4 py-2 text-sm"
                       whileHover={{ scale: 1.02 }}
                       whileTap={{ scale: 0.98 }}
                     >
@@ -402,8 +402,8 @@ export function PushToGitHubDialog({ isOpen, onClose, onPush }: PushToGitHubDial
     return (
       <Dialog.Root open={isOpen} onOpenChange={(open) => !open && handleClose()}>
         <Dialog.Portal>
-          <Dialog.Overlay className="fixed inset-0 bg-black/50 backdrop-blur-sm z-[9999]" />
-          <div className="fixed inset-0 flex items-center justify-center z-[9999]">
+          <Dialog.Overlay className="fixed inset-0 z-9999 bg-black/50 backdrop-blur-xs" />
+          <div className="fixed inset-0 z-9999 flex items-center justify-center">
             <motion.div
               initial={{ opacity: 0, scale: 0.95 }}
               animate={{ opacity: 1, scale: 1 }}
@@ -412,16 +412,16 @@ export function PushToGitHubDialog({ isOpen, onClose, onPush }: PushToGitHubDial
               className="w-[90vw] md:w-[500px]"
             >
               <Dialog.Content
-                className="bg-white dark:bg-bolt-elements-background-depth-1 rounded-lg p-6 border border-bolt-elements-borderColor dark:border-bolt-elements-borderColor-dark shadow-xl"
+                className="dark:bg-bolt-elements-background-depth-1 border-bolt-elements-border-color dark:border-bolt-elements-borderColor-dark rounded-lg border bg-white p-6 shadow-xl"
                 aria-describedby="connection-required-description"
               >
-                <div className="relative text-center space-y-4">
+                <div className="relative space-y-4 text-center">
                   <Dialog.Close asChild>
                     <button
                       onClick={handleClose}
-                      className="absolute right-0 top-0 p-2 rounded-lg transition-all duration-200 ease-in-out bg-transparent text-bolt-elements-textTertiary hover:text-bolt-elements-textPrimary dark:text-bolt-elements-textTertiary-dark dark:hover:text-bolt-elements-textPrimary-dark hover:bg-bolt-elements-background-depth-2 dark:hover:bg-bolt-elements-background-depth-3 focus:outline-none focus:ring-2 focus:ring-bolt-elements-borderColor dark:focus:ring-bolt-elements-borderColor-dark"
+                      className="text-bolt-elements-text-tertiary dark:text-bolt-elements-textTertiary-dark dark:hover:text-bolt-elements-textPrimary-dark hover:bg-bolt-elements-background-depth-2 dark:hover:bg-darken-50 focus:ring-bolt-elements-border-color dark:focus:ring-bolt-elements-borderColor-dark absolute top-0 right-0 rounded-lg bg-transparent p-2 transition-all duration-200 ease-in-out hover:text-black focus:ring-2 focus:outline-hidden"
                     >
-                      <span className="i-ph:x block w-5 h-5" aria-hidden="true" />
+                      <span className="i-ph:x block h-5 w-5" aria-hidden="true" />
                       <span className="sr-only">Close dialog</span>
                     </button>
                   </Dialog.Close>
@@ -429,23 +429,23 @@ export function PushToGitHubDialog({ isOpen, onClose, onPush }: PushToGitHubDial
                     initial={{ scale: 0.8 }}
                     animate={{ scale: 1 }}
                     transition={{ delay: 0.1 }}
-                    className="mx-auto w-16 h-16 rounded-xl bg-bolt-elements-background-depth-3 flex items-center justify-center text-purple-500"
+                    className="bg-darken-50 mx-auto flex h-16 w-16 items-center justify-center rounded-xl text-purple-500"
                   >
-                    <div className="i-ph:github-logo w-8 h-8" />
+                    <div className="i-ph:github-logo h-8 w-8" />
                   </motion.div>
-                  <h3 className="text-lg font-medium text-bolt-elements-textPrimary dark:text-bolt-elements-textPrimary-dark">
+                  <h3 className="dark:text-bolt-elements-textPrimary-dark text-lg font-medium text-black">
                     GitHub Connection Required
                   </h3>
                   <p
                     id="connection-required-description"
-                    className="text-sm text-bolt-elements-textSecondary dark:text-bolt-elements-textSecondary-dark max-w-md mx-auto"
+                    className="text-bolt-elements-text-secondary dark:text-bolt-elements-textSecondary-dark mx-auto max-w-md text-sm"
                   >
                     To push your code to GitHub, you need to connect your GitHub account in Settings {'>'} Connections
                     first.
                   </p>
-                  <div className="pt-2 flex justify-center gap-3">
+                  <div className="flex justify-center gap-3 pt-2">
                     <motion.button
-                      className="px-4 py-2 rounded-lg bg-bolt-elements-background-depth-2 dark:bg-bolt-elements-background-depth-3 text-bolt-elements-textSecondary dark:text-bolt-elements-textSecondary-dark text-sm hover:bg-bolt-elements-background-depth-3 dark:hover:bg-bolt-elements-background-depth-4 border border-bolt-elements-borderColor dark:border-bolt-elements-borderColor-dark"
+                      className="bg-bolt-elements-background-depth-2 dark:bg-darken-50 text-bolt-elements-text-secondary dark:text-bolt-elements-textSecondary-dark hover:bg-darken-50 dark:hover:bg-bolt-elements-background-depth-4 border-bolt-elements-border-color dark:border-bolt-elements-borderColor-dark rounded-lg border px-4 py-2 text-sm"
                       whileHover={{ scale: 1.02 }}
                       whileTap={{ scale: 0.98 }}
                       onClick={handleClose}
@@ -454,7 +454,7 @@ export function PushToGitHubDialog({ isOpen, onClose, onPush }: PushToGitHubDial
                     </motion.button>
                     <motion.a
                       href="/settings/connections"
-                      className="px-4 py-2 rounded-lg bg-purple-500 text-white text-sm hover:bg-purple-600 inline-flex items-center gap-2"
+                      className="inline-flex items-center gap-2 rounded-lg bg-purple-500 px-4 py-2 text-sm text-white hover:bg-purple-600"
                       whileHover={{ scale: 1.02 }}
                       whileTap={{ scale: 0.98 }}
                     >
@@ -474,8 +474,8 @@ export function PushToGitHubDialog({ isOpen, onClose, onPush }: PushToGitHubDial
   return (
     <Dialog.Root open={isOpen} onOpenChange={(open) => !open && handleClose()}>
       <Dialog.Portal>
-        <Dialog.Overlay className="fixed inset-0 bg-black/50 backdrop-blur-sm z-[9999]" />
-        <div className="fixed inset-0 flex items-center justify-center z-[9999]">
+        <Dialog.Overlay className="fixed inset-0 z-9999 bg-black/50 backdrop-blur-xs" />
+        <div className="fixed inset-0 z-9999 flex items-center justify-center">
           <motion.div
             initial={{ opacity: 0, scale: 0.95 }}
             animate={{ opacity: 1, scale: 1 }}
@@ -484,26 +484,26 @@ export function PushToGitHubDialog({ isOpen, onClose, onPush }: PushToGitHubDial
             className="w-[90vw] md:w-[500px]"
           >
             <Dialog.Content
-              className="bg-white dark:bg-bolt-elements-background-depth-1 rounded-lg border border-bolt-elements-borderColor dark:border-bolt-elements-borderColor-dark shadow-xl"
+              className="dark:bg-bolt-elements-background-depth-1 border-bolt-elements-border-color dark:border-bolt-elements-borderColor-dark rounded-lg border bg-white shadow-xl"
               aria-describedby="push-dialog-description"
             >
               <div className="p-6">
-                <div className="flex items-center gap-4 mb-6">
+                <div className="mb-6 flex items-center gap-4">
                   <motion.div
                     initial={{ scale: 0.8 }}
                     animate={{ scale: 1 }}
                     transition={{ delay: 0.1 }}
-                    className="w-10 h-10 rounded-xl bg-bolt-elements-background-depth-3 flex items-center justify-center text-purple-500"
+                    className="bg-darken-50 flex h-10 w-10 items-center justify-center rounded-xl text-purple-500"
                   >
-                    <div className="i-ph:github-logo w-5 h-5" />
+                    <div className="i-ph:github-logo h-5 w-5" />
                   </motion.div>
                   <div>
-                    <Dialog.Title className="text-lg font-medium text-bolt-elements-textPrimary dark:text-bolt-elements-textPrimary-dark">
+                    <Dialog.Title className="dark:text-bolt-elements-textPrimary-dark text-lg font-medium text-black">
                       Push to GitHub
                     </Dialog.Title>
                     <p
                       id="push-dialog-description"
-                      className="text-sm text-bolt-elements-textSecondary dark:text-bolt-elements-textSecondary-dark"
+                      className="text-bolt-elements-text-secondary dark:text-bolt-elements-textSecondary-dark text-sm"
                     >
                       Push your code to a new or existing GitHub repository
                     </p>
@@ -511,26 +511,26 @@ export function PushToGitHubDialog({ isOpen, onClose, onPush }: PushToGitHubDial
                   <Dialog.Close asChild>
                     <button
                       onClick={handleClose}
-                      className="ml-auto p-2 rounded-lg transition-all duration-200 ease-in-out bg-transparent text-bolt-elements-textTertiary hover:text-bolt-elements-textPrimary dark:text-bolt-elements-textTertiary-dark dark:hover:text-bolt-elements-textPrimary-dark hover:bg-bolt-elements-background-depth-2 dark:hover:bg-bolt-elements-background-depth-3 focus:outline-none focus:ring-2 focus:ring-bolt-elements-borderColor dark:focus:ring-bolt-elements-borderColor-dark"
+                      className="text-bolt-elements-text-tertiary dark:text-bolt-elements-textTertiary-dark dark:hover:text-bolt-elements-textPrimary-dark hover:bg-bolt-elements-background-depth-2 dark:hover:bg-darken-50 focus:ring-bolt-elements-border-color dark:focus:ring-bolt-elements-borderColor-dark ml-auto rounded-lg bg-transparent p-2 transition-all duration-200 ease-in-out hover:text-black focus:ring-2 focus:outline-hidden"
                     >
-                      <span className="i-ph:x block w-5 h-5" aria-hidden="true" />
+                      <span className="i-ph:x block h-5 w-5" aria-hidden="true" />
                       <span className="sr-only">Close dialog</span>
                     </button>
                   </Dialog.Close>
                 </div>
 
-                <div className="flex items-center gap-3 mb-6 p-4 bg-bolt-elements-background-depth-2 dark:bg-bolt-elements-background-depth-3 rounded-lg border border-bolt-elements-borderColor dark:border-bolt-elements-borderColor-dark">
+                <div className="bg-bolt-elements-background-depth-2 dark:bg-darken-50 border-bolt-elements-border-color dark:border-bolt-elements-borderColor-dark mb-6 flex items-center gap-3 rounded-lg border p-4">
                   <div className="relative">
-                    <img src={user.avatar_url} alt={user.login} className="w-10 h-10 rounded-full" />
-                    <div className="absolute -bottom-1 -right-1 w-5 h-5 rounded-full bg-purple-500 flex items-center justify-center text-white">
-                      <div className="i-ph:github-logo w-3 h-3" />
+                    <img src={user.avatar_url} alt={user.login} className="h-10 w-10 rounded-full" />
+                    <div className="absolute -right-1 -bottom-1 flex h-5 w-5 items-center justify-center rounded-full bg-purple-500 text-white">
+                      <div className="i-ph:github-logo h-3 w-3" />
                     </div>
                   </div>
                   <div>
-                    <p className="text-sm font-medium text-bolt-elements-textPrimary dark:text-bolt-elements-textPrimary-dark">
+                    <p className="dark:text-bolt-elements-textPrimary-dark text-sm font-medium text-black">
                       {user.name || user.login}
                     </p>
-                    <p className="text-sm text-bolt-elements-textSecondary dark:text-bolt-elements-textSecondary-dark">
+                    <p className="text-bolt-elements-text-secondary dark:text-bolt-elements-textSecondary-dark text-sm">
                       @{user.login}
                     </p>
                   </div>
@@ -540,13 +540,13 @@ export function PushToGitHubDialog({ isOpen, onClose, onPush }: PushToGitHubDial
                   <div className="space-y-2">
                     <label
                       htmlFor="repoName"
-                      className="text-sm text-bolt-elements-textSecondary dark:text-bolt-elements-textSecondary-dark"
+                      className="text-bolt-elements-text-secondary dark:text-bolt-elements-textSecondary-dark text-sm"
                     >
                       Repository Name
                     </label>
                     <div className="relative">
-                      <div className="absolute left-3 top-1/2 -translate-y-1/2 text-bolt-elements-textTertiary dark:text-bolt-elements-textTertiary-dark">
-                        <span className="i-ph:git-branch w-4 h-4" />
+                      <div className="text-bolt-elements-text-tertiary dark:text-bolt-elements-textTertiary-dark absolute top-1/2 left-3 -translate-y-1/2">
+                        <span className="i-ph:git-branch h-4 w-4" />
                       </div>
                       <input
                         id="repoName"
@@ -554,18 +554,18 @@ export function PushToGitHubDialog({ isOpen, onClose, onPush }: PushToGitHubDial
                         value={repoName}
                         onChange={(e) => setRepoName(e.target.value)}
                         placeholder="my-awesome-project"
-                        className="w-full pl-10 px-4 py-2 rounded-lg bg-bolt-elements-background-depth-2 dark:bg-bolt-elements-background-depth-3 border border-bolt-elements-borderColor dark:border-bolt-elements-borderColor-dark text-bolt-elements-textPrimary dark:text-bolt-elements-textPrimary-dark placeholder-bolt-elements-textTertiary dark:placeholder-bolt-elements-textTertiary-dark focus:outline-none focus:ring-2 focus:ring-purple-500"
+                        className="bg-bolt-elements-background-depth-2 dark:bg-darken-50 border-bolt-elements-border-color dark:border-bolt-elements-borderColor-dark dark:text-bolt-elements-textPrimary-dark placeholder-bolt-elements-text-tertiary dark:placeholder-bolt-elements-textTertiary-dark w-full rounded-lg border px-4 py-2 pl-10 text-black focus:ring-2 focus:ring-purple-500 focus:outline-hidden"
                         required
                       />
                     </div>
                   </div>
 
                   <div className="space-y-2">
-                    <div className="flex items-center justify-between mb-2">
-                      <label className="text-sm text-bolt-elements-textSecondary dark:text-bolt-elements-textSecondary-dark">
+                    <div className="mb-2 flex items-center justify-between">
+                      <label className="text-bolt-elements-text-secondary dark:text-bolt-elements-textSecondary-dark text-sm">
                         Recent Repositories
                       </label>
-                      <span className="text-xs text-bolt-elements-textTertiary dark:text-bolt-elements-textTertiary-dark">
+                      <span className="text-bolt-elements-text-tertiary dark:text-bolt-elements-textTertiary-dark text-xs">
                         {filteredRepos.length} of {recentRepos.length}
                       </span>
                     </div>
@@ -576,7 +576,7 @@ export function PushToGitHubDialog({ isOpen, onClose, onPush }: PushToGitHubDial
                         value={repoSearchQuery}
                         onChange={(e) => setRepoSearchQuery(e.target.value)}
                         onClear={() => setRepoSearchQuery('')}
-                        className="bg-bolt-elements-background-depth-2 dark:bg-bolt-elements-background-depth-3 border border-bolt-elements-borderColor dark:border-bolt-elements-borderColor-dark text-sm"
+                        className="bg-bolt-elements-background-depth-2 dark:bg-darken-50 border-bolt-elements-border-color dark:border-bolt-elements-borderColor-dark border text-sm"
                       />
                     </div>
 
@@ -588,7 +588,7 @@ export function PushToGitHubDialog({ isOpen, onClose, onPush }: PushToGitHubDial
                         variant="compact"
                       />
                     ) : (
-                      <div className="space-y-2 max-h-[200px] overflow-y-auto pr-2 custom-scrollbar">
+                      <div className="custom-scrollbar max-h-[200px] space-y-2 overflow-y-auto pr-2">
                         {filteredRepos.length === 0 && repoSearchQuery.trim() !== '' ? (
                           <EmptyState
                             icon="i-ph:magnifying-glass"
@@ -602,14 +602,14 @@ export function PushToGitHubDialog({ isOpen, onClose, onPush }: PushToGitHubDial
                               key={repo.full_name}
                               type="button"
                               onClick={() => setRepoName(repo.name)}
-                              className="w-full p-3 text-left rounded-lg bg-bolt-elements-background-depth-2 dark:bg-bolt-elements-background-depth-3 hover:bg-bolt-elements-background-depth-3 dark:hover:bg-bolt-elements-background-depth-4 transition-colors group border border-bolt-elements-borderColor dark:border-bolt-elements-borderColor-dark hover:border-purple-500/30"
+                              className="bg-bolt-elements-background-depth-2 dark:bg-darken-50 hover:bg-darken-50 dark:hover:bg-bolt-elements-background-depth-4 group border-bolt-elements-border-color dark:border-bolt-elements-borderColor-dark w-full rounded-lg border p-3 text-left transition-colors hover:border-purple-500/30"
                               whileHover={{ scale: 1.01 }}
                               whileTap={{ scale: 0.99 }}
                             >
                               <div className="flex items-center justify-between">
                                 <div className="flex items-center gap-2">
-                                  <div className="i-ph:git-branch w-4 h-4 text-purple-500" />
-                                  <span className="text-sm font-medium text-bolt-elements-textPrimary dark:text-bolt-elements-textPrimary-dark group-hover:text-purple-500">
+                                  <div className="i-ph:git-branch h-4 w-4 text-purple-500" />
+                                  <span className="dark:text-bolt-elements-textPrimary-dark text-sm font-medium text-black group-hover:text-purple-500">
                                     {repo.name}
                                   </span>
                                 </div>
@@ -620,11 +620,11 @@ export function PushToGitHubDialog({ isOpen, onClose, onPush }: PushToGitHubDial
                                 )}
                               </div>
                               {repo.description && (
-                                <p className="mt-1 text-xs text-bolt-elements-textSecondary dark:text-bolt-elements-textSecondary-dark line-clamp-2">
+                                <p className="text-bolt-elements-text-secondary dark:text-bolt-elements-textSecondary-dark mt-1 line-clamp-2 text-xs">
                                   {repo.description}
                                 </p>
                               )}
-                              <div className="mt-2 flex items-center gap-2 flex-wrap">
+                              <div className="mt-2 flex flex-wrap items-center gap-2">
                                 {repo.language && (
                                   <Badge variant="subtle" size="sm" icon="i-ph:code w-3 h-3">
                                     {repo.language}
@@ -652,32 +652,29 @@ export function PushToGitHubDialog({ isOpen, onClose, onPush }: PushToGitHubDial
                       <StatusIndicator status="loading" pulse={true} label="Loading repositories..." />
                     </div>
                   )}
-                  <div className="p-3 bg-bolt-elements-background-depth-2 dark:bg-bolt-elements-background-depth-3 rounded-lg border border-bolt-elements-borderColor dark:border-bolt-elements-borderColor-dark">
+                  <div className="bg-bolt-elements-background-depth-2 dark:bg-darken-50 border-bolt-elements-border-color dark:border-bolt-elements-borderColor-dark rounded-lg border p-3">
                     <div className="flex items-center gap-2">
                       <input
                         type="checkbox"
                         id="private"
                         checked={isPrivate}
                         onChange={(e) => setIsPrivate(e.target.checked)}
-                        className="rounded border-bolt-elements-borderColor dark:border-bolt-elements-borderColor-dark text-purple-500 focus:ring-purple-500 dark:bg-bolt-elements-background-depth-3"
+                        className="border-bolt-elements-border-color dark:border-bolt-elements-borderColor-dark dark:bg-darken-50 rounded text-purple-500 focus:ring-purple-500"
                       />
-                      <label
-                        htmlFor="private"
-                        className="text-sm text-bolt-elements-textPrimary dark:text-bolt-elements-textPrimary-dark"
-                      >
+                      <label htmlFor="private" className="dark:text-bolt-elements-textPrimary-dark text-sm text-black">
                         Make repository private
                       </label>
                     </div>
-                    <p className="text-xs text-bolt-elements-textTertiary dark:text-bolt-elements-textTertiary-dark mt-2 ml-6">
+                    <p className="text-bolt-elements-text-tertiary dark:text-bolt-elements-textTertiary-dark mt-2 ml-6 text-xs">
                       Private repositories are only visible to you and people you share them with
                     </p>
                   </div>
 
-                  <div className="pt-4 flex gap-2">
+                  <div className="flex gap-2 pt-4">
                     <motion.button
                       type="button"
                       onClick={handleClose}
-                      className="px-4 py-2 rounded-lg bg-bolt-elements-background-depth-2 dark:bg-bolt-elements-background-depth-3 text-bolt-elements-textSecondary dark:text-bolt-elements-textSecondary-dark hover:bg-bolt-elements-background-depth-3 dark:hover:bg-bolt-elements-background-depth-4 text-sm border border-bolt-elements-borderColor dark:border-bolt-elements-borderColor-dark"
+                      className="bg-bolt-elements-background-depth-2 dark:bg-darken-50 text-bolt-elements-text-secondary dark:text-bolt-elements-textSecondary-dark hover:bg-darken-50 dark:hover:bg-bolt-elements-background-depth-4 border-bolt-elements-border-color dark:border-bolt-elements-borderColor-dark rounded-lg border px-4 py-2 text-sm"
                       whileHover={{ scale: 1.02 }}
                       whileTap={{ scale: 0.98 }}
                     >
@@ -686,21 +683,21 @@ export function PushToGitHubDialog({ isOpen, onClose, onPush }: PushToGitHubDial
                     <motion.button
                       type="submit"
                       disabled={isLoading}
-                      className={classNames(
-                        'flex-1 px-4 py-2 bg-purple-500 text-white rounded-lg hover:bg-purple-600 text-sm inline-flex items-center justify-center gap-2',
-                        isLoading ? 'opacity-50 cursor-not-allowed' : '',
+                      className={cn(
+                        'inline-flex flex-1 items-center justify-center gap-2 rounded-lg bg-purple-500 px-4 py-2 text-sm text-white hover:bg-purple-600',
+                        isLoading ? 'cursor-not-allowed opacity-50' : '',
                       )}
                       whileHover={!isLoading ? { scale: 1.02 } : {}}
                       whileTap={!isLoading ? { scale: 0.98 } : {}}
                     >
                       {isLoading ? (
                         <>
-                          <div className="i-ph:spinner-gap animate-spin w-4 h-4" />
+                          <div className="i-ph:spinner-gap h-4 w-4 animate-spin" />
                           Pushing...
                         </>
                       ) : (
                         <>
-                          <div className="i-ph:github-logo w-4 h-4" />
+                          <div className="i-ph:github-logo h-4 w-4" />
                           Push to GitHub
                         </>
                       )}

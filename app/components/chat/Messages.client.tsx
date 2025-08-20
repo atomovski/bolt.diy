@@ -1,6 +1,6 @@
 import type { Message } from 'ai';
 import { Fragment } from 'react';
-import { classNames } from '~/utils/classNames';
+import { cn } from '~/utils/cn';
 import { AssistantMessage } from './AssistantMessage';
 import { UserMessage } from './UserMessage';
 import { useLocation } from '@remix-run/react';
@@ -55,7 +55,6 @@ export const Messages = forwardRef<HTMLDivElement, MessagesProps>(
           ? messages.map((message, index) => {
               const { role, content, id: messageId, annotations, parts } = message;
               const isUserMessage = role === 'user';
-              const isFirst = index === 0;
               const isHidden = annotations?.includes('hidden');
 
               if (isHidden) {
@@ -63,13 +62,8 @@ export const Messages = forwardRef<HTMLDivElement, MessagesProps>(
               }
 
               return (
-                <div
-                  key={index}
-                  className={classNames('flex gap-4 py-3 w-full rounded-lg', {
-                    'mt-4': !isFirst,
-                  })}
-                >
-                  <div className="grid grid-col-1 w-full">
+                <div key={index} className={cn('flex w-full flex-col gap-2 rounded-lg py-3')}>
+                  <div className="grid-col-1 grid w-full">
                     {isUserMessage ? (
                       <UserMessage content={content} parts={parts} />
                     ) : (
@@ -94,7 +88,7 @@ export const Messages = forwardRef<HTMLDivElement, MessagesProps>(
             })
           : null}
         {isStreaming && (
-          <div className="text-center w-full  text-bolt-elements-item-contentAccent i-svg-spinners:3-dots-fade text-4xl mt-4"></div>
+          <div className="text-bolt-elements-item-contentAccent i-svg-spinners:3-dots-fade mt-4 w-full text-center text-4xl"></div>
         )}
       </div>
     );

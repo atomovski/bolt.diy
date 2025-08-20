@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { motion } from 'framer-motion';
-import { classNames } from '~/utils/classNames';
+import { cn } from '~/utils/cn';
 import { Progress } from '~/components/ui/Progress';
 import { useToast } from '~/components/ui/use-toast';
 import { useSettings } from '~/lib/hooks/useSettings';
@@ -385,17 +385,17 @@ export default function OllamaModelInstaller({ onModelInstalled }: OllamaModelIn
     <div className="space-y-6">
       <div className="flex items-center justify-between pt-6">
         <div className="flex items-center gap-3">
-          <OllamaIcon className="w-8 h-8 text-purple-500" />
+          <OllamaIcon className="h-8 w-8 text-purple-500" />
           <div>
-            <h3 className="text-lg font-semibold text-bolt-elements-textPrimary">Ollama Models</h3>
-            <p className="text-sm text-bolt-elements-textSecondary mt-1">Install and manage your Ollama models</p>
+            <h3 className="text-lg font-semibold text-black">Ollama Models</h3>
+            <p className="text-bolt-elements-text-secondary mt-1 text-sm">Install and manage your Ollama models</p>
           </div>
         </div>
         <motion.button
           onClick={handleCheckUpdates}
           disabled={isChecking}
-          className={classNames(
-            'px-4 py-2 rounded-lg',
+          className={cn(
+            'rounded-lg px-4 py-2',
             'bg-purple-500/10 text-purple-500',
             'hover:bg-purple-500/20',
             'transition-all duration-200',
@@ -418,11 +418,11 @@ export default function OllamaModelInstaller({ onModelInstalled }: OllamaModelIn
           <div className="space-y-1">
             <input
               type="text"
-              className={classNames(
-                'w-full px-4 py-3 rounded-xl',
-                'bg-bolt-elements-background-depth-2 border border-bolt-elements-borderColor',
-                'text-bolt-elements-textPrimary placeholder-bolt-elements-textTertiary',
-                'focus:outline-none focus:ring-2 focus:ring-purple-500/30',
+              className={cn(
+                'w-full rounded-xl px-4 py-3',
+                'bg-bolt-elements-background-depth-2 border-bolt-elements-border-color border',
+                'placeholder-bolt-elements-text-tertiary text-black',
+                'focus:ring-2 focus:ring-purple-500/30 focus:outline-hidden',
                 'transition-all duration-200',
               )}
               placeholder="Search models or enter custom model name..."
@@ -434,13 +434,13 @@ export default function OllamaModelInstaller({ onModelInstalled }: OllamaModelIn
               }}
               disabled={isInstalling}
             />
-            <p className="text-sm text-bolt-elements-textSecondary px-1">
+            <p className="text-bolt-elements-text-secondary px-1 text-sm">
               Browse models at{' '}
               <a
                 href="https://ollama.com/library"
                 target="_blank"
                 rel="noopener noreferrer"
-                className="text-purple-500 hover:underline inline-flex items-center gap-1 text-base font-medium"
+                className="inline-flex items-center gap-1 text-base font-medium text-purple-500 hover:underline"
               >
                 ollama.com/library
                 <div className="i-ph:arrow-square-out text-sm" />
@@ -452,25 +452,25 @@ export default function OllamaModelInstaller({ onModelInstalled }: OllamaModelIn
         <motion.button
           onClick={() => handleInstallModel(modelString)}
           disabled={!modelString || isInstalling}
-          className={classNames(
+          className={cn(
             'rounded-lg px-4 py-2',
-            'bg-purple-500 text-white text-sm',
+            'bg-purple-500 text-sm text-white',
             'hover:bg-purple-600',
             'transition-all duration-200',
             'flex items-center gap-2',
-            { 'opacity-50 cursor-not-allowed': !modelString || isInstalling },
+            { 'cursor-not-allowed opacity-50': !modelString || isInstalling },
           )}
           whileHover={{ scale: 1.02 }}
           whileTap={{ scale: 0.98 }}
         >
           {isInstalling ? (
             <div className="flex items-center gap-2">
-              <div className="i-ph:spinner-gap-bold animate-spin w-4 h-4" />
+              <div className="i-ph:spinner-gap-bold h-4 w-4 animate-spin" />
               <span>Installing...</span>
             </div>
           ) : (
             <div className="flex items-center gap-2">
-              <OllamaIcon className="w-4 h-4" />
+              <OllamaIcon className="h-4 w-4" />
               <span>Install Model</span>
             </div>
           )}
@@ -484,11 +484,11 @@ export default function OllamaModelInstaller({ onModelInstalled }: OllamaModelIn
             onClick={() => {
               setSelectedTags((prev) => (prev.includes(tag) ? prev.filter((t) => t !== tag) : [...prev, tag]));
             }}
-            className={classNames(
-              'px-3 py-1 rounded-full text-xs font-medium transition-all duration-200',
+            className={cn(
+              'rounded-full px-3 py-1 text-xs font-medium transition-all duration-200',
               selectedTags.includes(tag)
                 ? 'bg-purple-500 text-white'
-                : 'bg-bolt-elements-background-depth-3 text-bolt-elements-textSecondary hover:bg-bolt-elements-background-depth-4',
+                : 'bg-darken-50 text-bolt-elements-text-secondary hover:bg-bolt-elements-background-depth-4',
             )}
           >
             {tag}
@@ -500,26 +500,26 @@ export default function OllamaModelInstaller({ onModelInstalled }: OllamaModelIn
         {filteredModels.map((model) => (
           <motion.div
             key={model.name}
-            className={classNames(
-              'flex items-start gap-2 p-3 rounded-lg',
-              'bg-bolt-elements-background-depth-3',
+            className={cn(
+              'flex items-start gap-2 rounded-lg p-3',
+              'bg-darken-50',
               'hover:bg-bolt-elements-background-depth-4',
               'transition-all duration-200',
-              'relative group',
+              'group relative',
             )}
           >
-            <OllamaIcon className="w-5 h-5 text-purple-500 mt-0.5 flex-shrink-0" />
+            <OllamaIcon className="mt-0.5 h-5 w-5 shrink-0 text-purple-500" />
             <div className="flex-1 space-y-1.5">
               <div className="flex items-start justify-between">
                 <div>
-                  <p className="text-bolt-elements-textPrimary font-mono text-sm">{model.name}</p>
-                  <p className="text-xs text-bolt-elements-textSecondary mt-0.5">{model.desc}</p>
+                  <p className="font-mono text-sm text-black">{model.name}</p>
+                  <p className="text-bolt-elements-text-secondary mt-0.5 text-xs">{model.desc}</p>
                 </div>
                 <div className="text-right">
-                  <span className="text-xs text-bolt-elements-textTertiary">{model.size}</span>
+                  <span className="text-bolt-elements-text-tertiary text-xs">{model.size}</span>
                   {model.installedVersion && (
                     <div className="mt-0.5 flex flex-col items-end gap-0.5">
-                      <span className="text-xs text-bolt-elements-textTertiary">v{model.installedVersion}</span>
+                      <span className="text-bolt-elements-text-tertiary text-xs">v{model.installedVersion}</span>
                       {model.needsUpdate && model.latestVersion && (
                         <span className="text-xs text-purple-500">v{model.latestVersion} available</span>
                       )}
@@ -532,7 +532,7 @@ export default function OllamaModelInstaller({ onModelInstalled }: OllamaModelIn
                   {model.tags.map((tag) => (
                     <span
                       key={tag}
-                      className="px-1.5 py-0.5 rounded-full text-[10px] bg-bolt-elements-background-depth-4 text-bolt-elements-textTertiary"
+                      className="bg-bolt-elements-background-depth-4 text-bolt-elements-text-tertiary rounded-full px-1.5 py-0.5 text-[10px]"
                     >
                       {tag}
                     </span>
@@ -543,8 +543,8 @@ export default function OllamaModelInstaller({ onModelInstalled }: OllamaModelIn
                     model.needsUpdate ? (
                       <motion.button
                         onClick={() => handleUpdateModel(model.name)}
-                        className={classNames(
-                          'px-2 py-0.5 rounded-lg text-xs',
+                        className={cn(
+                          'rounded-lg px-2 py-0.5 text-xs',
                           'bg-purple-500 text-white',
                           'hover:bg-purple-600',
                           'transition-all duration-200',
@@ -557,13 +557,13 @@ export default function OllamaModelInstaller({ onModelInstalled }: OllamaModelIn
                         Update
                       </motion.button>
                     ) : (
-                      <span className="px-2 py-0.5 rounded-lg text-xs text-green-500 bg-green-500/10">Up to date</span>
+                      <span className="rounded-lg bg-green-500/10 px-2 py-0.5 text-xs text-green-500">Up to date</span>
                     )
                   ) : (
                     <motion.button
                       onClick={() => handleInstallModel(model.name)}
-                      className={classNames(
-                        'px-2 py-0.5 rounded-lg text-xs',
+                      className={cn(
+                        'rounded-lg px-2 py-0.5 text-xs',
                         'bg-purple-500 text-white',
                         'hover:bg-purple-600',
                         'transition-all duration-200',
@@ -586,13 +586,13 @@ export default function OllamaModelInstaller({ onModelInstalled }: OllamaModelIn
       {installProgress && (
         <motion.div initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} className="space-y-2">
           <div className="flex justify-between text-sm">
-            <span className="text-bolt-elements-textSecondary">{installProgress.status}</span>
+            <span className="text-bolt-elements-text-secondary">{installProgress.status}</span>
             <div className="flex items-center gap-4">
-              <span className="text-bolt-elements-textTertiary">
+              <span className="text-bolt-elements-text-tertiary">
                 {installProgress.downloadedSize} / {installProgress.totalSize}
               </span>
-              <span className="text-bolt-elements-textTertiary">{installProgress.speed}</span>
-              <span className="text-bolt-elements-textSecondary">{Math.round(installProgress.progress)}%</span>
+              <span className="text-bolt-elements-text-tertiary">{installProgress.speed}</span>
+              <span className="text-bolt-elements-text-secondary">{Math.round(installProgress.progress)}%</span>
             </div>
           </div>
           <Progress value={installProgress.progress} className="h-1" />

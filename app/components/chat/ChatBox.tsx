@@ -1,6 +1,6 @@
 import React from 'react';
 import { ClientOnly } from 'remix-utils/client-only';
-import { classNames } from '~/utils/classNames';
+import { cn } from '~/utils/cn';
 import { PROVIDER_LIST } from '~/utils/constants';
 import { ModelSelector } from '~/components/chat/ModelSelector';
 import { APIKeyManager } from './APIKeyManager';
@@ -8,17 +8,15 @@ import { LOCAL_PROVIDERS } from '~/lib/stores/settings';
 import FilePreview from './FilePreview';
 import { ScreenshotStateManager } from './ScreenshotStateManager';
 import { SendButton } from './SendButton.client';
-import { IconButton } from '~/components/ui/IconButton';
 import { toast } from 'react-toastify';
-import { SpeechRecognitionButton } from '~/components/chat/SpeechRecognition';
-import { SupabaseConnection } from './SupabaseConnection';
+
 import { ExpoQrModal } from '~/components/workbench/ExpoQrModal';
-import styles from './BaseChat.module.scss';
 import type { ProviderInfo } from '~/types/model';
-import { ColorSchemeDialog } from '~/components/ui/ColorSchemeDialog';
 import type { DesignScheme } from '~/types/design-scheme';
 import type { ElementInfo } from '~/components/workbench/Inspector';
-import { McpTools } from './MCPTools';
+import { LoadingSpinner } from '~/components/ui/loading-spinner';
+import { Toggle, Icon, Button } from '~/components/ui';
+import { AdditionalOptions } from './additional-options';
 
 interface ChatBoxProps {
   isModelSettingsCollapsed: boolean;
@@ -41,6 +39,7 @@ interface ChatBoxProps {
   isListening: boolean;
   startListening: () => void;
   stopListening: () => void;
+  speechRecognitionSupported?: boolean;
   chatStarted: boolean;
   exportChat?: () => void;
   qrModalOpen: boolean;
@@ -61,51 +60,18 @@ interface ChatBoxProps {
   setDesignScheme?: (scheme: DesignScheme) => void;
   selectedElement?: ElementInfo | null;
   setSelectedElement?: ((element: ElementInfo | null) => void) | undefined;
+  isInspectorMode?: boolean;
+  toggleInspectorMode?: () => void;
+  currentView?: 'code' | 'diff' | 'preview';
 }
 
 export const ChatBox: React.FC<ChatBoxProps> = (props) => {
   return (
-    <div
-      className={classNames(
-        'relative bg-bolt-elements-background-depth-2 backdrop-blur p-3 rounded-lg border border-bolt-elements-borderColor relative w-full max-w-chat mx-auto z-prompt',
-
-        /*
-         * {
-         *   'sticky bottom-2': chatStarted,
-         * },
-         */
-      )}
-    >
-      <svg className={classNames(styles.PromptEffectContainer)}>
-        <defs>
-          <linearGradient
-            id="line-gradient"
-            x1="20%"
-            y1="0%"
-            x2="-14%"
-            y2="10%"
-            gradientUnits="userSpaceOnUse"
-            gradientTransform="rotate(-45)"
-          >
-            <stop offset="0%" stopColor="#b44aff" stopOpacity="0%"></stop>
-            <stop offset="40%" stopColor="#b44aff" stopOpacity="80%"></stop>
-            <stop offset="50%" stopColor="#b44aff" stopOpacity="80%"></stop>
-            <stop offset="100%" stopColor="#b44aff" stopOpacity="0%"></stop>
-          </linearGradient>
-          <linearGradient id="shine-gradient">
-            <stop offset="0%" stopColor="white" stopOpacity="0%"></stop>
-            <stop offset="40%" stopColor="#ffffff" stopOpacity="80%"></stop>
-            <stop offset="50%" stopColor="#ffffff" stopOpacity="80%"></stop>
-            <stop offset="100%" stopColor="white" stopOpacity="0%"></stop>
-          </linearGradient>
-        </defs>
-        <rect className={classNames(styles.PromptEffectLine)} pathLength="100" strokeLinecap="round"></rect>
-        <rect className={classNames(styles.PromptShine)} x="48" y="24" width="70" height="1"></rect>
-      </svg>
+    <div className={cn('max-w-chat z-prompt relative mx-auto w-full backdrop-blur-sm')}>
       <div>
         <ClientOnly>
           {() => (
-            <div className={props.isModelSettingsCollapsed ? 'hidden' : ''}>
+            <div className={props.isModelSettingsCollapsed ? 'hidden' : 'hidden'}>
               <ModelSelector
                 key={props.provider?.name + ':' + props.modelList.length}
                 model={props.model}
@@ -151,15 +117,15 @@ export const ChatBox: React.FC<ChatBoxProps> = (props) => {
         )}
       </ClientOnly>
       {props.selectedElement && (
-        <div className="flex mx-1.5 gap-2 items-center justify-between rounded-lg rounded-b-none border border-b-none border-bolt-elements-borderColor text-bolt-elements-textPrimary flex py-1 px-2.5 font-medium text-xs">
-          <div className="flex gap-2 items-center lowercase">
-            <code className="bg-accent-500 rounded-4px px-1.5 py-1 mr-0.5 text-white">
+        <div className="border-b-none mx-1.5 flex items-center justify-between gap-2 rounded-lg rounded-b-none border px-2.5 py-1 text-sm font-medium">
+          <div className="flex items-center gap-2 lowercase">
+            <code className="mr-0.5 rounded-md bg-green-500 px-1.5 py-1 text-white">
               {props?.selectedElement?.tagName}
             </code>
             selected for inspection
           </div>
           <button
-            className="bg-transparent text-accent-500 pointer-auto"
+            className="text-accent-500 pointer-auto bg-transparent"
             onClick={() => props.setSelectedElement?.(null)}
           >
             Clear
@@ -167,12 +133,14 @@ export const ChatBox: React.FC<ChatBoxProps> = (props) => {
         </div>
       )}
       <div
-        className={classNames('relative shadow-xs border border-bolt-elements-borderColor backdrop-blur rounded-lg')}
+        className={cn(
+          'relative rounded-2xl border bg-white px-2 pt-1 backdrop-blur-sm outline-none focus:ring-1 focus:outline-none',
+        )}
       >
         <textarea
           ref={props.textareaRef}
-          className={classNames(
-            'w-full pl-4 pt-4 pr-16 outline-none resize-none text-bolt-elements-textPrimary placeholder-bolt-elements-textTertiary bg-transparent text-sm',
+          className={cn(
+            'w-full resize-none bg-transparent pt-4 pr-16 pl-4 text-base outline-hidden',
             'transition-all duration-200',
             'hover:border-bolt-elements-focus',
           )}
@@ -236,77 +204,53 @@ export const ChatBox: React.FC<ChatBoxProps> = (props) => {
             minHeight: props.TEXTAREA_MIN_HEIGHT,
             maxHeight: props.TEXTAREA_MAX_HEIGHT,
           }}
-          placeholder={props.chatMode === 'build' ? 'How can Bolt help you today?' : 'What would you like to discuss?'}
+          placeholder={
+            props.chatMode === 'build' ? 'How can Modern help you today?' : 'What would you like to discuss?'
+          }
           translate="no"
         />
-        <ClientOnly>
-          {() => (
-            <SendButton
-              show={props.input.length > 0 || props.isStreaming || props.uploadedFiles.length > 0}
-              isStreaming={props.isStreaming}
-              disabled={!props.providerList || props.providerList.length === 0}
-              onClick={(event) => {
-                if (props.isStreaming) {
-                  props.handleStop?.();
-                  return;
-                }
-
-                if (props.input.length > 0 || props.uploadedFiles.length > 0) {
-                  props.handleSendMessage?.(event);
-                }
-              }}
-            />
-          )}
-        </ClientOnly>
-        <div className="flex justify-between items-center text-sm p-4 pt-2">
-          <div className="flex gap-1 items-center">
-            <ColorSchemeDialog designScheme={props.designScheme} setDesignScheme={props.setDesignScheme} />
-            <McpTools />
-            <IconButton title="Upload file" className="transition-all" onClick={() => props.handleFileUpload()}>
-              <div className="i-ph:paperclip text-xl"></div>
-            </IconButton>
-            <IconButton
+        <div className="flex items-center justify-between px-2 pt-2 pb-3 text-sm [&_svg]:size-4">
+          <div className="flex items-center gap-0.5">
+            <AdditionalOptions handleFileUpload={props.handleFileUpload} />
+            {/* <ColorSchemeDialog designScheme={props.designScheme} setDesignScheme={props.setDesignScheme} /> */}
+            {/* <McpTools /> */}
+            <Button
+              variant="ghost"
               title="Enhance prompt"
               disabled={props.input.length === 0 || props.enhancingPrompt}
-              className={classNames('transition-all', props.enhancingPrompt ? 'opacity-100' : '')}
+              className="size-8 p-0"
               onClick={() => {
                 props.enhancePrompt?.();
                 toast.success('Prompt enhanced!');
               }}
             >
-              {props.enhancingPrompt ? (
-                <div className="i-svg-spinners:90-ring-with-bg text-bolt-elements-loader-progress text-xl animate-spin"></div>
-              ) : (
-                <div className="i-bolt:stars text-xl"></div>
-              )}
-            </IconButton>
+              {props.enhancingPrompt ? <LoadingSpinner /> : <Icon.MagicWand />}
+            </Button>
 
-            <SpeechRecognitionButton
+            {/* <SpeechRecognitionButton
               isListening={props.isListening}
-              onStart={props.startListening}
+              onStart={() => {
+                console.log('Ho');
+                props.startListening();
+              }}
               onStop={props.stopListening}
-              disabled={props.isStreaming}
-            />
-            {props.chatStarted && (
-              <IconButton
-                title="Discuss"
-                className={classNames(
-                  'transition-all flex items-center gap-1 px-1.5',
-                  props.chatMode === 'discuss'
-                    ? '!bg-bolt-elements-item-backgroundAccent !text-bolt-elements-item-contentAccent'
-                    : 'bg-bolt-elements-item-backgroundDefault text-bolt-elements-item-contentDefault',
-                )}
-                onClick={() => {
-                  props.setChatMode?.(props.chatMode === 'discuss' ? 'build' : 'discuss');
-                }}
+              disabled={props.isStreaming || !props.speechRecognitionSupported}
+              speechRecognitionSupported={props.speechRecognitionSupported}
+            /> */}
+            {props.toggleInspectorMode && (
+              <Toggle
+                pressed={props.isInspectorMode}
+                onPressedChange={props.toggleInspectorMode}
+                aria-label="Toggle inspector mode"
+                className="size-8 gap-0.5 rounded-lg border-0 text-sm"
+                disabled={props.currentView !== 'preview'}
               >
-                <div className={`i-ph:chats text-xl`} />
-                {props.chatMode === 'discuss' ? <span>Discuss</span> : <span />}
-              </IconButton>
+                <Icon.CursorPointer className="size-4" />
+              </Toggle>
             )}
-            <IconButton
+            {/* <IconButton
               title="Model Settings"
-              className={classNames('transition-all flex items-center gap-1', {
+              className={cn('flex items-center gap-1 transition-all', {
                 'bg-bolt-elements-item-backgroundAccent text-bolt-elements-item-contentAccent':
                   props.isModelSettingsCollapsed,
                 'bg-bolt-elements-item-backgroundDefault text-bolt-elements-item-contentDefault':
@@ -315,17 +259,57 @@ export const ChatBox: React.FC<ChatBoxProps> = (props) => {
               onClick={() => props.setIsModelSettingsCollapsed(!props.isModelSettingsCollapsed)}
               disabled={!props.providerList || props.providerList.length === 0}
             >
-              <div className={`i-ph:caret-${props.isModelSettingsCollapsed ? 'right' : 'down'} text-lg`} />
-              {props.isModelSettingsCollapsed ? <span className="text-xs">{props.model}</span> : <span />}
-            </IconButton>
+              {props.isModelSettingsCollapsed ? (
+                <Icon.NavArrowRight className="size-4" />
+              ) : (
+                <Icon.NavArrowDown className="size-4" />
+              )}
+              {props.isModelSettingsCollapsed ? <span className="text-sm">{props.model}</span> : <span />}
+            </IconButton> */}
           </div>
-          {props.input.length > 3 ? (
-            <div className="text-xs text-bolt-elements-textTertiary">
-              Use <kbd className="kdb px-1.5 py-0.5 rounded bg-bolt-elements-background-depth-2">Shift</kbd> +{' '}
-              <kbd className="kdb px-1.5 py-0.5 rounded bg-bolt-elements-background-depth-2">Return</kbd> a new line
+          <div className="flex items-center gap-1">
+            <ClientOnly>
+              {() => (
+                <>
+                  {props.chatStarted && (
+                    <Toggle
+                      pressed={props.chatMode === 'discuss'}
+                      onPressedChange={() => {
+                        props.setChatMode?.(props.chatMode === 'discuss' ? 'build' : 'discuss');
+                      }}
+                      className="h-7 w-fit gap-0.5 rounded-full px-2.5 text-sm"
+                      aria-label="Discuss"
+                    >
+                      <Icon.LightBulb className="size-3" />
+                      Chat
+                    </Toggle>
+                  )}
+                  <SendButton
+                    show={props.input.length > 0 || props.isStreaming || props.uploadedFiles.length > 0}
+                    isStreaming={props.isStreaming}
+                    disabled={!props.providerList || props.providerList.length === 0 || props.input.length === 0}
+                    onClick={(event) => {
+                      if (props.isStreaming) {
+                        props.handleStop?.();
+                        return;
+                      }
+
+                      if (props.input.length > 0 || props.uploadedFiles.length > 0) {
+                        props.handleSendMessage?.(event);
+                      }
+                    }}
+                  />
+                </>
+              )}
+            </ClientOnly>
+          </div>
+          {/* {props.input.length > 3 ? (
+            <div className="text-bolt-elements-text-tertiary text-xs">
+              Use <kbd className="kdb bg-bolt-elements-background-depth-2 rounded-sm px-1.5 py-0.5">Shift</kbd> +{' '}
+              <kbd className="kdb bg-bolt-elements-background-depth-2 rounded-sm px-1.5 py-0.5">Return</kbd> a new line
             </div>
-          ) : null}
-          <SupabaseConnection />
+          ) : null} */}
+          {/* <SupabaseConnection /> */}
           <ExpoQrModal open={props.qrModalOpen} onClose={() => props.setQrModalOpen(false)} />
         </div>
       </div>

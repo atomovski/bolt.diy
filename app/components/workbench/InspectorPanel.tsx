@@ -63,17 +63,17 @@ export const InspectorPanel = ({ selectedElement, isVisible, onClose }: Inspecto
   };
 
   return (
-    <div className="fixed right-4 top-20 w-80 bg-bolt-elements-bg-depth-1 border border-bolt-elements-borderColor rounded-lg shadow-lg z-40 max-h-[calc(100vh-6rem)] overflow-hidden">
+    <div className="bg-bolt-elements-bg-depth-1 border-bolt-elements-border-color fixed top-20 right-4 z-40 max-h-[calc(100vh-6rem)] w-80 overflow-hidden rounded-lg border shadow-lg">
       {/* Header */}
-      <div className="flex items-center justify-between p-3 border-b border-bolt-elements-borderColor">
-        <h3 className="font-medium text-bolt-elements-textPrimary">Element Inspector</h3>
-        <button onClick={onClose} className="text-bolt-elements-textSecondary hover:text-bolt-elements-textPrimary">
+      <div className="border-bolt-elements-border-color flex items-center justify-between border-b p-3">
+        <h3 className="font-medium text-black">Element Inspector</h3>
+        <button onClick={onClose} className="text-bolt-elements-text-secondary hover:text-black">
           ✕
         </button>
       </div>
 
       {/* Element Info */}
-      <div className="p-3 border-b border-bolt-elements-borderColor">
+      <div className="border-bolt-elements-border-color border-b p-3">
         <div className="text-sm">
           <div className="font-mono text-blue-500">
             {selectedElement.tagName.toLowerCase()}
@@ -83,7 +83,7 @@ export const InspectorPanel = ({ selectedElement, isVisible, onClose }: Inspecto
             )}
           </div>
           {selectedElement.textContent && (
-            <div className="mt-1 text-bolt-elements-textSecondary text-xs truncate">
+            <div className="text-bolt-elements-text-secondary mt-1 truncate text-xs">
               "{selectedElement.textContent}"
             </div>
           )}
@@ -91,7 +91,7 @@ export const InspectorPanel = ({ selectedElement, isVisible, onClose }: Inspecto
       </div>
 
       {/* Tabs */}
-      <div className="flex border-b border-bolt-elements-borderColor">
+      <div className="border-bolt-elements-border-color flex border-b">
         {(['styles', 'computed', 'box'] as const).map((tab) => (
           <button
             key={tab}
@@ -99,7 +99,7 @@ export const InspectorPanel = ({ selectedElement, isVisible, onClose }: Inspecto
             className={`px-3 py-2 text-sm capitalize ${
               activeTab === tab
                 ? 'border-b-2 border-blue-500 text-blue-500'
-                : 'text-bolt-elements-textSecondary hover:text-bolt-elements-textPrimary'
+                : 'text-bolt-elements-text-secondary hover:text-black'
             }`}
           >
             {tab}
@@ -108,13 +108,13 @@ export const InspectorPanel = ({ selectedElement, isVisible, onClose }: Inspecto
       </div>
 
       {/* Content */}
-      <div className="p-3 overflow-y-auto max-h-96">
+      <div className="max-h-96 overflow-y-auto p-3">
         {activeTab === 'styles' && (
           <div className="space-y-2">
             {Object.entries(getRelevantStyles(selectedElement.styles)).map(([prop, value]) => (
               <div key={prop} className="flex justify-between text-sm">
-                <span className="text-bolt-elements-textSecondary">{prop}:</span>
-                <span className="text-bolt-elements-textPrimary font-mono">{value}</span>
+                <span className="text-bolt-elements-text-secondary">{prop}:</span>
+                <span className="font-mono text-black">{value}</span>
               </div>
             ))}
           </div>
@@ -123,20 +123,20 @@ export const InspectorPanel = ({ selectedElement, isVisible, onClose }: Inspecto
         {activeTab === 'box' && (
           <div className="space-y-2 text-sm">
             <div className="flex justify-between">
-              <span className="text-bolt-elements-textSecondary">Width:</span>
-              <span className="text-bolt-elements-textPrimary">{Math.round(selectedElement.rect.width)}px</span>
+              <span className="text-bolt-elements-text-secondary">Width:</span>
+              <span className="text-black">{Math.round(selectedElement.rect.width)}px</span>
             </div>
             <div className="flex justify-between">
-              <span className="text-bolt-elements-textSecondary">Height:</span>
-              <span className="text-bolt-elements-textPrimary">{Math.round(selectedElement.rect.height)}px</span>
+              <span className="text-bolt-elements-text-secondary">Height:</span>
+              <span className="text-black">{Math.round(selectedElement.rect.height)}px</span>
             </div>
             <div className="flex justify-between">
-              <span className="text-bolt-elements-textSecondary">Top:</span>
-              <span className="text-bolt-elements-textPrimary">{Math.round(selectedElement.rect.top)}px</span>
+              <span className="text-bolt-elements-text-secondary">Top:</span>
+              <span className="text-black">{Math.round(selectedElement.rect.top)}px</span>
             </div>
             <div className="flex justify-between">
-              <span className="text-bolt-elements-textSecondary">Left:</span>
-              <span className="text-bolt-elements-textPrimary">{Math.round(selectedElement.rect.left)}px</span>
+              <span className="text-bolt-elements-text-secondary">Left:</span>
+              <span className="text-black">{Math.round(selectedElement.rect.left)}px</span>
             </div>
           </div>
         )}

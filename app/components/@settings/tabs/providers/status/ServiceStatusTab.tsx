@@ -1,6 +1,6 @@
 import React, { useEffect, useState, useCallback } from 'react';
 import { motion } from 'framer-motion';
-import { classNames } from '~/utils/classNames';
+import { cn } from '~/utils/cn';
 import { TbActivityHeartbeat } from 'react-icons/tb';
 import { BsCheckCircleFill, BsXCircleFill, BsExclamationCircleFill } from 'react-icons/bs';
 import { SiAmazon, SiGoogle, SiHuggingface, SiPerplexity, SiOpenai } from 'react-icons/si';
@@ -676,13 +676,13 @@ const ServiceStatusTab = () => {
   const getStatusIcon = (status: ServiceStatus['status']) => {
     switch (status) {
       case 'operational':
-        return <BsCheckCircleFill className="w-4 h-4" />;
+        return <BsCheckCircleFill className="h-4 w-4" />;
       case 'degraded':
-        return <BsExclamationCircleFill className="w-4 h-4" />;
+        return <BsExclamationCircleFill className="h-4 w-4" />;
       case 'down':
-        return <BsXCircleFill className="w-4 h-4" />;
+        return <BsXCircleFill className="h-4 w-4" />;
       default:
-        return <BsXCircleFill className="w-4 h-4" />;
+        return <BsXCircleFill className="h-4 w-4" />;
     }
   };
 
@@ -694,58 +694,54 @@ const ServiceStatusTab = () => {
         animate={{ opacity: 1, y: 0 }}
         transition={{ duration: 0.3 }}
       >
-        <div className="flex items-center justify-between gap-2 mt-8 mb-4">
+        <div className="mt-8 mb-4 flex items-center justify-between gap-2">
           <div className="flex items-center gap-2">
             <div
-              className={classNames(
-                'w-8 h-8 flex items-center justify-center rounded-lg',
-                'bg-bolt-elements-background-depth-3',
-                'text-purple-500',
-              )}
+              className={cn('flex h-8 w-8 items-center justify-center rounded-lg', 'bg-darken-50', 'text-purple-500')}
             >
-              <TbActivityHeartbeat className="w-5 h-5" />
+              <TbActivityHeartbeat className="h-5 w-5" />
             </div>
             <div>
-              <h4 className="text-md font-medium text-bolt-elements-textPrimary">Service Status</h4>
-              <p className="text-sm text-bolt-elements-textSecondary">
+              <h4 className="text-md font-medium text-black">Service Status</h4>
+              <p className="text-bolt-elements-text-secondary text-sm">
                 Monitor and test the operational status of cloud LLM providers
               </p>
             </div>
           </div>
           <div className="flex items-center gap-2">
-            <span className="text-sm text-bolt-elements-textSecondary">
+            <span className="text-bolt-elements-text-secondary text-sm">
               Last updated: {lastRefresh.toLocaleTimeString()}
             </span>
             <button
               onClick={() => fetchAllStatuses()}
-              className={classNames(
-                'px-3 py-1.5 rounded-lg text-sm',
-                'bg-bolt-elements-background-depth-3 hover:bg-bolt-elements-background-depth-4',
-                'text-bolt-elements-textPrimary',
+              className={cn(
+                'rounded-lg px-3 py-1.5 text-sm',
+                'bg-darken-50 hover:bg-bolt-elements-background-depth-4',
+                'text-black',
                 'transition-all duration-200',
                 'flex items-center gap-2',
-                loading ? 'opacity-50 cursor-not-allowed' : '',
+                loading ? 'cursor-not-allowed opacity-50' : '',
               )}
               disabled={loading}
             >
-              <div className={`i-ph:arrows-clockwise w-4 h-4 ${loading ? 'animate-spin' : ''}`} />
+              <div className={`i-ph:arrows-clockwise h-4 w-4 ${loading ? 'animate-spin' : ''}`} />
               <span>{loading ? 'Refreshing...' : 'Refresh'}</span>
             </button>
           </div>
         </div>
 
         {/* API Key Test Section */}
-        <div className="p-4 bg-bolt-elements-background-depth-2 rounded-lg">
-          <h5 className="text-sm font-medium text-bolt-elements-textPrimary mb-2">Test API Key</h5>
+        <div className="bg-bolt-elements-background-depth-2 rounded-lg p-4">
+          <h5 className="mb-2 text-sm font-medium text-black">Test API Key</h5>
           <div className="flex gap-2">
             <select
               value={testProvider}
               onChange={(e) => setTestProvider(e.target.value as ProviderName)}
-              className={classNames(
-                'flex-1 px-3 py-1.5 rounded-lg text-sm max-w-[200px]',
-                'bg-bolt-elements-background-depth-3 border border-bolt-elements-borderColor',
-                'text-bolt-elements-textPrimary',
-                'focus:outline-none focus:ring-2 focus:ring-purple-500/30',
+              className={cn(
+                'max-w-[200px] flex-1 rounded-lg px-3 py-1.5 text-sm',
+                'bg-darken-50 border-bolt-elements-border-color border',
+                'text-black',
+                'focus:ring-2 focus:ring-purple-500/30 focus:outline-hidden',
               )}
             >
               <option value="">Select Provider</option>
@@ -760,11 +756,11 @@ const ServiceStatusTab = () => {
               value={testApiKey}
               onChange={(e) => setTestApiKey(e.target.value)}
               placeholder="Enter API key to test"
-              className={classNames(
-                'flex-1 px-3 py-1.5 rounded-lg text-sm',
-                'bg-bolt-elements-background-depth-3 border border-bolt-elements-borderColor',
-                'text-bolt-elements-textPrimary placeholder-bolt-elements-textTertiary',
-                'focus:outline-none focus:ring-2 focus:ring-purple-500/30',
+              className={cn(
+                'flex-1 rounded-lg px-3 py-1.5 text-sm',
+                'bg-darken-50 border-bolt-elements-border-color border',
+                'placeholder-bolt-elements-text-tertiary text-black',
+                'focus:ring-2 focus:ring-purple-500/30 focus:outline-hidden',
               )}
             />
             <button
@@ -772,23 +768,23 @@ const ServiceStatusTab = () => {
                 testProvider && testApiKey && testApiKeyForProvider(testProvider as ProviderName, testApiKey)
               }
               disabled={!testProvider || !testApiKey || testingStatus === 'testing'}
-              className={classNames(
-                'px-4 py-1.5 rounded-lg text-sm',
+              className={cn(
+                'rounded-lg px-4 py-1.5 text-sm',
                 'bg-purple-500 hover:bg-purple-600',
                 'text-white',
                 'transition-all duration-200',
                 'flex items-center gap-2',
-                !testProvider || !testApiKey || testingStatus === 'testing' ? 'opacity-50 cursor-not-allowed' : '',
+                !testProvider || !testApiKey || testingStatus === 'testing' ? 'cursor-not-allowed opacity-50' : '',
               )}
             >
               {testingStatus === 'testing' ? (
                 <>
-                  <div className="i-ph:spinner-gap w-4 h-4 animate-spin" />
+                  <div className="i-ph:spinner-gap h-4 w-4 animate-spin" />
                   <span>Testing...</span>
                 </>
               ) : (
                 <>
-                  <div className="i-ph:key w-4 h-4" />
+                  <div className="i-ph:key h-4 w-4" />
                   <span>Test Key</span>
                 </>
               )}
@@ -798,15 +794,15 @@ const ServiceStatusTab = () => {
 
         {/* Status Grid */}
         {loading && serviceStatuses.length === 0 ? (
-          <div className="text-center py-8 text-bolt-elements-textSecondary">Loading service statuses...</div>
+          <div className="text-bolt-elements-text-secondary py-8 text-center">Loading service statuses...</div>
         ) : (
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+          <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
             {serviceStatuses.map((service, index) => (
               <motion.div
                 key={service.provider}
-                className={classNames(
+                className={cn(
                   'bg-bolt-elements-background-depth-2',
-                  'hover:bg-bolt-elements-background-depth-3',
+                  'hover:bg-darken-50',
                   'transition-all duration-200',
                   'relative overflow-hidden rounded-lg',
                 )}
@@ -816,16 +812,16 @@ const ServiceStatusTab = () => {
                 whileHover={{ scale: 1.02 }}
               >
                 <div
-                  className={classNames('block p-4', service.statusUrl ? 'cursor-pointer' : '')}
+                  className={cn('block p-4', service.statusUrl ? 'cursor-pointer' : '')}
                   onClick={() => service.statusUrl && window.open(service.statusUrl, '_blank')}
                 >
                   <div className="flex items-center justify-between gap-4">
                     <div className="flex items-center gap-3">
                       {service.icon && (
                         <div
-                          className={classNames(
-                            'w-8 h-8 flex items-center justify-center rounded-lg',
-                            'bg-bolt-elements-background-depth-3',
+                          className={cn(
+                            'flex h-8 w-8 items-center justify-center rounded-lg',
+                            'bg-darken-50',
                             getStatusColor(service.status),
                           )}
                         >
@@ -835,31 +831,31 @@ const ServiceStatusTab = () => {
                         </div>
                       )}
                       <div>
-                        <h4 className="text-sm font-medium text-bolt-elements-textPrimary">{service.provider}</h4>
+                        <h4 className="text-sm font-medium text-black">{service.provider}</h4>
                         <div className="space-y-1">
-                          <p className="text-xs text-bolt-elements-textSecondary">
+                          <p className="text-bolt-elements-text-secondary text-xs">
                             Last checked: {new Date(service.lastChecked).toLocaleTimeString()}
                           </p>
                           {service.responseTime && (
-                            <p className="text-xs text-bolt-elements-textTertiary">
+                            <p className="text-bolt-elements-text-tertiary text-xs">
                               Response time: {Math.round(service.responseTime)}ms
                             </p>
                           )}
                           {service.message && (
-                            <p className="text-xs text-bolt-elements-textTertiary">{service.message}</p>
+                            <p className="text-bolt-elements-text-tertiary text-xs">{service.message}</p>
                           )}
                         </div>
                       </div>
                     </div>
-                    <div className={classNames('flex items-center gap-2', getStatusColor(service.status))}>
+                    <div className={cn('flex items-center gap-2', getStatusColor(service.status))}>
                       <span className="text-sm capitalize">{service.status}</span>
                       {getStatusIcon(service.status)}
                     </div>
                   </div>
                   {service.incidents && service.incidents.length > 0 && (
-                    <div className="mt-2 border-t border-bolt-elements-borderColor pt-2">
-                      <p className="text-xs font-medium text-bolt-elements-textSecondary mb-1">Recent Incidents:</p>
-                      <ul className="text-xs text-bolt-elements-textTertiary space-y-1">
+                    <div className="border-bolt-elements-border-color mt-2 border-t pt-2">
+                      <p className="text-bolt-elements-text-secondary mb-1 text-xs font-medium">Recent Incidents:</p>
+                      <ul className="text-bolt-elements-text-tertiary space-y-1 text-xs">
                         {service.incidents.map((incident, i) => (
                           <li key={i}>{incident}</li>
                         ))}

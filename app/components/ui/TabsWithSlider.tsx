@@ -1,6 +1,6 @@
 import React, { useState, useRef, useEffect } from 'react';
 import { motion } from 'framer-motion';
-import { classNames } from '~/utils/classNames';
+import { cn } from '~/utils/cn';
 
 interface Tab {
   /** Unique identifier for the tab */
@@ -73,24 +73,24 @@ export function TabsWithSlider({
   }, [activeTab, tabs]);
 
   return (
-    <div className={classNames('relative flex gap-2', className)}>
+    <div className={cn('relative flex gap-2', className)}>
       {/* Tab buttons */}
       {tabs.map((tab, index) => (
         <button
           key={tab.id}
           ref={(el) => (tabsRef.current[index] = el)}
           onClick={() => onChange(tab.id)}
-          className={classNames(
-            'px-4 py-2 h-10 rounded-lg transition-all duration-200 flex items-center gap-2 min-w-[120px] justify-center relative overflow-hidden',
+          className={cn(
+            'relative flex h-10 min-w-[120px] items-center justify-center gap-2 overflow-hidden rounded-lg px-4 py-2 transition-all duration-200',
             tab.id === activeTab
-              ? classNames('text-white shadow-sm shadow-purple-500/20', activeTabClassName)
-              : classNames(
-                  'bg-bolt-elements-background-depth-2 dark:bg-bolt-elements-background-depth-3 text-bolt-elements-textPrimary dark:text-bolt-elements-textPrimary-dark hover:bg-bolt-elements-background-depth-3 dark:hover:bg-bolt-elements-background-depth-4 border border-bolt-elements-borderColor dark:border-bolt-elements-borderColor-dark',
+              ? cn('text-white shadow-xs shadow-purple-500/20', activeTabClassName)
+              : cn(
+                  'bg-bolt-elements-background-depth-2 dark:bg-darken-50 dark:text-bolt-elements-textPrimary-dark hover:bg-darken-50 dark:hover:bg-bolt-elements-background-depth-4 border-bolt-elements-border-color dark:border-bolt-elements-borderColor-dark border text-black',
                   tabClassName,
                 ),
           )}
         >
-          <span className={classNames('flex items-center gap-2', tab.id === activeTab ? 'font-medium' : '')}>
+          <span className={cn('flex items-center gap-2', tab.id === activeTab ? 'font-medium' : '')}>
             {tab.icon && <span className={tab.icon} />}
             {tab.label}
           </span>
@@ -99,7 +99,7 @@ export function TabsWithSlider({
 
       {/* Animated slider */}
       <motion.div
-        className={classNames('absolute bottom-0 left-0 h-10 rounded-lg bg-purple-500 -z-10', sliderClassName)}
+        className={cn('absolute bottom-0 left-0 -z-10 h-10 rounded-lg bg-purple-500', sliderClassName)}
         initial={false}
         animate={{
           width: sliderDimensions.width,

@@ -1,7 +1,7 @@
+/* eslint-disable @blitz/lines-around-comment */
 import { useParams } from '@remix-run/react';
-import { classNames } from '~/utils/classNames';
+import { cn } from '~/utils/cn';
 import { type ChatHistoryItem } from '~/lib/persistence';
-import WithTooltip from '~/components/ui/Tooltip';
 import { useEditChatDescription } from '~/lib/hooks';
 import { forwardRef, type ForwardedRef, useCallback } from 'react';
 import { Checkbox } from '~/components/ui/Checkbox';
@@ -67,15 +67,15 @@ export function HistoryItem({
 
   return (
     <div
-      className={classNames(
-        'group rounded-lg text-sm text-gray-700 dark:text-gray-300 hover:text-gray-900 dark:hover:text-white hover:bg-gray-50/80 dark:hover:bg-gray-800/30 overflow-hidden flex justify-between items-center px-3 py-2 transition-colors',
-        { 'text-gray-900 dark:text-white bg-gray-50/80 dark:bg-gray-800/30': isActiveChat },
+      className={cn(
+        'group flex items-center justify-between overflow-hidden rounded-lg px-3 py-2 text-sm text-gray-700 transition-colors hover:bg-gray-50/80 hover:text-gray-900 dark:text-gray-300 dark:hover:bg-gray-800/30 dark:hover:text-white',
+        { 'bg-gray-50/80 text-gray-900 dark:bg-gray-800/30 dark:text-white': isActiveChat },
         { 'cursor-pointer': selectionMode },
       )}
       onClick={selectionMode ? handleItemClick : undefined}
     >
       {selectionMode && (
-        <div className="flex items-center mr-2" onClick={(e) => e.stopPropagation()}>
+        <div className="mr-2 flex items-center" onClick={(e) => e.stopPropagation()}>
           <Checkbox
             id={`select-${item.id}`}
             checked={isSelected}
@@ -86,10 +86,10 @@ export function HistoryItem({
       )}
 
       {editing ? (
-        <form onSubmit={handleSubmit} className="flex-1 flex items-center gap-2">
+        <form onSubmit={handleSubmit} className="flex flex-1 items-center gap-2">
           <input
             type="text"
-            className="flex-1 bg-white dark:bg-gray-900 text-gray-900 dark:text-white rounded-md px-3 py-1.5 text-sm border border-gray-200 dark:border-gray-800 focus:outline-none focus:ring-1 focus:ring-purple-500/50"
+            className="flex-1 rounded-md border border-gray-200 bg-white px-3 py-1.5 text-sm text-gray-900 focus:ring-1 focus:ring-purple-500/50 focus:outline-hidden dark:border-gray-800 dark:bg-gray-900 dark:text-white"
             autoFocus
             value={currentDescription}
             onChange={handleChange}
@@ -98,27 +98,25 @@ export function HistoryItem({
           />
           <button
             type="submit"
-            className="i-ph:check h-4 w-4 text-gray-500 hover:text-purple-500 transition-colors"
+            className="i-ph:check h-4 w-4 text-gray-500 transition-colors hover:text-purple-500"
             onMouseDown={handleSubmit}
           />
         </form>
       ) : (
         <a
           href={`/chat/${item.urlId}`}
-          className="flex w-full relative truncate block"
+          className="relative block flex w-full truncate"
           onClick={selectionMode ? handleItemClick : undefined}
         >
-          <WithTooltip tooltip={currentDescription}>
-            <span className="truncate pr-24">{currentDescription}</span>
-          </WithTooltip>
+          {/* <WithTooltip tooltip={currentDescription}> */}
+          <span className="truncate pr-24">{currentDescription}</span>
+          {/* </WithTooltip> */}
           <div
-            className={classNames(
-              'absolute right-0 top-0 bottom-0 flex items-center bg-transparent px-2 transition-colors',
-            )}
+            className={cn('absolute top-0 right-0 bottom-0 flex items-center bg-transparent px-2 transition-colors')}
           >
-            <div className="flex items-center gap-2.5 text-gray-400 dark:text-gray-500 opacity-0 group-hover:opacity-100 transition-opacity">
+            <div className="flex items-center gap-2.5 text-gray-400 opacity-0 transition-opacity group-hover:opacity-100 dark:text-gray-500">
               <ChatActionButton
-                toolTipContent="Export"
+                // toolTipContent="Export"
                 icon="i-ph:download-simple h-4 w-4"
                 onClick={(event) => {
                   event.preventDefault();
@@ -127,7 +125,7 @@ export function HistoryItem({
               />
               {onDuplicate && (
                 <ChatActionButton
-                  toolTipContent="Duplicate"
+                  // toolTipContent="Duplicate"
                   icon="i-ph:copy h-4 w-4"
                   onClick={(event) => {
                     event.preventDefault();
@@ -136,7 +134,7 @@ export function HistoryItem({
                 />
               )}
               <ChatActionButton
-                toolTipContent="Rename"
+                // toolTipContent="Rename"
                 icon="i-ph:pencil-fill h-4 w-4"
                 onClick={(event) => {
                   event.preventDefault();
@@ -144,7 +142,7 @@ export function HistoryItem({
                 }}
               />
               <ChatActionButton
-                toolTipContent="Delete"
+                // toolTipContent="Delete"
                 icon="i-ph:trash h-4 w-4"
                 className="hover:text-red-500 dark:hover:text-red-400"
                 onClick={handleDeleteClick}
@@ -160,12 +158,10 @@ export function HistoryItem({
 const ChatActionButton = forwardRef(
   (
     {
-      toolTipContent,
       icon,
       className,
       onClick,
     }: {
-      toolTipContent: string;
       icon: string;
       className?: string;
       onClick: (event: React.MouseEvent<HTMLButtonElement, MouseEvent>) => void;
@@ -174,14 +170,15 @@ const ChatActionButton = forwardRef(
     ref: ForwardedRef<HTMLButtonElement>,
   ) => {
     return (
-      <WithTooltip tooltip={toolTipContent} position="bottom" sideOffset={4}>
-        <button
-          ref={ref}
-          type="button"
-          className={`text-gray-400 dark:text-gray-500 hover:text-purple-500 dark:hover:text-purple-400 transition-colors ${icon} ${className ? className : ''}`}
-          onClick={onClick}
-        />
-      </WithTooltip>
+      // <WithTooltip tooltip={toolTipContent} position="bottom" sideOffset={4}>
+      <button
+        ref={ref}
+        type="button"
+        className={`text-gray-400 transition-colors hover:text-purple-500 dark:text-gray-500 dark:hover:text-purple-400 ${icon} ${className ? className : ''}`}
+        onClick={onClick}
+      />
+
+      // </WithTooltip>
     );
   },
 );

@@ -1,6 +1,6 @@
 import React from 'react';
 import { motion } from 'framer-motion';
-import { classNames } from '~/utils/classNames';
+import { cn } from '~/utils/cn';
 
 interface CloseButtonProps {
   onClick?: () => void;
@@ -31,11 +31,11 @@ export function CloseButton({ onClick, className, size = 'md' }: CloseButtonProp
     <motion.button
       type="button"
       onClick={onClick}
-      className={classNames(
-        'text-bolt-elements-textTertiary hover:text-bolt-elements-textSecondary dark:text-bolt-elements-textTertiary-dark dark:hover:text-bolt-elements-textSecondary-dark',
-        'rounded-lg hover:bg-bolt-elements-background-depth-2 dark:hover:bg-bolt-elements-background-depth-3',
+      className={cn(
+        'text-bolt-elements-text-tertiary hover:text-bolt-elements-text-secondary dark:text-bolt-elements-textTertiary-dark dark:hover:text-bolt-elements-textSecondary-dark',
+        'hover:bg-bolt-elements-background-depth-2 dark:hover:bg-darken-50 rounded-lg',
         'transition-colors duration-200',
-        'focus:outline-none focus:ring-2 focus:ring-purple-500/50',
+        'focus:ring-2 focus:ring-purple-500/50 focus:outline-hidden',
         sizeClasses[size],
         className,
       )}
@@ -43,7 +43,7 @@ export function CloseButton({ onClick, className, size = 'md' }: CloseButtonProp
       whileTap={{ scale: 0.95 }}
       aria-label="Close"
     >
-      <div className={classNames('i-ph:x', iconSizeClasses[size])} />
+      <div className={cn('i-ph:x', iconSizeClasses[size])} />
     </motion.button>
   );
 }

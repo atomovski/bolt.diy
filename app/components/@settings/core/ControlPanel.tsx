@@ -1,7 +1,7 @@
 import { useState, useEffect, useMemo } from 'react';
 import { useStore } from '@nanostores/react';
 import * as RadixDialog from '@radix-ui/react-dialog';
-import { classNames } from '~/utils/classNames';
+import { cn } from '~/utils/cn';
 import { TabTile } from '~/components/@settings/shared/components/TabTile';
 import { useFeatures } from '~/lib/hooks/useFeatures';
 import { useNotifications } from '~/lib/hooks/useNotifications';
@@ -12,7 +12,6 @@ import type { TabType, Profile } from './types';
 import { TAB_LABELS, DEFAULT_TAB_CONFIG, TAB_DESCRIPTIONS } from './constants';
 import { DialogTitle } from '~/components/ui/Dialog';
 import { AvatarDropdown } from './AvatarDropdown';
-import BackgroundRays from '~/components/ui/BackgroundRays';
 
 // Import all tab components
 import ProfileTab from '~/components/@settings/tabs/profile/ProfileTab';
@@ -36,7 +35,7 @@ interface ControlPanelProps {
 const BETA_TABS = new Set<TabType>(['service-status', 'local-providers', 'mcp']);
 
 const BetaLabel = () => (
-  <div className="absolute top-2 right-2 px-1.5 py-0.5 rounded-full bg-purple-500/10 dark:bg-purple-500/20">
+  <div className="absolute top-2 right-2 rounded-full bg-purple-500/10 px-1.5 py-0.5 dark:bg-purple-500/20">
     <span className="text-[10px] font-medium text-purple-600 dark:text-purple-400">BETA</span>
   </div>
 );
@@ -202,40 +201,37 @@ export const ControlPanel = ({ open, onClose }: ControlPanelProps) => {
   return (
     <RadixDialog.Root open={open}>
       <RadixDialog.Portal>
-        <div className="fixed inset-0 flex items-center justify-center z-[100] modern-scrollbar">
-          <RadixDialog.Overlay className="absolute inset-0 bg-black/70 dark:bg-black/80 backdrop-blur-sm transition-opacity duration-200" />
+        <div className="modern-scrollbar fixed inset-0 z-100 flex items-center justify-center">
+          <RadixDialog.Overlay className="absolute inset-0 bg-black/70 backdrop-blur-xs transition-opacity duration-200 dark:bg-black/80" />
 
           <RadixDialog.Content
             aria-describedby={undefined}
             onEscapeKeyDown={handleClose}
             onPointerDownOutside={handleClose}
-            className="relative z-[101]"
+            className="relative z-101"
           >
             <div
-              className={classNames(
-                'w-[1200px] h-[90vh]',
+              className={cn(
+                'h-[90vh] w-[1200px]',
                 'bg-bolt-elements-background-depth-1',
                 'rounded-2xl shadow-2xl',
-                'border border-bolt-elements-borderColor',
+                'border-bolt-elements-border-color border',
                 'flex flex-col overflow-hidden',
                 'relative',
                 'transform transition-all duration-200 ease-out',
-                open ? 'opacity-100 scale-100 translate-y-0' : 'opacity-0 scale-95 translate-y-4',
+                open ? 'translate-y-0 scale-100 opacity-100' : 'translate-y-4 scale-95 opacity-0',
               )}
             >
-              <div className="absolute inset-0 overflow-hidden rounded-2xl">
-                <BackgroundRays />
-              </div>
-              <div className="relative z-10 flex flex-col h-full">
+              <div className="relative z-10 flex h-full flex-col">
                 {/* Header */}
-                <div className="flex items-center justify-between px-6 py-4 border-b border-gray-200 dark:border-gray-700">
+                <div className="flex items-center justify-between border-b border-gray-200 px-6 py-4 dark:border-gray-700">
                   <div className="flex items-center space-x-4">
                     {(activeTab || showTabManagement) && (
                       <button
                         onClick={handleBack}
-                        className="flex items-center justify-center w-8 h-8 rounded-full bg-transparent hover:bg-purple-500/10 dark:hover:bg-purple-500/20 group transition-colors duration-150"
+                        className="group flex h-8 w-8 items-center justify-center rounded-full bg-transparent transition-colors duration-150 hover:bg-purple-500/10 dark:hover:bg-purple-500/20"
                       >
-                        <div className="i-ph:arrow-left w-4 h-4 text-gray-500 dark:text-gray-400 group-hover:text-purple-500 transition-colors" />
+                        <div className="i-ph:arrow-left h-4 w-4 text-gray-500 transition-colors group-hover:text-purple-500 dark:text-gray-400" />
                       </button>
                     )}
                     <DialogTitle className="text-xl font-semibold text-gray-900 dark:text-white">
@@ -252,16 +248,16 @@ export const ControlPanel = ({ open, onClose }: ControlPanelProps) => {
                     {/* Close Button */}
                     <button
                       onClick={handleClose}
-                      className="flex items-center justify-center w-8 h-8 rounded-full bg-transparent hover:bg-purple-500/10 dark:hover:bg-purple-500/20 group transition-all duration-200"
+                      className="group flex h-8 w-8 items-center justify-center rounded-full bg-transparent transition-all duration-200 hover:bg-purple-500/10 dark:hover:bg-purple-500/20"
                     >
-                      <div className="i-ph:x w-4 h-4 text-gray-500 dark:text-gray-400 group-hover:text-purple-500 transition-colors" />
+                      <div className="i-ph:x h-4 w-4 text-gray-500 transition-colors group-hover:text-purple-500 dark:text-gray-400" />
                     </button>
                   </div>
                 </div>
 
                 {/* Content */}
                 <div
-                  className={classNames(
+                  className={cn(
                     'flex-1',
                     'overflow-y-auto',
                     'hover:overflow-y-auto',
@@ -274,7 +270,7 @@ export const ControlPanel = ({ open, onClose }: ControlPanelProps) => {
                   )}
                 >
                   <div
-                    className={classNames(
+                    className={cn(
                       'p-6 transition-opacity duration-150',
                       activeTab || showTabManagement ? 'opacity-100' : 'opacity-100',
                     )}
@@ -282,11 +278,11 @@ export const ControlPanel = ({ open, onClose }: ControlPanelProps) => {
                     {activeTab ? (
                       getTabComponent(activeTab)
                     ) : (
-                      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 relative">
+                      <div className="relative grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-4">
                         {visibleTabs.map((tab, index) => (
                           <div
                             key={tab.id}
-                            className={classNames(
+                            className={cn(
                               'aspect-[1.5/1] transition-transform duration-100 ease-out',
                               'hover:scale-[1.01]',
                             )}
@@ -303,7 +299,7 @@ export const ControlPanel = ({ open, onClose }: ControlPanelProps) => {
                               statusMessage={getStatusMessage(tab.id)}
                               description={TAB_DESCRIPTIONS[tab.id]}
                               isLoading={loadingTab === tab.id}
-                              className="h-full relative"
+                              className="relative h-full"
                             >
                               {BETA_TABS.has(tab.id) && <BetaLabel />}
                             </TabTile>

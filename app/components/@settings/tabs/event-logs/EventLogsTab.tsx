@@ -3,7 +3,7 @@ import { motion } from 'framer-motion';
 import { Switch } from '~/components/ui/Switch';
 import { logStore, type LogEntry } from '~/lib/stores/logs';
 import { useStore } from '@nanostores/react';
-import { classNames } from '~/utils/classNames';
+import { cn } from '~/utils/cn';
 import * as DropdownMenu from '@radix-ui/react-dropdown-menu';
 import { Dialog, DialogRoot, DialogTitle } from '~/components/ui/Dialog';
 import { jsPDF } from 'jspdf';
@@ -145,7 +145,7 @@ const LogEntryItem = ({ log, isExpanded: forceExpanded, use24Hour, showTimestamp
           {details.prompt && (
             <div className="flex flex-col gap-1">
               <div className="text-xs font-medium text-gray-700 dark:text-gray-300">Prompt:</div>
-              <pre className="text-xs text-gray-600 dark:text-gray-400 bg-gray-50 dark:bg-gray-800/50 rounded p-2 whitespace-pre-wrap">
+              <pre className="rounded-sm bg-gray-50 p-2 text-xs whitespace-pre-wrap text-gray-600 dark:bg-gray-800/50 dark:text-gray-400">
                 {details.prompt}
               </pre>
             </div>
@@ -153,7 +153,7 @@ const LogEntryItem = ({ log, isExpanded: forceExpanded, use24Hour, showTimestamp
           {details.response && (
             <div className="flex flex-col gap-1">
               <div className="text-xs font-medium text-gray-700 dark:text-gray-300">Response:</div>
-              <pre className="text-xs text-gray-600 dark:text-gray-400 bg-gray-50 dark:bg-gray-800/50 rounded p-2 whitespace-pre-wrap">
+              <pre className="rounded-sm bg-gray-50 p-2 text-xs whitespace-pre-wrap text-gray-600 dark:bg-gray-800/50 dark:text-gray-400">
                 {details.response}
               </pre>
             </div>
@@ -172,11 +172,11 @@ const LogEntryItem = ({ log, isExpanded: forceExpanded, use24Hour, showTimestamp
             <span>•</span>
             <span>Duration: {details.duration}ms</span>
           </div>
-          <div className="text-xs text-gray-600 dark:text-gray-400 break-all">{details.url}</div>
+          <div className="text-xs break-all text-gray-600 dark:text-gray-400">{details.url}</div>
           {details.request && (
             <div className="flex flex-col gap-1">
               <div className="text-xs font-medium text-gray-700 dark:text-gray-300">Request:</div>
-              <pre className="text-xs text-gray-600 dark:text-gray-400 bg-gray-50 dark:bg-gray-800/50 rounded p-2 whitespace-pre-wrap">
+              <pre className="rounded-sm bg-gray-50 p-2 text-xs whitespace-pre-wrap text-gray-600 dark:bg-gray-800/50 dark:text-gray-400">
                 {JSON.stringify(details.request, null, 2)}
               </pre>
             </div>
@@ -184,7 +184,7 @@ const LogEntryItem = ({ log, isExpanded: forceExpanded, use24Hour, showTimestamp
           {details.response && (
             <div className="flex flex-col gap-1">
               <div className="text-xs font-medium text-gray-700 dark:text-gray-300">Response:</div>
-              <pre className="text-xs text-gray-600 dark:text-gray-400 bg-gray-50 dark:bg-gray-800/50 rounded p-2 whitespace-pre-wrap">
+              <pre className="rounded-sm bg-gray-50 p-2 text-xs whitespace-pre-wrap text-gray-600 dark:bg-gray-800/50 dark:text-gray-400">
                 {JSON.stringify(details.response, null, 2)}
               </pre>
             </div>
@@ -192,7 +192,7 @@ const LogEntryItem = ({ log, isExpanded: forceExpanded, use24Hour, showTimestamp
           {details.error && (
             <div className="flex flex-col gap-1">
               <div className="text-xs font-medium text-red-500">Error:</div>
-              <pre className="text-xs text-red-400 bg-red-50 dark:bg-red-500/10 rounded p-2 whitespace-pre-wrap">
+              <pre className="rounded-sm bg-red-50 p-2 text-xs whitespace-pre-wrap text-red-400 dark:bg-red-500/10">
                 {JSON.stringify(details.error, null, 2)}
               </pre>
             </div>
@@ -202,7 +202,7 @@ const LogEntryItem = ({ log, isExpanded: forceExpanded, use24Hour, showTimestamp
     }
 
     return (
-      <pre className="text-xs text-gray-600 dark:text-gray-400 bg-gray-50 dark:bg-gray-800/50 rounded whitespace-pre-wrap">
+      <pre className="rounded-sm bg-gray-50 text-xs whitespace-pre-wrap text-gray-600 dark:bg-gray-800/50 dark:text-gray-400">
         {JSON.stringify(details, null, 2)}
       </pre>
     );
@@ -212,7 +212,7 @@ const LogEntryItem = ({ log, isExpanded: forceExpanded, use24Hour, showTimestamp
     <motion.div
       initial={{ opacity: 0, y: 20 }}
       animate={{ opacity: 1, y: 0 }}
-      className={classNames(
+      className={cn(
         'flex flex-col gap-2',
         'rounded-lg p-4',
         'bg-[#FAFAFA] dark:bg-[#0A0A0A]',
@@ -223,14 +223,14 @@ const LogEntryItem = ({ log, isExpanded: forceExpanded, use24Hour, showTimestamp
     >
       <div className="flex items-start justify-between gap-4">
         <div className="flex items-start gap-3">
-          <span className={classNames('text-lg', style.icon, style.color)} />
+          <span className={cn('text-lg', style.icon, style.color)} />
           <div className="flex flex-col gap-1">
             <div className="text-sm font-medium text-gray-900 dark:text-white">{log.message}</div>
             {log.details && (
               <>
                 <button
                   onClick={() => setLocalExpanded(!localExpanded)}
-                  className="text-xs text-gray-500 dark:text-gray-400 hover:text-purple-500 dark:hover:text-purple-400 transition-colors"
+                  className="text-xs text-gray-500 transition-colors hover:text-purple-500 dark:text-gray-400 dark:hover:text-purple-400"
                 >
                   {localExpanded ? 'Hide' : 'Show'} Details
                 </button>
@@ -238,11 +238,9 @@ const LogEntryItem = ({ log, isExpanded: forceExpanded, use24Hour, showTimestamp
               </>
             )}
             <div className="flex items-center gap-2">
-              <div className={classNames('px-2 py-0.5 rounded text-xs font-medium uppercase', style.badge)}>
-                {log.level}
-              </div>
+              <div className={cn('rounded-sm px-2 py-0.5 text-xs font-medium uppercase', style.badge)}>{log.level}</div>
               {log.category && (
-                <div className="px-2 py-0.5 rounded-full text-xs bg-gray-100 dark:bg-gray-800 text-gray-500 dark:text-gray-400">
+                <div className="rounded-full bg-gray-100 px-2 py-0.5 text-xs text-gray-500 dark:bg-gray-800 dark:text-gray-400">
                   {log.category}
                 </div>
               )}
@@ -802,7 +800,7 @@ export function EventLogsTab() {
       <DialogRoot open={isOpen} onOpenChange={handleOpenChange}>
         <button
           onClick={() => setIsOpen(true)}
-          className={classNames(
+          className={cn(
             'group flex items-center gap-2',
             'rounded-lg px-3 py-1.5',
             'text-sm text-gray-900 dark:text-white',
@@ -812,14 +810,14 @@ export function EventLogsTab() {
             'transition-all duration-200',
           )}
         >
-          <span className="i-ph:download text-lg text-gray-500 dark:text-gray-400 group-hover:text-purple-500 transition-colors" />
+          <span className="i-ph:download text-lg text-gray-500 transition-colors group-hover:text-purple-500 dark:text-gray-400" />
           Export
         </button>
 
         <Dialog showCloseButton>
           <div className="p-6">
             <DialogTitle className="flex items-center gap-2">
-              <div className="i-ph:download w-5 h-5" />
+              <div className="i-ph:download h-5 w-5" />
               Export Event Logs
             </DialogTitle>
 
@@ -828,19 +826,19 @@ export function EventLogsTab() {
                 <button
                   key={format.id}
                   onClick={() => handleFormatClick(format.handler)}
-                  className={classNames(
-                    'flex items-center gap-3 px-4 py-3 text-sm rounded-lg transition-colors w-full text-left',
+                  className={cn(
+                    'flex w-full items-center gap-3 rounded-lg px-4 py-3 text-left text-sm transition-colors',
                     'bg-white dark:bg-[#0A0A0A]',
                     'border border-[#E5E5E5] dark:border-[#1A1A1A]',
                     'hover:bg-purple-50 dark:hover:bg-[#1a1a1a]',
                     'hover:border-purple-200 dark:hover:border-purple-900/30',
-                    'text-bolt-elements-textPrimary',
+                    'text-black',
                   )}
                 >
-                  <div className={classNames(format.icon, 'w-5 h-5')} />
+                  <div className={cn(format.icon, 'h-5 w-5')} />
                   <div>
                     <div className="font-medium">{format.label}</div>
-                    <div className="text-xs text-bolt-elements-textSecondary mt-0.5">
+                    <div className="text-bolt-elements-text-secondary mt-0.5 text-xs">
                       {format.id === 'json' && 'Export as a structured JSON file'}
                       {format.id === 'csv' && 'Export as a CSV spreadsheet'}
                       {format.id === 'pdf' && 'Export as a formatted PDF document'}
@@ -862,7 +860,7 @@ export function EventLogsTab() {
         <DropdownMenu.Root open={showLevelFilter} onOpenChange={setShowLevelFilter}>
           <DropdownMenu.Trigger asChild>
             <button
-              className={classNames(
+              className={cn(
                 'flex items-center gap-2',
                 'rounded-lg px-3 py-1.5',
                 'text-sm text-gray-900 dark:text-white',
@@ -873,7 +871,7 @@ export function EventLogsTab() {
               )}
             >
               <span
-                className={classNames('text-lg', selectedLevelOption?.icon || 'i-ph:funnel')}
+                className={cn('text-lg', selectedLevelOption?.icon || 'i-ph:funnel')}
                 style={{ color: selectedLevelOption?.color }}
               />
               {selectedLevelOption?.label || 'All Types'}
@@ -883,7 +881,7 @@ export function EventLogsTab() {
 
           <DropdownMenu.Portal>
             <DropdownMenu.Content
-              className="min-w-[200px] bg-white dark:bg-[#0A0A0A] rounded-lg shadow-lg py-1 z-[250] animate-in fade-in-0 zoom-in-95 border border-[#E5E5E5] dark:border-[#1A1A1A]"
+              className="animate-in fade-in-0 zoom-in-95 z-250 min-w-[200px] rounded-lg border border-[#E5E5E5] bg-white py-1 shadow-lg dark:border-[#1A1A1A] dark:bg-[#0A0A0A]"
               sideOffset={5}
               align="start"
               side="bottom"
@@ -891,16 +889,16 @@ export function EventLogsTab() {
               {logLevelOptions.map((option) => (
                 <DropdownMenu.Item
                   key={option.value}
-                  className="group flex items-center px-4 py-2.5 text-sm text-gray-700 dark:text-gray-200 hover:bg-purple-500/10 dark:hover:bg-purple-500/20 cursor-pointer transition-colors"
+                  className="group flex cursor-pointer items-center px-4 py-2.5 text-sm text-gray-700 transition-colors hover:bg-purple-500/10 dark:text-gray-200 dark:hover:bg-purple-500/20"
                   onClick={() => handleLevelFilterChange(option.value)}
                 >
                   <div className="mr-3 flex h-5 w-5 items-center justify-center">
                     <div
-                      className={classNames(option.icon, 'text-lg group-hover:text-purple-500 transition-colors')}
+                      className={cn(option.icon, 'text-lg transition-colors group-hover:text-purple-500')}
                       style={{ color: option.color }}
                     />
                   </div>
-                  <span className="group-hover:text-purple-500 transition-colors">{option.label}</span>
+                  <span className="transition-colors group-hover:text-purple-500">{option.label}</span>
                 </DropdownMenu.Item>
               ))}
             </DropdownMenu.Content>
@@ -935,11 +933,11 @@ export function EventLogsTab() {
             <span className="text-sm text-gray-500 dark:text-gray-400">Auto Expand</span>
           </div>
 
-          <div className="w-px h-4 bg-gray-200 dark:bg-gray-700" />
+          <div className="h-4 w-px bg-gray-200 dark:bg-gray-700" />
 
           <button
             onClick={handleRefresh}
-            className={classNames(
+            className={cn(
               'group flex items-center gap-2',
               'rounded-lg px-3 py-1.5',
               'text-sm text-gray-900 dark:text-white',
@@ -950,7 +948,7 @@ export function EventLogsTab() {
               { 'animate-spin': isRefreshing },
             )}
           >
-            <span className="i-ph:arrows-clockwise text-lg text-gray-500 dark:text-gray-400 group-hover:text-purple-500 transition-colors" />
+            <span className="i-ph:arrows-clockwise text-lg text-gray-500 transition-colors group-hover:text-purple-500 dark:text-gray-400" />
             Refresh
           </button>
 
@@ -965,16 +963,16 @@ export function EventLogsTab() {
             placeholder="Search logs..."
             value={searchQuery}
             onChange={(e) => setSearchQuery(e.target.value)}
-            className={classNames(
-              'w-full px-4 py-2 pl-10 rounded-lg',
+            className={cn(
+              'w-full rounded-lg px-4 py-2 pl-10',
               'bg-[#FAFAFA] dark:bg-[#0A0A0A]',
               'border border-[#E5E5E5] dark:border-[#1A1A1A]',
-              'text-gray-900 dark:text-white placeholder-gray-500 dark:placeholder-gray-400',
-              'focus:outline-none focus:ring-2 focus:ring-purple-500/20 focus:border-purple-500',
+              'text-gray-900 placeholder-gray-500 dark:text-white dark:placeholder-gray-400',
+              'focus:border-purple-500 focus:ring-2 focus:ring-purple-500/20 focus:outline-hidden',
               'transition-all duration-200',
             )}
           />
-          <div className="absolute left-3 top-1/2 -translate-y-1/2">
+          <div className="absolute top-1/2 left-3 -translate-y-1/2">
             <div className="i-ph:magnifying-glass text-lg text-gray-500 dark:text-gray-400" />
           </div>
         </div>
@@ -983,7 +981,7 @@ export function EventLogsTab() {
           <motion.div
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
-            className={classNames(
+            className={cn(
               'flex flex-col items-center justify-center gap-4',
               'rounded-lg p-8 text-center',
               'bg-[#FAFAFA] dark:bg-[#0A0A0A]',

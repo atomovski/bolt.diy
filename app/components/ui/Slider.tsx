@@ -1,6 +1,6 @@
 import { motion } from 'framer-motion';
 import { memo } from 'react';
-import { classNames } from '~/utils/classNames';
+import { cn } from '~/utils/cn';
 import { cubicEasingFn } from '~/utils/easings';
 import { genericMemo } from '~/utils/react';
 
@@ -22,7 +22,7 @@ export const Slider = genericMemo(<T,>({ selected, options, setSelected }: Slide
   const isMiddleSelected = hasMiddle && options.middle ? selected === options.middle.value : false;
 
   return (
-    <div className="flex items-center flex-wrap shrink-0 gap-1 bg-bolt-elements-background-depth-1 overflow-hidden rounded-full p-1">
+    <div className="bg-bolt-elements-background-depth-1 flex shrink-0 flex-wrap items-center gap-1 overflow-hidden rounded-full p-1">
       <SliderButton selected={isLeftSelected} setSelected={() => setSelected?.(options.left.value)}>
         {options.left.text}
       </SliderButton>
@@ -53,8 +53,8 @@ const SliderButton = memo(({ selected, children, setSelected }: SliderButtonProp
   return (
     <button
       onClick={setSelected}
-      className={classNames(
-        'bg-transparent text-sm px-2.5 py-0.5 rounded-full relative',
+      className={cn(
+        'relative rounded-full bg-transparent px-2.5 py-0.5 text-sm',
         selected
           ? 'text-bolt-elements-item-contentAccent'
           : 'text-bolt-elements-item-contentDefault hover:text-bolt-elements-item-contentActive',
@@ -65,7 +65,7 @@ const SliderButton = memo(({ selected, children, setSelected }: SliderButtonProp
         <motion.span
           layoutId="pill-tab"
           transition={{ duration: 0.2, ease: cubicEasingFn }}
-          className="absolute inset-0 z-0 bg-bolt-elements-item-backgroundAccent rounded-full"
+          className="bg-bolt-elements-item-backgroundAccent absolute inset-0 z-0 rounded-full"
         ></motion.span>
       )}
     </button>

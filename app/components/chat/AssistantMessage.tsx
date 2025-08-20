@@ -1,10 +1,10 @@
+/* eslint-disable @blitz/lines-around-comment */
 import { memo, Fragment } from 'react';
 import { Markdown } from './Markdown';
 import type { JSONValue } from 'ai';
-import Popover from '~/components/ui/Popover';
+import { Popover, PopoverContent, PopoverTrigger } from '~/components/ui/Popover';
 import { workbenchStore } from '~/lib/stores/workbench';
 import { WORK_DIR } from '~/utils/constants';
-import WithTooltip from '~/components/ui/Tooltip';
 import type { Message } from 'ai';
 import type { ProviderInfo } from '~/types/model';
 import type {
@@ -17,6 +17,7 @@ import type {
 } from '@ai-sdk/ui-utils';
 import { ToolInvocations } from './ToolInvocations';
 import type { ToolCallAnnotation } from '~/types/context';
+import { Button, Icon } from '~/components/ui';
 
 interface AssistantMessageProps {
   content: string;
@@ -103,29 +104,43 @@ export const AssistantMessage = memo(
     ) as ToolCallAnnotation[];
 
     return (
-      <div className="overflow-hidden w-full">
+      <div className="flex w-full flex-col gap-4 overflow-hidden">
         <>
-          <div className=" flex gap-2 items-center text-sm text-bolt-elements-textSecondary mb-2">
-            {(codeContext || chatSummary) && (
-              <Popover side="right" align="start" trigger={<div className="i-ph:info" />}>
-                {chatSummary && (
-                  <div className="max-w-chat">
-                    <div className="summary max-h-96 flex flex-col">
-                      <h2 className="border border-bolt-elements-borderColor rounded-md p4">Summary</h2>
-                      <div style={{ zoom: 0.7 }} className="overflow-y-auto m4">
-                        <Markdown>{chatSummary}</Markdown>
+          <div className="mb-2 flex items-center justify-between gap-4">
+            <div className="flex flex-1 flex-col gap-2">
+              {(codeContext || chatSummary) && (
+                <Popover>
+                  <PopoverTrigger asChild>
+                    <Button
+                      variant="outline"
+                      className="flex w-fit items-center gap-1 rounded-md px-2 py-1 text-base transition-colors"
+                    >
+                      <Icon.InfoCircle className="size-4" />
+                      {chatSummary ? 'Summary' : 'Context'}
+                      {codeContext && ` (${codeContext.length} files)`}
+                    </Button>
+                  </PopoverTrigger>
+                  <PopoverContent className="w-96 max-w-[90vw]" align="start">
+                    {chatSummary && (
+                      <div className="mb-4">
+                        <div className="summary flex max-h-96 flex-col">
+                          <h3 className="mb-2 text-sm font-medium">Summary</h3>
+                          <div className="overflow-y-auto">
+                            <Markdown>{chatSummary}</Markdown>
+                          </div>
+                        </div>
                       </div>
-                    </div>
+                    )}
                     {codeContext && (
-                      <div className="code-context flex flex-col p4 border border-bolt-elements-borderColor rounded-md">
-                        <h2>Context</h2>
-                        <div className="flex gap-4 mt-4 bolt" style={{ zoom: 0.6 }}>
+                      <div className="code-context">
+                        <h3 className="mb-2 text-sm font-medium">Context Files</h3>
+                        <div className="flex flex-wrap gap-2">
                           {codeContext.map((x) => {
                             const normalized = normalizedFilePath(x);
                             return (
                               <Fragment key={normalized}>
                                 <code
-                                  className="bg-bolt-elements-artifacts-inlineCode-background text-bolt-elements-artifacts-inlineCode-text px-1.5 py-1 rounded-md text-bolt-elements-item-contentAccent hover:underline cursor-pointer"
+                                  className="bg-bolt-elements-artifacts-inlineCode-background text-bolt-elements-artifacts-inlineCode-text text-bolt-elements-item-contentAccent cursor-pointer rounded-md px-1.5 py-1 text-xs hover:underline"
                                   onClick={(e) => {
                                     e.preventDefault();
                                     e.stopPropagation();
@@ -140,40 +155,35 @@ export const AssistantMessage = memo(
                         </div>
                       </div>
                     )}
-                  </div>
-                )}
-                <div className="context"></div>
-              </Popover>
-            )}
-            <div className="flex w-full items-center justify-between">
+                  </PopoverContent>
+                </Popover>
+              )}
               {usage && (
-                <div>
+                <div className="text-sm">
                   Tokens: {usage.totalTokens} (prompt: {usage.promptTokens}, completion: {usage.completionTokens})
                 </div>
               )}
-              {(onRewind || onFork) && messageId && (
-                <div className="flex gap-2 flex-col lg:flex-row ml-auto">
-                  {onRewind && (
-                    <WithTooltip tooltip="Revert to this message">
-                      <button
-                        onClick={() => onRewind(messageId)}
-                        key="i-ph:arrow-u-up-left"
-                        className="i-ph:arrow-u-up-left text-xl text-bolt-elements-textSecondary hover:text-bolt-elements-textPrimary transition-colors"
-                      />
-                    </WithTooltip>
-                  )}
-                  {onFork && (
-                    <WithTooltip tooltip="Fork chat from this message">
-                      <button
-                        onClick={() => onFork(messageId)}
-                        key="i-ph:git-fork"
-                        className="i-ph:git-fork text-xl text-bolt-elements-textSecondary hover:text-bolt-elements-textPrimary transition-colors"
-                      />
-                    </WithTooltip>
-                  )}
-                </div>
-              )}
             </div>
+            {(onRewind || onFork) && messageId && (
+              <div className="flex flex-shrink-0 items-center gap-2">
+                {onRewind && (
+                  // <WithTooltip tooltip="Revert to this message">
+                  <Icon.Rewind
+                    onClick={() => onRewind(messageId)}
+                    className="text-bolt-elements-text-secondary size-4 cursor-pointer transition-colors hover:text-black"
+                  />
+                  // </WithTooltip>
+                )}
+                {onFork && (
+                  // <WithTooltip tooltip="Fork chat from this message">
+                  <Icon.GitFork
+                    onClick={() => onFork(messageId)}
+                    className="text-bolt-elements-text-secondary size-4 cursor-pointer transition-colors hover:text-black"
+                  />
+                  // </WithTooltip>
+                )}
+              </div>
+            )}
           </div>
         </>
         <Markdown append={append} chatMode={chatMode} setChatMode={setChatMode} model={model} provider={provider} html>

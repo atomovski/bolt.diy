@@ -16,7 +16,7 @@ export const LoadingDots = memo(({ text }: LoadingDotsProps) => {
   }, []);
 
   return (
-    <div className="flex justify-center items-center h-full">
+    <div className="flex h-full items-center justify-center">
       <div className="relative">
         <span>{text}</span>
         <span className="absolute left-[calc(100%-12px)]">{'.'.repeat(dotCount)}</span>

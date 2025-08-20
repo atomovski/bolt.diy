@@ -1,7 +1,9 @@
 import React, { forwardRef } from 'react';
-import { classNames } from '~/utils/classNames';
+import { cn } from '~/utils/cn';
 import { Input } from './Input';
 import { motion, AnimatePresence } from 'framer-motion';
+import { LoadingSpinner } from './loading-spinner';
+import { Icon } from '~/components/ui';
 
 interface SearchInputProps extends React.InputHTMLAttributes<HTMLInputElement> {
   /** Function to call when the clear button is clicked */
@@ -33,25 +35,16 @@ export const SearchInput = forwardRef<HTMLInputElement, SearchInputProps>(
     const hasValue = Boolean(props.value);
 
     return (
-      <div className={classNames('relative flex items-center w-full', containerClassName)}>
+      <div className={cn('relative flex w-full items-center', containerClassName)}>
         {/* Search icon or loading spinner */}
-        <div
-          className={classNames(
-            'absolute left-3 top-1/2 -translate-y-1/2 text-bolt-elements-textTertiary',
-            iconClassName,
-          )}
-        >
-          {loading ? (
-            <span className="i-ph:spinner-gap animate-spin w-4 h-4" />
-          ) : (
-            <span className="i-ph:magnifying-glass w-4 h-4" />
-          )}
+        <div className={cn('absolute top-1/2 left-3 -translate-y-1/2', iconClassName)}>
+          {loading ? <LoadingSpinner spinnerSize="sm" /> : <Icon.Search className="size-4" />}
         </div>
 
         {/* Input field */}
         <Input
           ref={ref}
-          className={classNames('pl-10', hasValue && showClearButton ? 'pr-10' : '', className)}
+          className={cn('bg-darken-50 border-0 pl-10', hasValue && showClearButton ? 'pr-10' : '', className)}
           {...props}
         />
 
@@ -65,10 +58,10 @@ export const SearchInput = forwardRef<HTMLInputElement, SearchInputProps>(
               transition={{ duration: 0.15 }}
               type="button"
               onClick={onClear}
-              className="absolute right-3 top-1/2 -translate-y-1/2 text-bolt-elements-textTertiary hover:text-bolt-elements-textSecondary p-1 rounded-full hover:bg-bolt-elements-background-depth-2"
+              className="absolute top-1/2 right-3 -translate-y-1/2 rounded-full p-1"
               aria-label="Clear search"
             >
-              <span className="i-ph:x w-3.5 h-3.5" />
+              <span className="i-ph:x h-3.5 w-3.5" />
             </motion.button>
           )}
         </AnimatePresence>
