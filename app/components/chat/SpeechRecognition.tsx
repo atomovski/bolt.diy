@@ -1,28 +1,47 @@
-import { IconButton } from '~/components/ui/IconButton';
-import { classNames } from '~/utils/classNames';
-import React from 'react';
+import { Button } from '~/components/ui/Button';
+import { Icon } from '~/components/ui';
 
 export const SpeechRecognitionButton = ({
   isListening,
   onStart,
   onStop,
   disabled,
+  speechRecognitionSupported = true,
 }: {
   isListening: boolean;
   onStart: () => void;
   onStop: () => void;
   disabled: boolean;
+  speechRecognitionSupported?: boolean;
 }) => {
+  const getTitle = () => {
+    if (!speechRecognitionSupported) {
+      return 'Speech recognition not supported in this browser';
+    }
+
+    if (disabled) {
+      return 'Speech recognition unavailable while streaming';
+    }
+
+    return isListening ? 'Stop listening' : 'Start speech recognition';
+  };
+
   return (
-    <IconButton
-      title={isListening ? 'Stop listening' : 'Start speech recognition'}
+    <Button
+      variant="ghost"
+      size="icon"
+      title={getTitle()}
       disabled={disabled}
-      className={classNames('transition-all', {
-        'text-bolt-elements-item-contentAccent': isListening,
-      })}
-      onClick={isListening ? onStop : onStart}
+      onClick={
+        isListening
+          ? onStop
+          : () => {
+              console.log('Hey');
+              onStart();
+            }
+      }
     >
-      {isListening ? <div className="i-ph:microphone-slash text-xl" /> : <div className="i-ph:microphone text-xl" />}
-    </IconButton>
+      {isListening ? <Icon.MicrophoneMute /> : <Icon.Microphone />}
+    </Button>
   );
 };

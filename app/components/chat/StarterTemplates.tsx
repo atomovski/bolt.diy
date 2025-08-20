@@ -14,7 +14,7 @@ const FrameworkLink: React.FC<FrameworkLinkProps> = ({ template }) => (
     className="items-center justify-center"
   >
     <div
-      className={`inline-block ${template.icon} w-8 h-8 text-4xl transition-theme hover:text-purple-500 dark:text-white dark:opacity-50 dark:hover:opacity-100 dark:hover:text-purple-400 transition-all grayscale hover:grayscale-0 transition`}
+      className={`inline-block ${template.icon} transition-theme h-8 w-8 text-4xl grayscale transition transition-all hover:text-purple-500 hover:grayscale-0 dark:text-white dark:opacity-50 dark:hover:text-purple-400 dark:hover:opacity-100`}
       title={template.label}
     />
   </a>
@@ -25,7 +25,7 @@ const StarterTemplates: React.FC = () => {
     <div className="flex flex-col items-center gap-4">
       <span className="text-sm text-gray-500">or start a blank app with your favorite stack</span>
       <div className="flex justify-center">
-        <div className="flex flex-wrap justify-center items-center gap-4 max-w-sm">
+        <div className="flex max-w-sm flex-wrap items-center justify-center gap-4">
           {STARTER_TEMPLATES.map((template) => (
             <FrameworkLink key={template.name} template={template} />
           ))}

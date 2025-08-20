@@ -1,8 +1,15 @@
 import { json, type LoaderFunctionArgs } from '@remix-run/cloudflare';
-import { default as IndexRoute } from './_index';
+import { AppLayout } from '~/components/layout/AppLayout';
+import { ChatPage } from '~/components/pages/ChatPage';
 
 export async function loader(args: LoaderFunctionArgs) {
   return json({ id: args.params.id });
 }
 
-export default IndexRoute;
+export default function Chat() {
+  return (
+    <AppLayout>
+      <ChatPage />
+    </AppLayout>
+  );
+}

@@ -1,4 +1,4 @@
-import { classNames } from '~/utils/classNames';
+import { cn } from '~/utils/cn';
 import { IconButton } from '~/components/ui';
 
 export function DiscussMode() {
@@ -6,8 +6,8 @@ export function DiscussMode() {
     <div>
       <IconButton
         title="Discuss"
-        className={classNames(
-          'transition-all flex items-center gap-1 bg-bolt-elements-item-backgroundAccent text-bolt-elements-item-contentAccent',
+        className={cn(
+          'bg-bolt-elements-item-backgroundAccent text-bolt-elements-item-contentAccent flex items-center gap-1 transition-all',
         )}
       >
         <div className={`i-ph:chats text-xl`} />

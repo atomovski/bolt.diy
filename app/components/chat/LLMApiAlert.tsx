@@ -1,6 +1,6 @@
 import { AnimatePresence, motion } from 'framer-motion';
 import type { LlmErrorAlertType } from '~/types/actions';
-import { classNames } from '~/utils/classNames';
+import { cn } from '~/utils/cn';
 
 interface Props {
   alert: LlmErrorAlertType;
@@ -43,16 +43,11 @@ export default function LlmErrorAlert({ alert, clearAlert }: Props) {
         animate={{ opacity: 1, y: 0 }}
         exit={{ opacity: 0, y: -20 }}
         transition={{ duration: 0.3 }}
-        className="rounded-lg border border-bolt-elements-borderColor bg-bolt-elements-background-depth-2 p-4 mb-2"
+        className="border-bolt-elements-border-color bg-bolt-elements-background-depth-2 mb-2 rounded-lg border p-4"
       >
         <div className="flex items-start">
-          <motion.div
-            className="flex-shrink-0"
-            initial={{ scale: 0 }}
-            animate={{ scale: 1 }}
-            transition={{ delay: 0.2 }}
-          >
-            <div className={`${getErrorIcon()} text-xl text-bolt-elements-button-danger-text`}></div>
+          <motion.div className="shrink-0" initial={{ scale: 0 }} animate={{ scale: 1 }} transition={{ delay: 0.2 }}>
+            <div className={`${getErrorIcon()} text-bolt-elements-button-danger-text text-xl`}></div>
           </motion.div>
 
           <div className="ml-3 flex-1">
@@ -60,7 +55,7 @@ export default function LlmErrorAlert({ alert, clearAlert }: Props) {
               initial={{ opacity: 0 }}
               animate={{ opacity: 1 }}
               transition={{ delay: 0.1 }}
-              className="text-sm font-medium text-bolt-elements-textPrimary"
+              className="text-sm font-medium text-black"
             >
               {title}
             </motion.h3>
@@ -69,12 +64,12 @@ export default function LlmErrorAlert({ alert, clearAlert }: Props) {
               initial={{ opacity: 0 }}
               animate={{ opacity: 1 }}
               transition={{ delay: 0.2 }}
-              className="mt-2 text-sm text-bolt-elements-textSecondary"
+              className="text-bolt-elements-text-secondary mt-2 text-sm"
             >
               <p>{getErrorMessage()}</p>
 
               {description && (
-                <div className="text-xs text-bolt-elements-textSecondary p-2 bg-bolt-elements-background-depth-3 rounded mt-4 mb-4">
+                <div className="text-bolt-elements-text-secondary bg-darken-50 mt-4 mb-4 rounded-sm p-2 text-xs">
                   Error Details: {description}
                 </div>
               )}
@@ -89,11 +84,11 @@ export default function LlmErrorAlert({ alert, clearAlert }: Props) {
               <div className="flex gap-2">
                 <button
                   onClick={clearAlert}
-                  className={classNames(
-                    'px-2 py-1.5 rounded-md text-sm font-medium',
+                  className={cn(
+                    'rounded-md px-2 py-1.5 text-sm font-medium',
                     'bg-bolt-elements-button-secondary-background',
-                    'hover:bg-bolt-elements-button-secondary-backgroundHover',
-                    'focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-bolt-elements-button-secondary-background',
+                    'hover:bg-bolt-elements-button-secondary-background-hover',
+                    'focus:ring-bolt-elements-button-secondary-background focus:ring-2 focus:ring-offset-2 focus:outline-hidden',
                     'text-bolt-elements-button-secondary-text',
                   )}
                 >

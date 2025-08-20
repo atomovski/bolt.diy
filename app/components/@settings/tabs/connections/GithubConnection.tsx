@@ -2,7 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { motion } from 'framer-motion';
 import { toast } from 'react-toastify';
 import { logStore } from '~/lib/stores/logs';
-import { classNames } from '~/utils/classNames';
+import { cn } from '~/utils/cn';
 import Cookies from 'js-cookie';
 import { Collapsible, CollapsibleTrigger, CollapsibleContent } from '~/components/ui/Collapsible';
 import { Button } from '~/components/ui/Button';
@@ -85,7 +85,7 @@ interface GitHubConnection {
 
 // Add the GitHub logo SVG component
 const GithubLogo = () => (
-  <svg viewBox="0 0 24 24" className="w-5 h-5">
+  <svg viewBox="0 0 24 24" className="h-5 w-5">
     <path
       fill="currentColor"
       d="M12 0c-6.626 0-12 5.373-12 12 0 5.302 3.438 9.8 8.207 11.387.599.111.793-.261.793-.577v-2.234c-3.338.726-4.033-1.416-4.033-1.416-.546-1.387-1.333-1.756-1.333-1.756-1.089-.745.083-.729.083-.729 1.205.084 1.839 1.237 1.839 1.237 1.07 1.834 2.807 1.304 3.492.997.107-.775.418-1.305.762-1.604-2.665-.305-5.467-1.334-5.467-5.931 0-1.311.469-2.381 1.236-3.221-.124-.303-.535-1.524.117-3.176 0 0 1.008-.322 3.301 1.23.957-.266 1.983-.399 3.003-.404 1.02.005 2.047.138 3.006.404 2.291-1.552 3.297-1.23 3.297-1.23.653 1.653.242 2.874.118 3.176.77.84 1.235 1.911 1.235 3.221 0 4.609-2.807 5.624-5.479 5.921.43.372.823 1.102.823 2.222v3.293c0 .319.192.694.801.576 4.765-1.589 8.199-6.086 8.199-11.386 0-6.627-5.373-12-12-12z"
@@ -535,42 +535,40 @@ export default function GitHubConnection() {
 
   return (
     <motion.div
-      className="bg-bolt-elements-background dark:bg-bolt-elements-background border border-bolt-elements-borderColor dark:border-bolt-elements-borderColor rounded-lg"
+      className="bg-bolt-elements-background dark:bg-bolt-elements-background border-bolt-elements-border-color dark:border-bolt-elements-border-color rounded-lg border"
       initial={{ opacity: 0, y: 20 }}
       animate={{ opacity: 1, y: 0 }}
       transition={{ delay: 0.2 }}
     >
-      <div className="p-6 space-y-6">
+      <div className="space-y-6 p-6">
         <div className="flex items-center justify-between">
           <div className="flex items-center gap-2">
             <GithubLogo />
-            <h3 className="text-base font-medium text-bolt-elements-textPrimary dark:text-bolt-elements-textPrimary">
-              GitHub Connection
-            </h3>
+            <h3 className="text-base font-medium text-black dark:text-black">GitHub Connection</h3>
           </div>
         </div>
 
         {!connection.user && (
-          <div className="text-xs text-bolt-elements-textSecondary bg-bolt-elements-background-depth-1 dark:bg-bolt-elements-background-depth-1 p-3 rounded-lg mb-4">
-            <p className="flex items-center gap-1 mb-1">
-              <span className="i-ph:lightbulb w-3.5 h-3.5 text-bolt-elements-icon-success dark:text-bolt-elements-icon-success" />
+          <div className="text-bolt-elements-text-secondary bg-bolt-elements-background-depth-1 dark:bg-bolt-elements-background-depth-1 mb-4 rounded-lg p-3 text-xs">
+            <p className="mb-1 flex items-center gap-1">
+              <span className="i-ph:lightbulb text-bolt-elements-icon-success dark:text-bolt-elements-icon-success h-3.5 w-3.5" />
               <span className="font-medium">Tip:</span> You can also set the{' '}
-              <code className="px-1 py-0.5 bg-bolt-elements-background-depth-2 dark:bg-bolt-elements-background-depth-2 rounded">
+              <code className="bg-bolt-elements-background-depth-2 dark:bg-bolt-elements-background-depth-2 rounded-sm px-1 py-0.5">
                 VITE_GITHUB_ACCESS_TOKEN
               </code>{' '}
               environment variable to connect automatically.
             </p>
             <p>
               For fine-grained tokens, also set{' '}
-              <code className="px-1 py-0.5 bg-bolt-elements-background-depth-2 dark:bg-bolt-elements-background-depth-2 rounded">
+              <code className="bg-bolt-elements-background-depth-2 dark:bg-bolt-elements-background-depth-2 rounded-sm px-1 py-0.5">
                 VITE_GITHUB_TOKEN_TYPE=fine-grained
               </code>
             </p>
           </div>
         )}
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+        <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
           <div>
-            <label className="block text-sm text-bolt-elements-textSecondary dark:text-bolt-elements-textSecondary mb-2">
+            <label className="text-bolt-elements-text-secondary dark:text-bolt-elements-text-secondary mb-2 block text-sm">
               Token Type
             </label>
             <select
@@ -581,12 +579,12 @@ export default function GitHubConnection() {
                 setConnection((prev) => ({ ...prev, tokenType: newTokenType }));
               }}
               disabled={isConnecting || !!connection.user}
-              className={classNames(
-                'w-full px-3 py-2 rounded-lg text-sm',
+              className={cn(
+                'w-full rounded-lg px-3 py-2 text-sm',
                 'bg-bolt-elements-background-depth-1 dark:bg-bolt-elements-background-depth-1',
-                'border border-bolt-elements-borderColor dark:border-bolt-elements-borderColor',
-                'text-bolt-elements-textPrimary dark:text-bolt-elements-textPrimary',
-                'focus:outline-none focus:ring-1 focus:ring-bolt-elements-item-contentAccent dark:focus:ring-bolt-elements-item-contentAccent',
+                'border-bolt-elements-border-color dark:border-bolt-elements-border-color border',
+                'text-black dark:text-black',
+                'focus:ring-bolt-elements-item-contentAccent dark:focus:ring-bolt-elements-item-contentAccent focus:ring-1 focus:outline-hidden',
                 'disabled:opacity-50',
               )}
             >
@@ -596,7 +594,7 @@ export default function GitHubConnection() {
           </div>
 
           <div>
-            <label className="block text-sm text-bolt-elements-textSecondary dark:text-bolt-elements-textSecondary mb-2">
+            <label className="text-bolt-elements-text-secondary dark:text-bolt-elements-text-secondary mb-2 block text-sm">
               {connection.tokenType === 'classic' ? 'Personal Access Token' : 'Fine-grained Token'}
             </label>
             <input
@@ -607,24 +605,24 @@ export default function GitHubConnection() {
               placeholder={`Enter your GitHub ${
                 connection.tokenType === 'classic' ? 'personal access token' : 'fine-grained token'
               }`}
-              className={classNames(
-                'w-full px-3 py-2 rounded-lg text-sm',
+              className={cn(
+                'w-full rounded-lg px-3 py-2 text-sm',
                 'bg-[#F8F8F8] dark:bg-[#1A1A1A]',
                 'border border-[#E5E5E5] dark:border-[#333333]',
-                'text-bolt-elements-textPrimary placeholder-bolt-elements-textTertiary',
-                'focus:outline-none focus:ring-1 focus:ring-bolt-elements-borderColorActive',
+                'placeholder-bolt-elements-text-tertiary text-black',
+                'focus:ring-bolt-elements-border-color-active focus:ring-1 focus:outline-hidden',
                 'disabled:opacity-50',
               )}
             />
-            <div className="mt-2 text-sm text-bolt-elements-textSecondary">
+            <div className="text-bolt-elements-text-secondary mt-2 text-sm">
               <a
                 href={`https://github.com/settings/tokens${connection.tokenType === 'fine-grained' ? '/beta' : '/new'}`}
                 target="_blank"
                 rel="noopener noreferrer"
-                className="text-bolt-elements-borderColorActive hover:underline inline-flex items-center gap-1"
+                className="text-bolt-elements-border-color-active inline-flex items-center gap-1 hover:underline"
               >
                 Get your token
-                <div className="i-ph:arrow-square-out w-4 h-4" />
+                <div className="i-ph:arrow-square-out h-4 w-4" />
               </a>
               <span className="mx-2">•</span>
               <span>
@@ -642,11 +640,11 @@ export default function GitHubConnection() {
             <button
               onClick={handleConnect}
               disabled={isConnecting || !connection.token}
-              className={classNames(
-                'px-4 py-2 rounded-lg text-sm flex items-center gap-2',
+              className={cn(
+                'flex items-center gap-2 rounded-lg px-4 py-2 text-sm',
                 'bg-[#303030] text-white',
                 'hover:bg-[#5E41D0] hover:text-white',
-                'disabled:opacity-50 disabled:cursor-not-allowed transition-all duration-200',
+                'transition-all duration-200 disabled:cursor-not-allowed disabled:opacity-50',
                 'transform active:scale-95',
               )}
             >
@@ -657,28 +655,28 @@ export default function GitHubConnection() {
                 </>
               ) : (
                 <>
-                  <div className="i-ph:plug-charging w-4 h-4" />
+                  <div className="i-ph:plug-charging h-4 w-4" />
                   Connect
                 </>
               )}
             </button>
           ) : (
             <>
-              <div className="flex items-center justify-between w-full">
+              <div className="flex w-full items-center justify-between">
                 <div className="flex items-center gap-4">
                   <button
                     onClick={handleDisconnect}
-                    className={classNames(
-                      'px-4 py-2 rounded-lg text-sm flex items-center gap-2',
+                    className={cn(
+                      'flex items-center gap-2 rounded-lg px-4 py-2 text-sm',
                       'bg-red-500 text-white',
                       'hover:bg-red-600',
                     )}
                   >
-                    <div className="i-ph:plug w-4 h-4" />
+                    <div className="i-ph:plug h-4 w-4" />
                     Disconnect
                   </button>
-                  <span className="text-sm text-bolt-elements-textSecondary flex items-center gap-1">
-                    <div className="i-ph:check-circle w-4 h-4 text-green-500" />
+                  <span className="text-bolt-elements-text-secondary flex items-center gap-1 text-sm">
+                    <div className="i-ph:check-circle h-4 w-4 text-green-500" />
                     Connected to GitHub
                   </span>
                 </div>
@@ -686,9 +684,9 @@ export default function GitHubConnection() {
                   <Button
                     variant="outline"
                     onClick={() => window.open('https://github.com/dashboard', '_blank', 'noopener,noreferrer')}
-                    className="flex items-center gap-2 hover:bg-bolt-elements-item-backgroundActive/10 hover:text-bolt-elements-textPrimary dark:hover:text-bolt-elements-textPrimary transition-colors"
+                    className="hover:bg-bolt-elements-item-backgroundActive/10 flex items-center gap-2 transition-colors hover:text-black dark:hover:text-black"
                   >
-                    <div className="i-ph:layout w-4 h-4" />
+                    <div className="i-ph:layout h-4 w-4" />
                     Dashboard
                   </Button>
                   <Button
@@ -698,16 +696,16 @@ export default function GitHubConnection() {
                     }}
                     disabled={isFetchingStats}
                     variant="outline"
-                    className="flex items-center gap-2 hover:bg-bolt-elements-item-backgroundActive/10 hover:text-bolt-elements-textPrimary dark:hover:text-bolt-elements-textPrimary transition-colors"
+                    className="hover:bg-bolt-elements-item-backgroundActive/10 flex items-center gap-2 transition-colors hover:text-black dark:hover:text-black"
                   >
                     {isFetchingStats ? (
                       <>
-                        <div className="i-ph:spinner-gap w-4 h-4 animate-spin" />
+                        <div className="i-ph:spinner-gap h-4 w-4 animate-spin" />
                         Refreshing...
                       </>
                     ) : (
                       <>
-                        <div className="i-ph:arrows-clockwise w-4 h-4" />
+                        <div className="i-ph:arrows-clockwise h-4 w-4" />
                         Refresh Stats
                       </>
                     )}
@@ -719,18 +717,18 @@ export default function GitHubConnection() {
         </div>
 
         {connection.user && connection.stats && (
-          <div className="mt-6 border-t border-bolt-elements-borderColor dark:border-bolt-elements-borderColor pt-6">
-            <div className="flex items-center gap-4 p-4 bg-bolt-elements-background-depth-1 dark:bg-bolt-elements-background-depth-1 rounded-lg mb-4">
+          <div className="border-bolt-elements-border-color dark:border-bolt-elements-border-color mt-6 border-t pt-6">
+            <div className="bg-bolt-elements-background-depth-1 dark:bg-bolt-elements-background-depth-1 mb-4 flex items-center gap-4 rounded-lg p-4">
               <img
                 src={connection.user.avatar_url}
                 alt={connection.user.login}
-                className="w-12 h-12 rounded-full border-2 border-bolt-elements-item-contentAccent dark:border-bolt-elements-item-contentAccent"
+                className="border-bolt-elements-item-contentAccent dark:border-bolt-elements-item-contentAccent h-12 w-12 rounded-full border-2"
               />
               <div>
-                <h4 className="text-sm font-medium text-bolt-elements-textPrimary dark:text-bolt-elements-textPrimary">
+                <h4 className="text-sm font-medium text-black dark:text-black">
                   {connection.user.name || connection.user.login}
                 </h4>
-                <p className="text-sm text-bolt-elements-textSecondary dark:text-bolt-elements-textSecondary">
+                <p className="text-bolt-elements-text-secondary dark:text-bolt-elements-text-secondary text-sm">
                   {connection.user.login}
                 </p>
               </div>
@@ -738,24 +736,24 @@ export default function GitHubConnection() {
 
             <Collapsible open={isStatsExpanded} onOpenChange={setIsStatsExpanded}>
               <CollapsibleTrigger asChild>
-                <div className="flex items-center justify-between p-4 rounded-lg bg-bolt-elements-background dark:bg-bolt-elements-background-depth-2 border border-bolt-elements-borderColor dark:border-bolt-elements-borderColor hover:border-bolt-elements-borderColorActive/70 dark:hover:border-bolt-elements-borderColorActive/70 transition-all duration-200">
+                <div className="bg-bolt-elements-background dark:bg-bolt-elements-background-depth-2 border-bolt-elements-border-color dark:border-bolt-elements-border-color hover:border-bolt-elements-border-color-active/70 dark:hover:border-bolt-elements-border-color-active/70 flex items-center justify-between rounded-lg border p-4 transition-all duration-200">
                   <div className="flex items-center gap-2">
-                    <div className="i-ph:chart-bar w-4 h-4 text-bolt-elements-item-contentAccent" />
-                    <span className="text-sm font-medium text-bolt-elements-textPrimary">GitHub Stats</span>
+                    <div className="i-ph:chart-bar text-bolt-elements-item-contentAccent h-4 w-4" />
+                    <span className="text-sm font-medium text-black">GitHub Stats</span>
                   </div>
                   <div
-                    className={classNames(
-                      'i-ph:caret-down w-4 h-4 transform transition-transform duration-200 text-bolt-elements-textSecondary',
+                    className={cn(
+                      'i-ph:caret-down text-bolt-elements-text-secondary h-4 w-4 transform transition-transform duration-200',
                       isStatsExpanded ? 'rotate-180' : '',
                     )}
                   />
                 </div>
               </CollapsibleTrigger>
               <CollapsibleContent className="overflow-hidden">
-                <div className="space-y-4 mt-4">
+                <div className="mt-4 space-y-4">
                   {/* Languages Section */}
                   <div className="mb-6">
-                    <h4 className="text-sm font-medium text-bolt-elements-textPrimary mb-3">Top Languages</h4>
+                    <h4 className="mb-3 text-sm font-medium text-black">Top Languages</h4>
                     <div className="flex flex-wrap gap-2">
                       {Object.entries(connection.stats.languages)
                         .sort(([, a], [, b]) => b - a)
@@ -763,7 +761,7 @@ export default function GitHubConnection() {
                         .map(([language]) => (
                           <span
                             key={language}
-                            className="px-3 py-1 text-xs rounded-full bg-bolt-elements-sidebar-buttonBackgroundDefault text-bolt-elements-sidebar-buttonText"
+                            className="bg-bolt-elements-sidebar-buttonBackgroundDefault text-bolt-elements-sidebar-buttonText rounded-full px-3 py-1 text-xs"
                           >
                             {language}
                           </span>
@@ -772,7 +770,7 @@ export default function GitHubConnection() {
                   </div>
 
                   {/* Additional Stats */}
-                  <div className="grid grid-cols-4 gap-4 mb-6">
+                  <div className="mb-6 grid grid-cols-4 gap-4">
                     {[
                       {
                         label: 'Member Since',
@@ -793,10 +791,10 @@ export default function GitHubConnection() {
                     ].map((stat, index) => (
                       <div
                         key={index}
-                        className="flex flex-col p-3 rounded-lg bg-bolt-elements-background-depth-2 dark:bg-bolt-elements-background-depth-2 border border-bolt-elements-borderColor dark:border-bolt-elements-borderColor"
+                        className="bg-bolt-elements-background-depth-2 dark:bg-bolt-elements-background-depth-2 border-bolt-elements-border-color dark:border-bolt-elements-border-color flex flex-col rounded-lg border p-3"
                       >
-                        <span className="text-xs text-bolt-elements-textSecondary">{stat.label}</span>
-                        <span className="text-lg font-medium text-bolt-elements-textPrimary">{stat.value}</span>
+                        <span className="text-bolt-elements-text-secondary text-xs">{stat.label}</span>
+                        <span className="text-lg font-medium text-black">{stat.value}</span>
                       </div>
                     ))}
                   </div>
@@ -805,7 +803,7 @@ export default function GitHubConnection() {
                   <div className="mt-4">
                     <div className="space-y-4">
                       <div>
-                        <h5 className="text-sm font-medium text-bolt-elements-textPrimary mb-2">Repository Stats</h5>
+                        <h5 className="mb-2 text-sm font-medium text-black">Repository Stats</h5>
                         <div className="grid grid-cols-2 gap-4">
                           {[
                             {
@@ -819,17 +817,17 @@ export default function GitHubConnection() {
                           ].map((stat, index) => (
                             <div
                               key={index}
-                              className="flex flex-col p-3 rounded-lg bg-bolt-elements-background-depth-2 dark:bg-bolt-elements-background-depth-2 border border-bolt-elements-borderColor dark:border-bolt-elements-borderColor"
+                              className="bg-bolt-elements-background-depth-2 dark:bg-bolt-elements-background-depth-2 border-bolt-elements-border-color dark:border-bolt-elements-border-color flex flex-col rounded-lg border p-3"
                             >
-                              <span className="text-xs text-bolt-elements-textSecondary">{stat.label}</span>
-                              <span className="text-lg font-medium text-bolt-elements-textPrimary">{stat.value}</span>
+                              <span className="text-bolt-elements-text-secondary text-xs">{stat.label}</span>
+                              <span className="text-lg font-medium text-black">{stat.value}</span>
                             </div>
                           ))}
                         </div>
                       </div>
 
                       <div>
-                        <h5 className="text-sm font-medium text-bolt-elements-textPrimary mb-2">Contribution Stats</h5>
+                        <h5 className="mb-2 text-sm font-medium text-black">Contribution Stats</h5>
                         <div className="grid grid-cols-3 gap-4">
                           {[
                             {
@@ -853,11 +851,11 @@ export default function GitHubConnection() {
                           ].map((stat, index) => (
                             <div
                               key={index}
-                              className="flex flex-col p-3 rounded-lg bg-bolt-elements-background-depth-2 dark:bg-bolt-elements-background-depth-2 border border-bolt-elements-borderColor dark:border-bolt-elements-borderColor"
+                              className="bg-bolt-elements-background-depth-2 dark:bg-bolt-elements-background-depth-2 border-bolt-elements-border-color dark:border-bolt-elements-border-color flex flex-col rounded-lg border p-3"
                             >
-                              <span className="text-xs text-bolt-elements-textSecondary">{stat.label}</span>
-                              <span className="text-lg font-medium text-bolt-elements-textPrimary flex items-center gap-1">
-                                <div className={`${stat.icon} w-4 h-4 ${stat.iconColor}`} />
+                              <span className="text-bolt-elements-text-secondary text-xs">{stat.label}</span>
+                              <span className="flex items-center gap-1 text-lg font-medium text-black">
+                                <div className={`${stat.icon} h-4 w-4 ${stat.iconColor}`} />
                                 {stat.value}
                               </span>
                             </div>
@@ -866,7 +864,7 @@ export default function GitHubConnection() {
                       </div>
 
                       <div>
-                        <h5 className="text-sm font-medium text-bolt-elements-textPrimary mb-2">Gists</h5>
+                        <h5 className="mb-2 text-sm font-medium text-black">Gists</h5>
                         <div className="grid grid-cols-2 gap-4">
                           {[
                             {
@@ -880,17 +878,17 @@ export default function GitHubConnection() {
                           ].map((stat, index) => (
                             <div
                               key={index}
-                              className="flex flex-col p-3 rounded-lg bg-bolt-elements-background-depth-2 dark:bg-bolt-elements-background-depth-2 border border-bolt-elements-borderColor dark:border-bolt-elements-borderColor"
+                              className="bg-bolt-elements-background-depth-2 dark:bg-bolt-elements-background-depth-2 border-bolt-elements-border-color dark:border-bolt-elements-border-color flex flex-col rounded-lg border p-3"
                             >
-                              <span className="text-xs text-bolt-elements-textSecondary">{stat.label}</span>
-                              <span className="text-lg font-medium text-bolt-elements-textPrimary">{stat.value}</span>
+                              <span className="text-bolt-elements-text-secondary text-xs">{stat.label}</span>
+                              <span className="text-lg font-medium text-black">{stat.value}</span>
                             </div>
                           ))}
                         </div>
                       </div>
 
-                      <div className="pt-2 border-t border-bolt-elements-borderColor">
-                        <span className="text-xs text-bolt-elements-textSecondary">
+                      <div className="border-bolt-elements-border-color border-t pt-2">
+                        <span className="text-bolt-elements-text-secondary text-xs">
                           Last updated: {new Date(connection.stats.lastUpdated).toLocaleString()}
                         </span>
                       </div>
@@ -899,57 +897,57 @@ export default function GitHubConnection() {
 
                   {/* Repositories Section */}
                   <div className="space-y-4">
-                    <h4 className="text-sm font-medium text-bolt-elements-textPrimary">Recent Repositories</h4>
-                    <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    <h4 className="text-sm font-medium text-black">Recent Repositories</h4>
+                    <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
                       {connection.stats.repos.map((repo) => (
                         <a
                           key={repo.full_name}
                           href={repo.html_url}
                           target="_blank"
                           rel="noopener noreferrer"
-                          className="group block p-4 rounded-lg bg-bolt-elements-background-depth-1 dark:bg-bolt-elements-background-depth-1 border border-bolt-elements-borderColor dark:border-bolt-elements-borderColor hover:border-bolt-elements-borderColorActive dark:hover:border-bolt-elements-borderColorActive transition-all duration-200"
+                          className="group bg-bolt-elements-background-depth-1 dark:bg-bolt-elements-background-depth-1 border-bolt-elements-border-color dark:border-bolt-elements-border-color hover:border-bolt-elements-border-color-active dark:hover:border-bolt-elements-border-color-active block rounded-lg border p-4 transition-all duration-200"
                         >
                           <div className="space-y-3">
                             <div className="flex items-start justify-between">
                               <div className="flex items-center gap-2">
-                                <div className="i-ph:git-branch w-4 h-4 text-bolt-elements-icon-tertiary" />
-                                <h5 className="text-sm font-medium text-bolt-elements-textPrimary group-hover:text-bolt-elements-item-contentAccent transition-colors">
+                                <div className="i-ph:git-branch text-bolt-elements-icon-tertiary h-4 w-4" />
+                                <h5 className="group-hover:text-bolt-elements-item-contentAccent text-sm font-medium text-black transition-colors">
                                   {repo.name}
                                 </h5>
                               </div>
-                              <div className="flex items-center gap-3 text-xs text-bolt-elements-textSecondary">
+                              <div className="text-bolt-elements-text-secondary flex items-center gap-3 text-xs">
                                 <span className="flex items-center gap-1" title="Stars">
-                                  <div className="i-ph:star w-3.5 h-3.5 text-bolt-elements-icon-warning" />
+                                  <div className="i-ph:star text-bolt-elements-icon-warning h-3.5 w-3.5" />
                                   {repo.stargazers_count.toLocaleString()}
                                 </span>
                                 <span className="flex items-center gap-1" title="Forks">
-                                  <div className="i-ph:git-fork w-3.5 h-3.5 text-bolt-elements-icon-info" />
+                                  <div className="i-ph:git-fork text-bolt-elements-icon-info h-3.5 w-3.5" />
                                   {repo.forks_count.toLocaleString()}
                                 </span>
                               </div>
                             </div>
 
                             {repo.description && (
-                              <p className="text-xs text-bolt-elements-textSecondary line-clamp-2">
+                              <p className="text-bolt-elements-text-secondary line-clamp-2 text-xs">
                                 {repo.description}
                               </p>
                             )}
 
-                            <div className="flex items-center gap-3 text-xs text-bolt-elements-textSecondary">
+                            <div className="text-bolt-elements-text-secondary flex items-center gap-3 text-xs">
                               <span className="flex items-center gap-1" title="Default Branch">
-                                <div className="i-ph:git-branch w-3.5 h-3.5" />
+                                <div className="i-ph:git-branch h-3.5 w-3.5" />
                                 {repo.default_branch}
                               </span>
                               <span className="flex items-center gap-1" title="Last Updated">
-                                <div className="i-ph:clock w-3.5 h-3.5" />
+                                <div className="i-ph:clock h-3.5 w-3.5" />
                                 {new Date(repo.updated_at).toLocaleDateString(undefined, {
                                   year: 'numeric',
                                   month: 'short',
                                   day: 'numeric',
                                 })}
                               </span>
-                              <span className="flex items-center gap-1 ml-auto group-hover:text-bolt-elements-item-contentAccent transition-colors">
-                                <div className="i-ph:arrow-square-out w-3.5 h-3.5" />
+                              <span className="group-hover:text-bolt-elements-item-contentAccent ml-auto flex items-center gap-1 transition-colors">
+                                <div className="i-ph:arrow-square-out h-3.5 w-3.5" />
                                 View
                               </span>
                             </div>
@@ -972,8 +970,8 @@ function LoadingSpinner() {
   return (
     <div className="flex items-center justify-center p-4">
       <div className="flex items-center gap-2">
-        <div className="i-ph:spinner-gap-bold animate-spin w-4 h-4" />
-        <span className="text-bolt-elements-textSecondary">Loading...</span>
+        <div className="i-ph:spinner-gap-bold h-4 w-4 animate-spin" />
+        <span className="text-bolt-elements-text-secondary">Loading...</span>
       </div>
     </div>
   );

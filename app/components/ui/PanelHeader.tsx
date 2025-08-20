@@ -1,5 +1,5 @@
 import { memo } from 'react';
-import { classNames } from '~/utils/classNames';
+import { cn } from '~/utils/cn';
 
 interface PanelHeaderProps {
   className?: string;
@@ -9,8 +9,8 @@ interface PanelHeaderProps {
 export const PanelHeader = memo(({ className, children }: PanelHeaderProps) => {
   return (
     <div
-      className={classNames(
-        'flex items-center gap-2 bg-bolt-elements-background-depth-2 text-bolt-elements-textSecondary border-b border-bolt-elements-borderColor px-4 py-1 min-h-[34px] text-sm',
+      className={cn(
+        'bg-darken-50 text-bolt-elements-text-secondary border-bolt-elements-border-color flex min-h-[34px] items-center gap-2 border-b px-4 py-1 text-sm',
         className,
       )}
     >

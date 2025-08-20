@@ -1,6 +1,6 @@
 import { AnimatePresence, motion } from 'framer-motion';
 import type { SupabaseAlert } from '~/types/actions';
-import { classNames } from '~/utils/classNames';
+import { cn } from '~/utils/cn';
 import { supabaseConnection } from '~/lib/stores/supabase';
 import { useStore } from '@nanostores/react';
 import { useState } from 'react';
@@ -99,7 +99,7 @@ export function SupabaseChatAlert({ alert, clearAlert, postMessage }: Props) {
         animate={{ opacity: 1, y: 0 }}
         exit={{ opacity: 0, y: -20 }}
         transition={{ duration: 0.3 }}
-        className="max-w-chat rounded-lg border-l-2 border-l-[#098F5F] border border-bolt-elements-borderColor bg-bolt-elements-background-depth-2"
+        className="max-w-chat border-bolt-elements-border-color bg-bolt-elements-background-depth-2 rounded-lg border border-l-2 border-l-[#098F5F]"
       >
         {/* Header */}
         <div className="p-4 pb-2">
@@ -112,28 +112,24 @@ export function SupabaseChatAlert({ alert, clearAlert, postMessage }: Props) {
         {/* SQL Content */}
         <div className="px-4">
           {!isConnected ? (
-            <div className="p-3 rounded-md bg-bolt-elements-background-depth-3">
-              <span className="text-sm text-bolt-elements-textPrimary">
-                You must first connect to Supabase and select a project.
-              </span>
+            <div className="bg-darken-50 rounded-md p-3">
+              <span className="text-sm text-black">You must first connect to Supabase and select a project.</span>
             </div>
           ) : (
             <>
               <div
-                className="flex items-center p-2 rounded-md bg-bolt-elements-background-depth-3 cursor-pointer"
+                className="bg-darken-50 flex cursor-pointer items-center rounded-md p-2"
                 onClick={() => setIsCollapsed(!isCollapsed)}
               >
-                <div className="i-ph:database text-bolt-elements-textPrimary mr-2"></div>
-                <span className="text-sm text-bolt-elements-textPrimary flex-grow">
-                  {description || 'Create table and setup auth'}
-                </span>
+                <div className="i-ph:database mr-2 text-black"></div>
+                <span className="grow text-sm text-black">{description || 'Create table and setup auth'}</span>
                 <div
-                  className={`i-ph:caret-up text-bolt-elements-textPrimary transition-transform ${isCollapsed ? 'rotate-180' : ''}`}
+                  className={`i-ph:caret-up text-black transition-transform ${isCollapsed ? 'rotate-180' : ''}`}
                 ></div>
               </div>
 
               {!isCollapsed && content && (
-                <div className="mt-2 p-3 bg-bolt-elements-background-depth-4 rounded-md overflow-auto max-h-60 font-mono text-xs text-bolt-elements-textSecondary">
+                <div className="bg-bolt-elements-background-depth-4 text-bolt-elements-text-secondary mt-2 max-h-60 overflow-auto rounded-md p-3 font-mono text-xs">
                   <pre>{cleanSqlContent(content)}</pre>
                 </div>
               )}
@@ -143,17 +139,17 @@ export function SupabaseChatAlert({ alert, clearAlert, postMessage }: Props) {
 
         {/* Message and Actions */}
         <div className="p-4">
-          <p className="text-sm text-bolt-elements-textSecondary mb-4">{message}</p>
+          <p className="text-bolt-elements-text-secondary mb-4 text-sm">{message}</p>
 
           <div className="flex gap-2">
             {showConnectButton ? (
               <button
                 onClick={handleConnectClick}
-                className={classNames(
-                  `px-3 py-2 rounded-md text-sm font-medium`,
+                className={cn(
+                  `rounded-md px-3 py-2 text-sm font-medium`,
                   'bg-[#098F5F]',
                   'hover:bg-[#0aa06c]',
-                  'focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-green-500',
+                  'focus:ring-2 focus:ring-green-500 focus:ring-offset-2 focus:outline-hidden',
                   'text-white',
                   'flex items-center gap-1.5',
                 )}
@@ -164,14 +160,14 @@ export function SupabaseChatAlert({ alert, clearAlert, postMessage }: Props) {
               <button
                 onClick={() => executeSupabaseAction(content)}
                 disabled={isExecuting}
-                className={classNames(
-                  `px-3 py-2 rounded-md text-sm font-medium`,
+                className={cn(
+                  `rounded-md px-3 py-2 text-sm font-medium`,
                   'bg-[#098F5F]',
                   'hover:bg-[#0aa06c]',
-                  'focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-green-500',
+                  'focus:ring-2 focus:ring-green-500 focus:ring-offset-2 focus:outline-hidden',
                   'text-white',
                   'flex items-center gap-1.5',
-                  isExecuting ? 'opacity-70 cursor-not-allowed' : '',
+                  isExecuting ? 'cursor-not-allowed opacity-70' : '',
                 )}
               >
                 {isExecuting ? 'Applying...' : 'Apply Changes'}
@@ -180,13 +176,13 @@ export function SupabaseChatAlert({ alert, clearAlert, postMessage }: Props) {
             <button
               onClick={clearAlert}
               disabled={isExecuting}
-              className={classNames(
-                `px-3 py-2 rounded-md text-sm font-medium`,
+              className={cn(
+                `rounded-md px-3 py-2 text-sm font-medium`,
                 'bg-[#503B26]',
                 'hover:bg-[#774f28]',
-                'focus:outline-none',
+                'focus:outline-hidden',
                 'text-[#F79007]',
-                isExecuting ? 'opacity-70 cursor-not-allowed' : '',
+                isExecuting ? 'cursor-not-allowed opacity-70' : '',
               )}
             >
               Dismiss

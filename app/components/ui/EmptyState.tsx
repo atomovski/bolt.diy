@@ -1,11 +1,11 @@
 import React from 'react';
-import { classNames } from '~/utils/classNames';
+import { cn } from '~/utils/cn';
 import { Button } from './Button';
 import { motion } from 'framer-motion';
 
 // Variant-specific styles
 const VARIANT_STYLES = {
-  default: {
+  primary: {
     container: 'py-8 p-6',
     icon: {
       container: 'w-12 h-12 mb-3',
@@ -14,7 +14,7 @@ const VARIANT_STYLES = {
     title: 'text-base',
     description: 'text-sm mt-1',
     actions: 'mt-4',
-    buttonSize: 'default' as const,
+    buttonSize: 'lg' as const,
   },
   compact: {
     container: 'py-4 p-4',
@@ -55,7 +55,7 @@ interface EmptyStateProps {
   className?: string;
 
   /** Component size variant */
-  variant?: 'default' | 'compact';
+  variant?: 'primary' | 'compact';
 }
 
 /**
@@ -72,7 +72,7 @@ export function EmptyState({
   secondaryActionLabel,
   onSecondaryAction,
   className,
-  variant = 'default',
+  variant = 'primary',
 }: EmptyStateProps) {
   // Get styles based on variant
   const styles = VARIANT_STYLES[variant];
@@ -85,38 +85,38 @@ export function EmptyState({
 
   return (
     <div
-      className={classNames(
+      className={cn(
         'flex flex-col items-center justify-center',
-        'text-bolt-elements-textSecondary dark:text-bolt-elements-textSecondary-dark',
-        'bg-bolt-elements-background-depth-2 dark:bg-bolt-elements-background-depth-3 rounded-lg',
+        'text-bolt-elements-text-secondary dark:text-bolt-elements-textSecondary-dark',
+        'bg-bolt-elements-background-depth-2 dark:bg-darken-50 rounded-lg',
         styles.container,
         className,
       )}
     >
       {/* Icon */}
       <div
-        className={classNames(
-          'rounded-full bg-bolt-elements-background-depth-3 dark:bg-bolt-elements-background-depth-4 flex items-center justify-center',
+        className={cn(
+          'bg-darken-50 dark:bg-bolt-elements-background-depth-4 flex items-center justify-center rounded-full',
           styles.icon.container,
         )}
       >
         <span
-          className={classNames(
+          className={cn(
             icon,
             styles.icon.size,
-            'text-bolt-elements-textTertiary dark:text-bolt-elements-textTertiary-dark',
+            'text-bolt-elements-text-tertiary dark:text-bolt-elements-textTertiary-dark',
           )}
         />
       </div>
 
       {/* Title */}
-      <p className={classNames('font-medium', styles.title)}>{title}</p>
+      <p className={cn('font-medium', styles.title)}>{title}</p>
 
       {/* Description */}
       {description && (
         <p
-          className={classNames(
-            'text-bolt-elements-textTertiary dark:text-bolt-elements-textTertiary-dark text-center max-w-xs',
+          className={cn(
+            'text-bolt-elements-text-tertiary dark:text-bolt-elements-textTertiary-dark max-w-xs text-center',
             styles.description,
           )}
         >
@@ -126,14 +126,14 @@ export function EmptyState({
 
       {/* Action buttons */}
       {(actionLabel || secondaryActionLabel) && (
-        <div className={classNames('flex items-center gap-2', styles.actions)}>
+        <div className={cn('flex items-center gap-2', styles.actions)}>
           {actionLabel && onAction && (
             <motion.div {...buttonAnimation}>
               <Button
                 onClick={onAction}
-                variant="default"
+                variant="primary"
                 size={styles.buttonSize}
-                className="bg-purple-500 hover:bg-purple-600 text-white"
+                className="bg-purple-500 text-white hover:bg-purple-600"
               >
                 {actionLabel}
               </Button>

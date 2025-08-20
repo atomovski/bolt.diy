@@ -1,7 +1,9 @@
 import { useStore } from '@nanostores/react';
 import type { LinksFunction } from '@remix-run/cloudflare';
 import { Links, Meta, Outlet, Scripts, ScrollRestoration } from '@remix-run/react';
-import tailwindReset from '@unocss/reset/tailwind-compat.css?url';
+import { Icon } from '~/components/ui';
+// eslint-disable-next-line no-restricted-imports
+import tailwindStyles from '../tailwind.css?url';
 import { themeStore } from './lib/stores/theme';
 import { stripIndents } from './utils/stripIndent';
 import { createHead } from 'remix-island';
@@ -14,8 +16,6 @@ import reactToastifyStyles from 'react-toastify/dist/ReactToastify.css?url';
 import globalStyles from './styles/index.scss?url';
 import xtermStyles from '@xterm/xterm/css/xterm.css?url';
 
-import 'virtual:uno.css';
-
 export const links: LinksFunction = () => [
   {
     rel: 'icon',
@@ -23,7 +23,7 @@ export const links: LinksFunction = () => [
     type: 'image/svg+xml',
   },
   { rel: 'stylesheet', href: reactToastifyStyles },
-  { rel: 'stylesheet', href: tailwindReset },
+  { rel: 'stylesheet', href: tailwindStyles },
   { rel: 'stylesheet', href: globalStyles },
   { rel: 'stylesheet', href: xtermStyles },
   {
@@ -97,7 +97,14 @@ export default function App() {
 
   return (
     <Layout>
-      <Outlet />
+      <Icon.IconoirProvider
+        iconProps={{
+          strokeWidth: 1.5,
+          className: 'size-4',
+        }}
+      >
+        <Outlet />
+      </Icon.IconoirProvider>
     </Layout>
   );
 }

@@ -1,6 +1,6 @@
 import React from 'react';
 import { motion } from 'framer-motion';
-import { classNames } from '~/utils/classNames';
+import { cn } from '~/utils/cn';
 
 // Predefined gradient colors
 const GRADIENT_COLORS = [
@@ -68,13 +68,13 @@ export function GradientCard({
 
   return (
     <motion.div
-      className={classNames(
-        'p-5 rounded-xl bg-gradient-to-br',
+      className={cn(
+        'rounded-xl bg-linear-to-br p-5',
         gradientClass,
         borderEffect
-          ? 'border border-bolt-elements-borderColor dark:border-bolt-elements-borderColor-dark hover:border-purple-500/40'
+          ? 'border-bolt-elements-border-color dark:border-bolt-elements-borderColor-dark border hover:border-purple-500/40'
           : '',
-        'transition-all duration-300 shadow-sm',
+        'shadow-xs transition-all duration-300',
         hoverEffect ? 'hover:shadow-md' : '',
         className,
       )}

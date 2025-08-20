@@ -83,16 +83,16 @@ export default function ServiceStatusTab() {
 
   if (loading) {
     return (
-      <div className="flex items-center justify-center h-full">
-        <div className="animate-spin i-ph:circle-notch w-8 h-8 text-purple-500" />
+      <div className="flex h-full items-center justify-center">
+        <div className="i-ph:circle-notch h-8 w-8 animate-spin text-purple-500" />
       </div>
     );
   }
 
   if (error) {
     return (
-      <div className="flex flex-col items-center justify-center h-full text-red-500 dark:text-red-400">
-        <div className="i-ph:warning w-8 h-8 mb-2" />
+      <div className="flex h-full flex-col items-center justify-center text-red-500 dark:text-red-400">
+        <div className="i-ph:warning mb-2 h-8 w-8" />
         <p>{error}</p>
       </div>
     );
@@ -104,20 +104,20 @@ export default function ServiceStatusTab() {
         {serviceStatuses.map((service) => (
           <div
             key={service.provider}
-            className="p-4 bg-white dark:bg-gray-800 rounded-lg border border-gray-200 dark:border-gray-700"
+            className="rounded-lg border border-gray-200 bg-white p-4 dark:border-gray-700 dark:bg-gray-800"
           >
-            <div className="flex items-center justify-between mb-2">
+            <div className="mb-2 flex items-center justify-between">
               <h3 className="text-lg font-semibold text-gray-900 dark:text-white">{service.provider}</h3>
               <div className={`flex items-center ${getStatusColor(service.status)}`}>
-                <div className={`${getStatusIcon(service.status)} w-5 h-5 mr-2`} />
+                <div className={`${getStatusIcon(service.status)} mr-2 h-5 w-5`} />
                 <span className="capitalize">{service.status}</span>
               </div>
             </div>
-            <p className="text-gray-600 dark:text-gray-300 mb-2">{service.message}</p>
+            <p className="mb-2 text-gray-600 dark:text-gray-300">{service.message}</p>
             {service.incidents && service.incidents.length > 0 && (
               <div className="mt-2">
-                <h4 className="text-sm font-semibold text-gray-700 dark:text-gray-300 mb-1">Recent Incidents:</h4>
-                <ul className="text-sm text-gray-600 dark:text-gray-400 space-y-1">
+                <h4 className="mb-1 text-sm font-semibold text-gray-700 dark:text-gray-300">Recent Incidents:</h4>
+                <ul className="space-y-1 text-sm text-gray-600 dark:text-gray-400">
                   {service.incidents.map((incident, index) => (
                     <li key={index}>{incident}</li>
                   ))}

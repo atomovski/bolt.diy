@@ -77,11 +77,11 @@ export default function WebContainerPreview() {
   }, [previewId, handleRefresh, notifyPreviewReady]);
 
   return (
-    <div className="w-full h-full">
+    <div className="h-full w-full">
       <iframe
         ref={iframeRef}
         title="WebContainer Preview"
-        className="w-full h-full border-none"
+        className="h-full w-full border-none"
         sandbox="allow-scripts allow-forms allow-popups allow-modals allow-storage-access-by-user-activation allow-same-origin"
         allow="cross-origin-isolated"
         loading="eager"

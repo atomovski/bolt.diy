@@ -2,11 +2,12 @@ import * as DropdownMenu from '@radix-ui/react-dropdown-menu';
 import { AnimatePresence, motion, type Variants } from 'framer-motion';
 import { memo, useEffect, useRef, useState } from 'react';
 import type { FileMap } from '~/lib/stores/files';
-import { classNames } from '~/utils/classNames';
+import { cn } from '~/utils/cn';
 import { WORK_DIR } from '~/utils/constants';
 import { cubicEasingFn } from '~/utils/easings';
 import { renderLogger } from '~/utils/logger';
 import FileTree from './FileTree';
+import { Icon } from '~/components/ui';
 
 const WORK_DIR_REGEX = new RegExp(`^${WORK_DIR.split('/').slice(0, -1).join('/').replaceAll('/', '\\/')}/`);
 
@@ -90,18 +91,18 @@ export const FileBreadcrumb = memo<FileBreadcrumbProps>(({ files, pathSegments =
                   ref={(ref) => {
                     segmentRefs.current[index] = ref;
                   }}
-                  className={classNames('flex items-center gap-1.5 cursor-pointer shrink-0', {
-                    'text-bolt-elements-textTertiary hover:text-bolt-elements-textPrimary': !isActive,
-                    'text-bolt-elements-textPrimary underline': isActive,
+                  className={cn('flex shrink-0 cursor-pointer items-center gap-1.5', {
+                    'text-secondary hover:text-black': !isActive,
+                    'text-black underline': isActive,
                     'pr-4': isLast,
                   })}
                   onClick={() => handleSegmentClick(index)}
                 >
-                  {isLast && <div className="i-ph:file-duotone" />}
+                  {isLast && <Icon.EmptyPage className="size-3" />}
                   {segment}
                 </span>
               </DropdownMenu.Trigger>
-              {index > 0 && !isLast && <span className="i-ph:caret-right inline-block mx-1" />}
+              {index > 0 && !isLast && <Icon.NavArrowRight className="text-secondary mx-1 size-4" />}
               <AnimatePresence>
                 {isActive && (
                   <DropdownMenu.Portal>
@@ -119,8 +120,8 @@ export const FileBreadcrumb = memo<FileBreadcrumbProps>(({ files, pathSegments =
                         exit="close"
                         variants={contextMenuVariants}
                       >
-                        <div className="rounded-lg overflow-hidden">
-                          <div className="max-h-[50vh] min-w-[300px] overflow-scroll bg-bolt-elements-background-depth-1 border border-bolt-elements-borderColor shadow-sm rounded-lg">
+                        <div className="overflow-hidden rounded-lg">
+                          <div className="bg-bolt-elements-background-depth-1 border-bolt-elements-border-color max-h-[50vh] min-w-[300px] overflow-scroll rounded-lg border shadow-xs">
                             <FileTree
                               files={files}
                               hideRoot
@@ -135,7 +136,7 @@ export const FileBreadcrumb = memo<FileBreadcrumbProps>(({ files, pathSegments =
                             />
                           </div>
                         </div>
-                        <DropdownMenu.Arrow className="fill-bolt-elements-borderColor" />
+                        <DropdownMenu.Arrow className="fill-bolt-elements-border-color" />
                       </motion.div>
                     </DropdownMenu.Content>
                   </DropdownMenu.Portal>

@@ -1,6 +1,6 @@
 import { useDrag, useDrop } from 'react-dnd';
 import { motion } from 'framer-motion';
-import { classNames } from '~/utils/classNames';
+import { cn } from '~/utils/cn';
 import type { TabVisibilityConfig } from '~/components/@settings/core/types';
 import { TAB_LABELS } from '~/components/@settings/core/types';
 import { Switch } from '~/components/ui/Switch';
@@ -77,8 +77,8 @@ const DraggableTabItem = ({
         scale: isDragging ? 1.02 : 1,
         boxShadow: isDragging ? '0 8px 16px rgba(0,0,0,0.1)' : 'none',
       }}
-      className={classNames(
-        'flex items-center justify-between p-4 rounded-lg',
+      className={cn(
+        'flex items-center justify-between rounded-lg p-4',
         'bg-[#F5F5F5] dark:bg-[#1A1A1A]',
         'border border-[#E5E5E5] dark:border-[#333333]',
         isDragging ? 'z-50' : '',
@@ -86,12 +86,12 @@ const DraggableTabItem = ({
     >
       <div className="flex items-center gap-4">
         <div className="cursor-grab">
-          <div className="i-ph:dots-six-vertical w-4 h-4 text-bolt-elements-textSecondary" />
+          <div className="i-ph:dots-six-vertical text-bolt-elements-text-secondary h-4 w-4" />
         </div>
         <div>
-          <div className="font-medium text-bolt-elements-textPrimary">{TAB_LABELS[tab.id]}</div>
+          <div className="font-medium text-black">{TAB_LABELS[tab.id]}</div>
           {showControls && (
-            <div className="text-xs text-bolt-elements-textSecondary">
+            <div className="text-bolt-elements-text-secondary text-xs">
               Order: {tab.order}, Window: {tab.window}
             </div>
           )}
@@ -106,17 +106,17 @@ const DraggableTabItem = ({
               className="data-[state=checked]:bg-purple-500"
               aria-label={`Toggle ${TAB_LABELS[tab.id]} visibility`}
             />
-            <label className="text-sm text-bolt-elements-textSecondary">Visible</label>
+            <label className="text-bolt-elements-text-secondary text-sm">Visible</label>
           </div>
           <div className="flex items-center gap-2">
-            <label className="text-sm text-bolt-elements-textSecondary">User</label>
+            <label className="text-bolt-elements-text-secondary text-sm">User</label>
             <Switch
               checked={tab.window === 'developer'}
               onCheckedChange={(checked: boolean) => onWindowChange?.(tab, checked ? 'developer' : 'user')}
               className="data-[state=checked]:bg-purple-500"
               aria-label={`Toggle ${TAB_LABELS[tab.id]} window assignment`}
             />
-            <label className="text-sm text-bolt-elements-textSecondary">Dev</label>
+            <label className="text-bolt-elements-text-secondary text-sm">Dev</label>
           </div>
         </div>
       )}

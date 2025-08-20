@@ -7,7 +7,7 @@ import React, { type RefCallback, useEffect, useState } from 'react';
 import { ClientOnly } from 'remix-utils/client-only';
 import { Menu } from '~/components/sidebar/Menu.client';
 import { Workbench } from '~/components/workbench/Workbench.client';
-import { classNames } from '~/utils/classNames';
+import { cn } from '~/utils/cn';
 import { PROVIDER_LIST } from '~/utils/constants';
 import { Messages } from './Messages.client';
 import { getApiKeysFromCookies } from './APIKeyManager';
@@ -80,6 +80,9 @@ interface BaseChatProps {
   setDesignScheme?: (scheme: DesignScheme) => void;
   selectedElement?: ElementInfo | null;
   setSelectedElement?: (element: ElementInfo | null) => void;
+  isInspectorMode?: boolean;
+  toggleInspectorMode?: () => void;
+  currentView?: 'code' | 'diff' | 'preview';
   addToolResult?: ({ toolCallId, result }: { toolCallId: string; result: any }) => void;
 }
 
@@ -127,6 +130,9 @@ export const BaseChat = React.forwardRef<HTMLDivElement, BaseChatProps>(
       setDesignScheme,
       selectedElement,
       setSelectedElement,
+      isInspectorMode,
+      toggleInspectorMode,
+      currentView: currentViewProp,
       addToolResult = () => {
         throw new Error('addToolResult not implemented');
       },
@@ -144,12 +150,19 @@ export const BaseChat = React.forwardRef<HTMLDivElement, BaseChatProps>(
     const [progressAnnotations, setProgressAnnotations] = useState<ProgressAnnotation[]>([]);
     const expoUrl = useStore(expoUrlAtom);
     const [qrModalOpen, setQrModalOpen] = useState(false);
+    const [currentView, setCurrentView] = useState<'code' | 'diff' | 'preview'>('preview');
 
     useEffect(() => {
       if (expoUrl) {
         setQrModalOpen(true);
       }
     }, [expoUrl]);
+
+    useEffect(() => {
+      if (currentViewProp) {
+        setCurrentView(currentViewProp);
+      }
+    }, [currentViewProp]);
 
     useEffect(() => {
       if (data) {
@@ -253,6 +266,8 @@ export const BaseChat = React.forwardRef<HTMLDivElement, BaseChatProps>(
     };
 
     const startListening = () => {
+      console.log('Starting speech recognition...');
+
       if (recognition) {
         recognition.start();
         setIsListening(true);
@@ -342,35 +357,33 @@ export const BaseChat = React.forwardRef<HTMLDivElement, BaseChatProps>(
     const baseChat = (
       <div
         ref={ref}
-        className={classNames(styles.BaseChat, 'relative flex h-full w-full overflow-hidden')}
+        className={cn(styles.BaseChat, 'relative flex h-full w-full overflow-hidden')}
         data-chat-visible={showChat}
       >
         <ClientOnly>{() => <Menu />}</ClientOnly>
-        <div className="flex flex-col lg:flex-row overflow-y-auto w-full h-full">
-          <div className={classNames(styles.Chat, 'flex flex-col flex-grow lg:min-w-[var(--chat-min-width)] h-full')}>
+        <div className="flex h-full w-full flex-col overflow-y-auto lg:flex-row">
+          <div className={cn(styles.Chat, 'flex h-full grow flex-col lg:min-w-(--chat-min-width)')}>
             {!chatStarted && (
-              <div id="intro" className="mt-[16vh] max-w-2xl mx-auto text-center px-4 lg:px-0">
-                <h1 className="text-3xl lg:text-6xl font-bold text-bolt-elements-textPrimary mb-4 animate-fade-in">
-                  Where ideas begin
-                </h1>
-                <p className="text-md lg:text-xl mb-8 text-bolt-elements-textSecondary animate-fade-in animation-delay-200">
+              <div id="intro" className="mx-auto mt-[16vh] max-w-2xl px-4 text-center lg:px-0">
+                <h1 className="animate-fade-in mb-4 text-3xl font-bold text-black lg:text-6xl">Where ideas begin</h1>
+                <p className="text-md text-bolt-elements-text-secondary animate-fade-in animation-delay-200 mb-8 lg:text-xl">
                   Bring ideas to life in seconds or get help on existing projects.
                 </p>
               </div>
             )}
             <StickToBottom
-              className={classNames('pt-6 px-2 sm:px-6 relative', {
-                'h-full flex flex-col modern-scrollbar': chatStarted,
+              className={cn('relative px-2 pt-6 sm:px-6', {
+                'modern-scrollbar flex h-full flex-col': chatStarted,
               })}
               resize="smooth"
               initial="smooth"
             >
-              <StickToBottom.Content className="flex flex-col gap-4 relative ">
+              <StickToBottom.Content className="relative flex flex-col gap-4">
                 <ClientOnly>
                   {() => {
                     return chatStarted ? (
                       <Messages
-                        className="flex flex-col w-full flex-1 max-w-chat pb-4 mx-auto z-1"
+                        className="max-w-chat z-1 mx-auto flex w-full flex-1 flex-col pb-4"
                         messages={messages}
                         isStreaming={isStreaming}
                         append={append}
@@ -386,7 +399,7 @@ export const BaseChat = React.forwardRef<HTMLDivElement, BaseChatProps>(
                 <ScrollToBottom />
               </StickToBottom.Content>
               <div
-                className={classNames('my-auto flex flex-col gap-2 w-full max-w-chat mx-auto z-prompt mb-6', {
+                className={cn('max-w-chat z-prompt mx-auto my-auto mb-6 flex w-full flex-col gap-2', {
                   'sticky bottom-2': chatStarted,
                 })}
               >
@@ -465,6 +478,9 @@ export const BaseChat = React.forwardRef<HTMLDivElement, BaseChatProps>(
                   setDesignScheme={setDesignScheme}
                   selectedElement={selectedElement}
                   setSelectedElement={setSelectedElement}
+                  isInspectorMode={isInspectorMode}
+                  toggleInspectorMode={toggleInspectorMode}
+                  currentView={currentView}
                 />
               </div>
             </StickToBottom>
@@ -491,7 +507,14 @@ export const BaseChat = React.forwardRef<HTMLDivElement, BaseChatProps>(
           </div>
           <ClientOnly>
             {() => (
-              <Workbench chatStarted={chatStarted} isStreaming={isStreaming} setSelectedElement={setSelectedElement} />
+              <Workbench
+                chatStarted={chatStarted}
+                isStreaming={isStreaming}
+                setSelectedElement={setSelectedElement}
+                isInspectorMode={isInspectorMode}
+                toggleInspectorMode={toggleInspectorMode}
+                onViewChange={setCurrentView}
+              />
             )}
           </ClientOnly>
         </div>
@@ -508,9 +531,9 @@ function ScrollToBottom() {
   return (
     !isAtBottom && (
       <>
-        <div className="sticky bottom-0 left-0 right-0 bg-gradient-to-t from-bolt-elements-background-depth-1 to-transparent h-20 z-10" />
+        <div className="from-bolt-elements-background-depth-1 sticky right-0 bottom-0 left-0 z-10 h-20 bg-linear-to-t to-transparent" />
         <button
-          className="sticky z-50 bottom-0 left-0 right-0 text-4xl rounded-lg px-1.5 py-0.5 flex items-center justify-center mx-auto gap-2 bg-bolt-elements-background-depth-2 border border-bolt-elements-borderColor text-bolt-elements-textPrimary text-sm"
+          className="bg-bolt-elements-background-depth-2 border-bolt-elements-border-color sticky right-0 bottom-0 left-0 z-50 mx-auto flex items-center justify-center gap-2 rounded-lg border px-1.5 py-0.5 text-4xl text-sm text-black"
           onClick={() => scrollToBottom()}
         >
           Go to last message

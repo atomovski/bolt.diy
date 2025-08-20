@@ -278,7 +278,7 @@ export const ScreenshotSelector = memo(
       >
         {selectionStart && selectionEnd && !isCapturing && (
           <div
-            className="absolute border-2 border-blue-500 bg-blue-200 bg-opacity-20"
+            className="bg-opacity-20 absolute border-2 border-blue-500 bg-blue-200"
             style={{
               left: Math.min(selectionStart.x, selectionEnd.x),
               top: Math.min(selectionStart.y, selectionEnd.y),

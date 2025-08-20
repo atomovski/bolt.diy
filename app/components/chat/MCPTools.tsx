@@ -1,9 +1,10 @@
 import { useEffect, useMemo, useState } from 'react';
-import { classNames } from '~/utils/classNames';
+import { cn } from '~/utils/cn';
 import { Dialog, DialogRoot, DialogClose, DialogTitle, DialogButton } from '~/components/ui/Dialog';
 import { IconButton } from '~/components/ui/IconButton';
 import { useMCPStore } from '~/lib/stores/mcp';
 import McpServerList from '~/components/@settings/tabs/mcp/McpServerList';
+import { Icon } from '~/components/ui';
 
 export function McpTools() {
   const isInitialized = useMCPStore((state) => state.isInitialized);
@@ -52,20 +53,20 @@ export function McpTools() {
           onClick={() => setIsDialogOpen(!isDialogOpen)}
           title="MCP Tools Available"
           disabled={!isInitialized}
-          className="transition-all disabled:opacity-50 disabled:cursor-not-allowed"
+          className="transition-all disabled:cursor-not-allowed disabled:opacity-50"
         >
           {!isInitialized ? (
-            <div className="i-svg-spinners:90-ring-with-bg text-bolt-elements-loader-progress text-xl animate-spin"></div>
+            <div className="i-svg-spinners:90-ring-with-bg text-bolt-elements-loader-progress animate-spin text-xl"></div>
           ) : (
-            <div className="i-bolt:mcp text-xl"></div>
+            <Icon.Flash className="size-5" />
           )}
         </IconButton>
       </div>
 
       <DialogRoot open={isDialogOpen} onOpenChange={handleDialogOpen}>
         {isDialogOpen && (
-          <Dialog className="max-w-4xl w-full p-6">
-            <div className="space-y-4 max-h-[80vh] overflow-y-auto pr-2">
+          <Dialog className="w-full max-w-4xl p-6">
+            <div className="max-h-[80vh] space-y-4 overflow-y-auto pr-2">
               <DialogTitle>
                 <div className="i-bolt:mcp text-xl"></div>
                 MCP tools
@@ -73,23 +74,23 @@ export function McpTools() {
 
               <div className="space-y-4">
                 <div>
-                  <div className="flex justify-end items-center mb-2">
+                  <div className="mb-2 flex items-center justify-end">
                     <button
                       onClick={checkServerAvailability}
                       disabled={isCheckingServers || serverEntries.length === 0}
-                      className={classNames(
-                        'px-3 py-1.5 rounded-lg text-sm',
-                        'bg-bolt-elements-background-depth-3 hover:bg-bolt-elements-background-depth-4',
-                        'text-bolt-elements-textPrimary',
+                      className={cn(
+                        'rounded-lg px-3 py-1.5 text-sm',
+                        'bg-darken-50 hover:bg-bolt-elements-background-depth-4',
+                        'text-black',
                         'transition-all duration-200',
                         'flex items-center gap-2',
-                        'disabled:opacity-50 disabled:cursor-not-allowed',
+                        'disabled:cursor-not-allowed disabled:opacity-50',
                       )}
                     >
                       {isCheckingServers ? (
-                        <div className="i-svg-spinners:90-ring-with-bg w-3 h-3 text-bolt-elements-loader-progress animate-spin" />
+                        <div className="i-svg-spinners:90-ring-with-bg text-bolt-elements-loader-progress h-3 w-3 animate-spin" />
                       ) : (
-                        <div className="i-ph:arrow-counter-clockwise w-3 h-3" />
+                        <div className="i-ph:arrow-counter-clockwise h-3 w-3" />
                       )}
                       Check availability
                     </button>
@@ -103,17 +104,17 @@ export function McpTools() {
                       toggleServerExpanded={toggleServerExpanded}
                     />
                   ) : (
-                    <div className="py-4 text-center text-bolt-elements-textSecondary">
+                    <div className="text-bolt-elements-text-secondary py-4 text-center">
                       <p>No MCP servers configured</p>
-                      <p className="text-xs mt-1">Configure servers in Settings → MCP Servers</p>
+                      <p className="mt-1 text-xs">Configure servers in Settings → MCP Servers</p>
                     </div>
                   )}
                 </div>
 
-                <div>{error && <p className="mt-2 text-sm text-bolt-elements-icon-error">{error}</p>}</div>
+                <div>{error && <p className="text-bolt-elements-icon-error mt-2 text-sm">{error}</p>}</div>
               </div>
 
-              <div className="flex justify-end gap-2 mt-6">
+              <div className="mt-6 flex justify-end gap-2">
                 <div className="flex gap-2">
                   <DialogClose asChild>
                     <DialogButton type="secondary">Close</DialogButton>
