@@ -221,6 +221,7 @@ Permitted actions:
 ✓ Import these files as dependencies
 ✓ Read from these files
 ✓ Reference these files
+✓ Update files to fix CORS issues
 
 Strictly forbidden actions:
 ❌ Modify any content within these files

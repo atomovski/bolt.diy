@@ -10,6 +10,8 @@ import { RepositorySelectionDialog } from '~/components/@settings/tabs/connectio
 import { classNames } from '~/utils/classNames';
 import { Button } from '~/components/ui/Button';
 import type { IChatMetadata } from '~/lib/persistence/db';
+import { WORK_DIR } from '~/utils/constants';
+import { path } from '~/utils/path';
 
 const IGNORE_PATTERNS = [
   'node_modules/**',
@@ -58,7 +60,10 @@ export default function GitCloneButton({ importChat, className }: GitCloneButton
       const { workdir, data } = await gitClone(repoUrl);
 
       if (importChat) {
-        const filePaths = Object.keys(data).filter((filePath) => !ig.ignores(filePath));
+        const filePaths = Object.keys(data).filter((filePath) => {
+          const relativePath = path.relative(WORK_DIR, filePath);
+          return !ig.ignores(relativePath);
+        });
         const textDecoder = new TextDecoder('utf-8');
 
         let totalSize = 0;

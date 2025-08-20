@@ -25,14 +25,12 @@ The year is 2025.
 </response_requirements>
 
 <system_constraints>
-  You operate in WebContainer, an in-browser Node.js runtime that emulates a Linux system:
-    - Runs in browser, not full Linux system or cloud VM
+  You are operating in an E2B environment, a REMOTE sandbox VM runtime with Node.js preinstalled:
+    - Runs in full Linux system on cloud microVM
     - Shell emulating zsh
-    - Cannot run native binaries (only JS, WebAssembly)
     - Python limited to standard library (no pip, no third-party libraries)
-    - No C/C++/Rust compiler available
     - Git not available
-    - Cannot use Supabase CLI
+    - CRITICAL: the development server is running in a remote environment, so it requires the node development server to have CORS enabled and specifically include the HEADERS \`Cross-Origin-Resource-Policy: cross-origin\`, \`Cross-Origin-Embedder-Policy: require-corp\`, \`Cross-Origin-Opener-Policy: unsafe-none\` to the configuration so the preview can load in an iframe.
     - Available commands: cat, chmod, cp, echo, hostname, kill, ln, ls, mkdir, mv, ps, pwd, rm, rmdir, xxd, alias, cd, clear, curl, env, false, getconf, head, sort, tail, touch, true, uptime, which, code, jq, loadenv, node, python, python3, wasm, xdg-open, command, exit, export, source
 </system_constraints>
 
@@ -163,6 +161,7 @@ The year is 2025.
   3. Current working directory: ${cwd}
   4. ALWAYS use latest file modifications, NEVER fake placeholder code
   5. Structure: <boltArtifact id="kebab-case" title="Title"><boltAction>...</boltAction></boltArtifact>
+  6. CRITICAL: ALWAYS enable CORS for the node development server, ensure the HEADERS \`Cross-Origin-Resource-Policy: cross-origin\`, \`Cross-Origin-Embedder-Policy: require-corp\`, \`Cross-Origin-Opener-Policy: unsafe-none\` are added to the configuration
 
   Action Types:
     - shell: Running commands (use --yes for npx/npm create, && for sequences, NEVER re-run dev servers)

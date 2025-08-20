@@ -1,10 +1,13 @@
-import type { WebContainer } from '@webcontainer/api';
+import type { Sandbox } from 'e2b';
+import { FileType } from 'e2b';
 import { useCallback, useEffect, useRef, useState, type MutableRefObject } from 'react';
-import { webcontainer as webcontainerPromise } from '~/lib/webcontainer';
+import { sandbox as sandboxPromise } from '~/lib/e2b';
 import git, { type GitAuth, type PromiseFsClient } from 'isomorphic-git';
 import http from 'isomorphic-git/http/web';
 import Cookies from 'js-cookie';
 import { toast } from 'react-toastify';
+import { WORK_DIR } from '~/utils/constants';
+import { logger } from '~/utils/logger';
 
 const lookupSavedPassword = (url: string) => {
   const domain = url.split('/')[2];
@@ -30,13 +33,13 @@ const saveGitAuth = (url: string, auth: GitAuth) => {
 
 export function useGit() {
   const [ready, setReady] = useState(false);
-  const [webcontainer, setWebcontainer] = useState<WebContainer>();
+  const [sandbox, setSandbox] = useState<Sandbox>();
   const [fs, setFs] = useState<PromiseFsClient>();
   const fileData = useRef<Record<string, { data: any; encoding?: string }>>({});
   useEffect(() => {
-    webcontainerPromise.then((container) => {
+    sandboxPromise.then((container) => {
       fileData.current = {};
-      setWebcontainer(container);
+      setSandbox(container);
       setFs(getFs(container, fileData));
       setReady(true);
     });
@@ -44,8 +47,8 @@ export function useGit() {
 
   const gitClone = useCallback(
     async (url: string, retryCount = 0) => {
-      if (!webcontainer || !fs || !ready) {
-        throw new Error('Webcontainer not initialized. Please try again later.');
+      if (!sandbox || !fs || !ready) {
+        throw new Error('Sandbox not initialized. Please try again later.');
       }
 
       fileData.current = {};
@@ -58,7 +61,7 @@ export function useGit() {
       const headers: {
         [x: string]: string;
       } = {
-        'User-Agent': 'bolt.diy',
+        'User-Agent': 'modern-git',
       };
 
       const auth = lookupSavedPassword(url);
@@ -77,7 +80,7 @@ export function useGit() {
         await git.clone({
           fs,
           http,
-          dir: webcontainer.workdir,
+          dir: WORK_DIR,
           url,
           depth: 1,
           singleBranch: true,
@@ -125,7 +128,7 @@ export function useGit() {
           data[key] = value;
         }
 
-        return { workdir: webcontainer.workdir, data };
+        return { workdir: WORK_DIR, data };
       } catch (error) {
         console.error('Git clone error:', error);
 
@@ -165,114 +168,176 @@ export function useGit() {
         }
       }
     },
-    [webcontainer, fs, ready],
+    [sandbox, fs, ready],
   );
 
   return { ready, gitClone };
 }
 
-const getFs = (
-  webcontainer: WebContainer,
-  record: MutableRefObject<Record<string, { data: any; encoding?: string }>>,
-) => ({
+const getFs = (sandbox: Sandbox, record: MutableRefObject<Record<string, { data: any; encoding?: string }>>) => ({
   promises: {
-    readFile: async (path: string, options: any) => {
+    readFile: async (gitPath: string, options: any) => {
       const encoding = options?.encoding;
-      const relativePath = pathUtils.relative(webcontainer.workdir, path);
+
+      logger.debug('@@@@@@@@@@@@ Reading file:', gitPath, 'with encoding:', encoding);
+
+      // Check if gitPath is valid
+      if (!gitPath || typeof gitPath !== 'string') {
+        const fsError = new Error(`EINVAL: invalid argument, open '${gitPath}'`) as NodeJS.ErrnoException;
+        fsError.code = 'EINVAL';
+        fsError.errno = -22;
+        fsError.syscall = 'open';
+        fsError.path = gitPath;
+        throw fsError;
+      }
 
       try {
-        const result = await webcontainer.fs.readFile(relativePath, encoding);
+        // Git pack files and other binary files need to be read as bytes
+        const isBinaryFile =
+          gitPath.includes('.pack') || gitPath.includes('.idx') || gitPath.includes('objects/') || encoding === null;
 
-        return result;
+        if (isBinaryFile || encoding === null) {
+          // Read as binary for pack files and when no encoding specified
+          const binaryData = await sandbox.files.read(gitPath, { format: 'bytes' });
+          return new Uint8Array(binaryData);
+        }
+
+        // For text files, read as text
+        const result = await sandbox.files.read(gitPath);
+
+        // Handle encoding if specified
+        if (encoding === 'utf8' || !encoding) {
+          return result;
+        } else if (encoding === 'base64') {
+          return Buffer.from(result).toString('base64');
+        } else {
+          // For other encodings, return as buffer
+          return Buffer.from(result);
+        }
+      } catch (error) {
+        logger.debug('Failed to read file:', error);
+
+        // Convert e2b errors to Node.js fs errors for compatibility
+        const fsError = new Error(`ENOENT: no such file or directory, open '${gitPath}'`) as NodeJS.ErrnoException;
+        fsError.code = 'ENOENT';
+        fsError.errno = -2;
+        fsError.syscall = 'open';
+        fsError.path = gitPath;
+        throw fsError;
+      }
+    },
+    writeFile: async (gitPath: string, data: any, options: any = {}) => {
+      logger.debug('@@@@@@@@@@@@ Writing file: ', gitPath);
+
+      if (record.current) {
+        record.current[gitPath] = { data, encoding: options?.encoding };
+      }
+
+      try {
+        // Ensure parent directory exists
+        const parentDir = pathUtils.dirname(gitPath);
+
+        if (parentDir && parentDir !== '.' && parentDir !== '/') {
+          try {
+            await sandbox.files.makeDir(parentDir);
+          } catch (error: any) {
+            /*
+             * Ignore error if directory already exists (409 Conflict)
+             * e2b throws 409 when directory exists, which is fine
+             */
+            if (!error.message?.includes('Conflict') && !error.message?.includes('already exists')) {
+              logger.debug('makeDir failed with non-conflict error:', error);
+            }
+          }
+        }
+
+        // Handle different data types
+        if (data instanceof Uint8Array) {
+          // For binary data, convert to buffer and write
+          await sandbox.files.write(gitPath, Buffer.from(data).buffer);
+        } else if (typeof data === 'string') {
+          // For text data, write directly
+          await sandbox.files.write(gitPath, data);
+        } else {
+          // For other types, convert to string
+          await sandbox.files.write(gitPath, String(data));
+        }
+
+        return;
       } catch (error) {
         throw error;
       }
     },
-    writeFile: async (path: string, data: any, options: any = {}) => {
-      const relativePath = pathUtils.relative(webcontainer.workdir, path);
-
-      if (record.current) {
-        record.current[relativePath] = { data, encoding: options?.encoding };
-      }
+    mkdir: async (gitPath: string, _options: any) => {
+      logger.debug('@@@@@@@@@@@@ Creating directory: ', gitPath);
 
       try {
-        // Handle encoding properly based on data type
-        if (data instanceof Uint8Array) {
-          // For binary data, don't pass encoding
-          const result = await webcontainer.fs.writeFile(relativePath, data);
-          return result;
-        } else {
-          // For text data, use the encoding if provided
-          const encoding = options?.encoding || 'utf8';
-          const result = await webcontainer.fs.writeFile(relativePath, data, encoding);
+        // e2b makeDir is recursive by default
+        await sandbox.files.makeDir(gitPath);
+        return;
+      } catch (error) {
+        throw error;
+      }
+    },
+    readdir: async (gitPath: string, options: any) => {
+      logger.debug('@@@@@@@@@@@@ Reading directory: ', gitPath);
 
-          return result;
+      try {
+        const entries = await sandbox.files.list(gitPath);
+
+        // Return just the names (like Node.js fs.readdir by default)
+        if (options?.withFileTypes) {
+          // Return entries with type information
+          return entries.map((entry) => ({
+            name: entry.name,
+            isFile: () => entry.type !== FileType.DIR,
+            isDirectory: () => entry.type === FileType.DIR,
+            isSymbolicLink: () => false,
+          }));
+        } else {
+          // Return just names
+          return entries.map((entry) => entry.name);
         }
       } catch (error) {
         throw error;
       }
     },
-    mkdir: async (path: string, options: any) => {
-      const relativePath = pathUtils.relative(webcontainer.workdir, path);
+    rm: async (gitPath: string, _options: any) => {
+      logger.debug('@@@@@@@@@@@@ Removing file: ', gitPath);
 
       try {
-        const result = await webcontainer.fs.mkdir(relativePath, { ...options, recursive: true });
-
-        return result;
+        //await sandbox.files.remove(gitPath);
+        return;
       } catch (error) {
         throw error;
       }
     },
-    readdir: async (path: string, options: any) => {
-      const relativePath = pathUtils.relative(webcontainer.workdir, path);
+    rmdir: async (gitPath: string, _options: any) => {
+      logger.debug('@@@@@@@@@@@@ Removing directory: ', gitPath);
 
       try {
-        const result = await webcontainer.fs.readdir(relativePath, options);
-
-        return result;
+        //await sandbox.files.remove(gitPath);
+        return;
       } catch (error) {
         throw error;
       }
     },
-    rm: async (path: string, options: any) => {
-      const relativePath = pathUtils.relative(webcontainer.workdir, path);
+    unlink: async (gitPath: string) => {
+      logger.debug('@@@@@@@@@@@@ Removing file: ', gitPath);
 
       try {
-        const result = await webcontainer.fs.rm(relativePath, { ...(options || {}) });
-
-        return result;
+        await sandbox.files.remove(gitPath);
+        return;
       } catch (error) {
         throw error;
       }
     },
-    rmdir: async (path: string, options: any) => {
-      const relativePath = pathUtils.relative(webcontainer.workdir, path);
+    stat: async (gitPath: string) => {
+      logger.debug('@@@@@@@@@@@@ Stat file: ', gitPath);
 
       try {
-        const result = await webcontainer.fs.rm(relativePath, { recursive: true, ...options });
-
-        return result;
-      } catch (error) {
-        throw error;
-      }
-    },
-    unlink: async (path: string) => {
-      const relativePath = pathUtils.relative(webcontainer.workdir, path);
-
-      try {
-        return await webcontainer.fs.rm(relativePath, { recursive: false });
-      } catch (error) {
-        throw error;
-      }
-    },
-    stat: async (path: string) => {
-      try {
-        const relativePath = pathUtils.relative(webcontainer.workdir, path);
-        const dirPath = pathUtils.dirname(relativePath);
-        const fileName = pathUtils.basename(relativePath);
-
         // Special handling for .git/index file
-        if (relativePath === '.git/index') {
+        if (gitPath === `${WORK_DIR}/.git/index`) {
           return {
             isFile: () => true,
             isDirectory: () => false,
@@ -298,24 +363,15 @@ const getFs = (
           };
         }
 
-        const resp = await webcontainer.fs.readdir(dirPath, { withFileTypes: true });
-        const fileInfo = resp.find((x) => x.name === fileName);
-
-        if (!fileInfo) {
-          const err = new Error(`ENOENT: no such file or directory, stat '${path}'`) as NodeJS.ErrnoException;
-          err.code = 'ENOENT';
-          err.errno = -2;
-          err.syscall = 'stat';
-          err.path = path;
-          throw err;
-        }
+        const info = await sandbox.files.getInfo(gitPath);
+        const isDirectory = info.type === FileType.DIR;
 
         return {
-          isFile: () => fileInfo.isFile(),
-          isDirectory: () => fileInfo.isDirectory(),
+          isFile: () => !isDirectory,
+          isDirectory: () => isDirectory,
           isSymbolicLink: () => false,
-          size: fileInfo.isDirectory() ? 4096 : 1,
-          mode: fileInfo.isDirectory() ? 0o040755 : 0o100644, // Directory or regular file
+          size: isDirectory ? 4096 : info.size || 1,
+          mode: isDirectory ? 0o040755 : 0o100644, // Directory or regular file
           mtimeMs: Date.now(),
           ctimeMs: Date.now(),
           birthtimeMs: Date.now(),
@@ -327,40 +383,41 @@ const getFs = (
           nlink: 1,
           rdev: 0,
           blksize: 4096,
-          blocks: 8,
+          blocks: Math.ceil((info.size || 1) / 512),
           mtime: new Date(),
           ctime: new Date(),
           birthtime: new Date(),
           atime: new Date(),
         };
       } catch (error: any) {
-        if (!error.code) {
-          error.code = 'ENOENT';
-          error.errno = -2;
-          error.syscall = 'stat';
-          error.path = path;
-        }
+        logger.debug('Failed to stat file:', error);
 
-        throw error;
+        // Convert e2b errors to Node.js fs errors
+        const err = new Error(`ENOENT: no such file or directory, stat '${gitPath}'`) as NodeJS.ErrnoException;
+        err.code = 'ENOENT';
+        err.errno = -2;
+        err.syscall = 'stat';
+        err.path = gitPath;
+        throw err;
       }
     },
-    lstat: async (path: string) => {
-      return await getFs(webcontainer, record).promises.stat(path);
+    lstat: async (gitPath: string) => {
+      return await getFs(sandbox, record).promises.stat(gitPath);
     },
-    readlink: async (path: string) => {
-      throw new Error(`EINVAL: invalid argument, readlink '${path}'`);
+    readlink: async (gitPath: string) => {
+      throw new Error(`EINVAL: invalid argument, readlink '${gitPath}'`);
     },
-    symlink: async (target: string, path: string) => {
+    symlink: async (target: string, gitPath: string) => {
       /*
-       * Since WebContainer doesn't support symlinks,
+       * Since E2B Sandbox doesn't support symlinks,
        * we'll throw a "operation not supported" error
        */
-      throw new Error(`EPERM: operation not permitted, symlink '${target}' -> '${path}'`);
+      throw new Error(`EPERM: operation not permitted, symlink '${target}' -> '${gitPath}'`);
     },
 
-    chmod: async (_path: string, _mode: number) => {
+    chmod: async (_gitPath: string, _mode: number) => {
       /*
-       * WebContainer doesn't support changing permissions,
+       * E2B Sandbox doesn't support changing permissions,
        * but we can pretend it succeeded for compatibility
        */
       return await Promise.resolve();
