@@ -14,8 +14,45 @@ export interface PreviewInfo {
   baseUrl: string;
 }
 
+export interface WindowSize {
+  name: string;
+  width: number;
+  height: number;
+}
+
 // Create a broadcast channel for preview updates
 const PREVIEW_CHANNEL = 'preview-updates';
+
+export const WINDOW_SIZES: WindowSize[] = [
+  { name: 'Custom', width: 1024, height: 768 },
+  { name: 'iPhone SE', width: 375, height: 667 },
+  { name: 'iPhone 12/13', width: 390, height: 844 },
+  {
+    name: 'iPhone 12/13 Pro Max',
+    width: 428,
+    height: 926,
+  },
+  { name: 'iPad Mini', width: 768, height: 1024 },
+  { name: 'iPad Air', width: 820, height: 1180 },
+  { name: 'iPad Pro 11"', width: 834, height: 1194 },
+  {
+    name: 'iPad Pro 12.9"',
+    width: 1024,
+    height: 1366,
+  },
+];
+
+export const showDeviceModeAtom = atom<boolean>(false);
+export const selectedWindowSizeAtom = atom<WindowSize>(WINDOW_SIZES[1]); // Default to iPhone SE instead of Custom
+export const isLandscapeAtom = atom<boolean>(false);
+export const widthPercentAtom = atom<number>(37.5);
+export const currentWidthAtom = atom<number>(0);
+export const currentHeightAtom = atom<number>(0);
+export const customWidthAtom = atom<number>(1024);
+export const customHeightAtom = atom<number>(768);
+
+// Container ref for fullscreen functionality
+export const previewContainerRefAtom = atom<HTMLDivElement | null>(null);
 
 export class PreviewsStore {
   #availablePreviews = new Map<number, PreviewInfo>();

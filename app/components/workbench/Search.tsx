@@ -178,16 +178,16 @@ export function Search() {
   };
 
   return (
-    <div className="flex flex-col h-full bg-bolt-elements-background-depth-2">
+    <div className="bg-bolt-elements-background-depth-2 flex h-full flex-col">
       {/* Search Bar */}
-      <div className="flex items-center py-3 px-3">
+      <div className="flex items-center px-3 py-3">
         <div className="relative flex-1">
           <input
             type="text"
             value={searchQuery}
             onChange={(e) => setSearchQuery(e.target.value)}
             placeholder="Search"
-            className="w-full px-2 py-1 rounded-md bg-bolt-elements-background-depth-3 text-bolt-elements-textPrimary placeholder-bolt-elements-textTertiary focus:outline-none transition-all"
+            className="bg-darken-50 placeholder-bolt-elements-text-tertiary w-full rounded-md px-2 py-1 text-black transition-all focus:outline-hidden"
           />
         </div>
       </div>
@@ -195,26 +195,26 @@ export function Search() {
       {/* Results */}
       <div className="flex-1 overflow-auto py-2">
         {isSearching && (
-          <div className="flex items-center justify-center h-32 text-bolt-elements-textTertiary">
-            <div className="i-ph:circle-notch animate-spin mr-2" /> Searching...
+          <div className="text-bolt-elements-text-tertiary flex h-32 items-center justify-center">
+            <div className="i-ph:circle-notch mr-2 animate-spin" /> Searching...
           </div>
         )}
         {!isSearching && hasSearched && searchResults.length === 0 && searchQuery.trim() !== '' && (
-          <div className="flex items-center justify-center h-32 text-gray-500">No results found.</div>
+          <div className="flex h-32 items-center justify-center text-gray-500">No results found.</div>
         )}
         {!isSearching &&
           Object.keys(groupedResults).map((file) => (
             <div key={file} className="mb-2">
               <button
-                className="flex gap-2 items-center w-full text-left py-1 px-2 text-bolt-elements-textSecondary bg-transparent hover:bg-bolt-elements-background-depth-3 group"
+                className="text-bolt-elements-text-secondary hover:bg-darken-50 group flex w-full items-center gap-2 bg-transparent px-2 py-1 text-left"
                 onClick={() => setExpandedFiles((prev) => ({ ...prev, [file]: !prev[file] }))}
               >
                 <span
-                  className=" i-ph:caret-down-thin w-3 h-3 text-bolt-elements-textSecondary transition-transform"
+                  className="i-ph:caret-down-thin text-bolt-elements-text-secondary h-3 w-3 transition-transform"
                   style={{ transform: expandedFiles[file] ? 'rotate(180deg)' : undefined }}
                 />
-                <span className="font-normal text-sm">{file.split('/').pop()}</span>
-                <span className="h-5.5 w-5.5 flex items-center justify-center text-xs ml-auto bg-bolt-elements-item-backgroundAccent text-bolt-elements-item-contentAccent rounded-full">
+                <span className="text-sm font-normal">{file.split('/').pop()}</span>
+                <span className="bg-bolt-elements-item-backgroundAccent text-bolt-elements-item-contentAccent ml-auto flex h-5.5 w-5.5 items-center justify-center rounded-full text-xs">
                   {groupedResults[file].length}
                 </span>
               </button>
@@ -233,13 +233,13 @@ export function Search() {
                     return (
                       <div
                         key={idx}
-                        className="hover:bg-bolt-elements-background-depth-3 cursor-pointer transition-colors pl-6 py-1"
+                        className="hover:bg-darken-50 cursor-pointer py-1 pl-6 transition-colors"
                         onClick={() => handleResultClick(match.path, match.lineNumber)}
                       >
-                        <pre className="font-mono text-xs text-bolt-elements-textTertiary truncate">
+                        <pre className="text-bolt-elements-text-tertiary truncate font-mono text-xs">
                           {!isStart && <span>...</span>}
                           {previewText.slice(0, matchStart)}
-                          <span className="bg-bolt-elements-item-backgroundAccent text-bolt-elements-item-contentAccent rounded px-1">
+                          <span className="bg-bolt-elements-item-backgroundAccent text-bolt-elements-item-contentAccent rounded-sm px-1">
                             {previewText.slice(matchStart, matchEnd)}
                           </span>
                           {previewText.slice(matchEnd)}

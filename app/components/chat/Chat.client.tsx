@@ -11,7 +11,7 @@ import { workbenchStore } from '~/lib/stores/workbench';
 import { DEFAULT_MODEL, DEFAULT_PROVIDER, PROMPT_COOKIE_KEY, PROVIDER_LIST } from '~/utils/constants';
 import { cubicEasingFn } from '~/utils/easings';
 import { createScopedLogger, renderLogger } from '~/utils/logger';
-import { BaseChat } from './BaseChat';
+import { BaseChat } from './NewBaseChat';
 import Cookies from 'js-cookie';
 import { debounce } from '~/utils/debounce';
 import { useSettings } from '~/lib/hooks/useSettings';
@@ -148,6 +148,8 @@ export const ChatImpl = memo(
     const [apiKeys, setApiKeys] = useState<Record<string, string>>({});
     const [chatMode, setChatMode] = useState<'discuss' | 'build'>('build');
     const [selectedElement, setSelectedElement] = useState<ElementInfo | null>(null);
+    const [isInspectorMode, setIsInspectorMode] = useState(false);
+    const [currentView] = useState<'code' | 'diff' | 'preview'>('preview');
     const mcpSettings = useMCPStore((state) => state.settings);
 
     const {
@@ -627,6 +629,10 @@ export const ChatImpl = memo(
       Cookies.set('selectedProvider', newProvider.name, { expires: 30 });
     };
 
+    const toggleInspectorMode = () => {
+      setIsInspectorMode(!isInspectorMode);
+    };
+
     return (
       <BaseChat
         ref={animationScope}
@@ -696,6 +702,9 @@ export const ChatImpl = memo(
         setDesignScheme={setDesignScheme}
         selectedElement={selectedElement}
         setSelectedElement={setSelectedElement}
+        isInspectorMode={isInspectorMode}
+        toggleInspectorMode={toggleInspectorMode}
+        currentView={currentView}
         addToolResult={addToolResult}
       />
     );

@@ -5,7 +5,7 @@ import { URL_CONFIGURABLE_PROVIDERS } from '~/lib/stores/settings';
 import type { IProviderConfig } from '~/types/model';
 import { logStore } from '~/lib/stores/logs';
 import { motion } from 'framer-motion';
-import { classNames } from '~/utils/classNames';
+import { cn } from '~/utils/cn';
 import { toast } from 'react-toastify';
 import { providerBaseUrlEnvKeys } from '~/utils/constants';
 import { SiAmazon, SiGoogle, SiHuggingface, SiPerplexity, SiOpenai } from 'react-icons/si';
@@ -138,39 +138,35 @@ const CloudProvidersTab = () => {
         animate={{ opacity: 1, y: 0 }}
         transition={{ duration: 0.3 }}
       >
-        <div className="flex items-center justify-between gap-4 mt-8 mb-4">
+        <div className="mt-8 mb-4 flex items-center justify-between gap-4">
           <div className="flex items-center gap-2">
             <div
-              className={classNames(
-                'w-8 h-8 flex items-center justify-center rounded-lg',
-                'bg-bolt-elements-background-depth-3',
-                'text-purple-500',
-              )}
+              className={cn('flex h-8 w-8 items-center justify-center rounded-lg', 'bg-darken-50', 'text-purple-500')}
             >
-              <TbCloudComputing className="w-5 h-5" />
+              <TbCloudComputing className="h-5 w-5" />
             </div>
             <div>
-              <h4 className="text-md font-medium text-bolt-elements-textPrimary">Cloud Providers</h4>
-              <p className="text-sm text-bolt-elements-textSecondary">Connect to cloud-based AI models and services</p>
+              <h4 className="text-md font-medium text-black">Cloud Providers</h4>
+              <p className="text-bolt-elements-text-secondary text-sm">Connect to cloud-based AI models and services</p>
             </div>
           </div>
 
           <div className="flex items-center gap-2">
-            <span className="text-sm text-bolt-elements-textSecondary">Enable All Cloud</span>
+            <span className="text-bolt-elements-text-secondary text-sm">Enable All Cloud</span>
             <Switch checked={categoryEnabled} onCheckedChange={handleToggleCategory} />
           </div>
         </div>
 
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+        <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
           {filteredProviders.map((provider, index) => (
             <motion.div
               key={provider.name}
-              className={classNames(
-                'rounded-lg border bg-bolt-elements-background text-bolt-elements-textPrimary shadow-sm',
+              className={cn(
+                'bg-bolt-elements-background rounded-lg border text-black shadow-xs',
                 'bg-bolt-elements-background-depth-2',
-                'hover:bg-bolt-elements-background-depth-3',
+                'hover:bg-darken-50',
                 'transition-all duration-200',
-                'relative overflow-hidden group',
+                'group relative overflow-hidden',
                 'flex flex-col',
               )}
               initial={{ opacity: 0, y: 20 }}
@@ -178,10 +174,10 @@ const CloudProvidersTab = () => {
               transition={{ delay: index * 0.1 }}
               whileHover={{ scale: 1.02 }}
             >
-              <div className="absolute top-0 right-0 p-2 flex gap-1">
+              <div className="absolute top-0 right-0 flex gap-1 p-2">
                 {URL_CONFIGURABLE_PROVIDERS.includes(provider.name) && (
                   <motion.span
-                    className="px-2 py-0.5 text-xs rounded-full bg-purple-500/10 text-purple-500 font-medium"
+                    className="rounded-full bg-purple-500/10 px-2 py-0.5 text-xs font-medium text-purple-500"
                     whileHover={{ scale: 1.05 }}
                     whileTap={{ scale: 0.95 }}
                   >
@@ -192,16 +188,16 @@ const CloudProvidersTab = () => {
 
               <div className="flex items-start gap-4 p-4">
                 <motion.div
-                  className={classNames(
-                    'w-10 h-10 flex items-center justify-center rounded-xl',
-                    'bg-bolt-elements-background-depth-3 group-hover:bg-bolt-elements-background-depth-4',
+                  className={cn(
+                    'flex h-10 w-10 items-center justify-center rounded-xl',
+                    'bg-darken-50 group-hover:bg-bolt-elements-background-depth-4',
                     'transition-all duration-200',
-                    provider.settings.enabled ? 'text-purple-500' : 'text-bolt-elements-textSecondary',
+                    provider.settings.enabled ? 'text-purple-500' : 'text-bolt-elements-text-secondary',
                   )}
                   whileHover={{ scale: 1.1 }}
                   whileTap={{ scale: 0.9 }}
                 >
-                  <div className={classNames('w-6 h-6', 'transition-transform duration-200', 'group-hover:rotate-12')}>
+                  <div className={cn('h-6 w-6', 'transition-transform duration-200', 'group-hover:rotate-12')}>
                     {React.createElement(PROVIDER_ICONS[provider.name as ProviderName] || BsRobot, {
                       className: 'w-full h-full',
                       'aria-label': `${provider.name} logo`,
@@ -209,13 +205,13 @@ const CloudProvidersTab = () => {
                   </div>
                 </motion.div>
 
-                <div className="flex-1 min-w-0">
-                  <div className="flex items-center justify-between gap-4 mb-2">
+                <div className="min-w-0 flex-1">
+                  <div className="mb-2 flex items-center justify-between gap-4">
                     <div>
-                      <h4 className="text-sm font-medium text-bolt-elements-textPrimary group-hover:text-purple-500 transition-colors">
+                      <h4 className="text-sm font-medium text-black transition-colors group-hover:text-purple-500">
                         {provider.name}
                       </h4>
-                      <p className="text-xs text-bolt-elements-textSecondary mt-0.5">
+                      <p className="text-bolt-elements-text-secondary mt-0.5 text-xs">
                         {PROVIDER_DESCRIPTIONS[provider.name as keyof typeof PROVIDER_DESCRIPTIONS] ||
                           (URL_CONFIGURABLE_PROVIDERS.includes(provider.name)
                             ? 'Configure custom endpoint for this provider'
@@ -235,17 +231,17 @@ const CloudProvidersTab = () => {
                       exit={{ opacity: 0, height: 0 }}
                       transition={{ duration: 0.2 }}
                     >
-                      <div className="flex items-center gap-2 mt-4">
+                      <div className="mt-4 flex items-center gap-2">
                         {editingProvider === provider.name ? (
                           <input
                             type="text"
                             defaultValue={provider.settings.baseUrl}
                             placeholder={`Enter ${provider.name} base URL`}
-                            className={classNames(
-                              'flex-1 px-3 py-1.5 rounded-lg text-sm',
-                              'bg-bolt-elements-background-depth-3 border border-bolt-elements-borderColor',
-                              'text-bolt-elements-textPrimary placeholder-bolt-elements-textTertiary',
-                              'focus:outline-none focus:ring-2 focus:ring-purple-500/30',
+                            className={cn(
+                              'flex-1 rounded-lg px-3 py-1.5 text-sm',
+                              'bg-darken-50 border-bolt-elements-border-color border',
+                              'placeholder-bolt-elements-text-tertiary text-black',
+                              'focus:ring-2 focus:ring-purple-500/30 focus:outline-hidden',
                               'transition-all duration-200',
                             )}
                             onKeyDown={(e) => {
@@ -260,12 +256,12 @@ const CloudProvidersTab = () => {
                           />
                         ) : (
                           <div
-                            className="flex-1 px-3 py-1.5 rounded-lg text-sm cursor-pointer group/url"
+                            className="group/url flex-1 cursor-pointer rounded-lg px-3 py-1.5 text-sm"
                             onClick={() => setEditingProvider(provider.name)}
                           >
-                            <div className="flex items-center gap-2 text-bolt-elements-textSecondary">
+                            <div className="text-bolt-elements-text-secondary flex items-center gap-2">
                               <div className="i-ph:link text-sm" />
-                              <span className="group-hover/url:text-purple-500 transition-colors">
+                              <span className="transition-colors group-hover/url:text-purple-500">
                                 {provider.settings.baseUrl || 'Click to set base URL'}
                               </span>
                             </div>
@@ -287,7 +283,7 @@ const CloudProvidersTab = () => {
               </div>
 
               <motion.div
-                className="absolute inset-0 border-2 border-purple-500/0 rounded-lg pointer-events-none"
+                className="pointer-events-none absolute inset-0 rounded-lg border-2 border-purple-500/0"
                 animate={{
                   borderColor: provider.settings.enabled ? 'rgba(168, 85, 247, 0.2)' : 'rgba(168, 85, 247, 0)',
                   scale: provider.settings.enabled ? 1 : 0.98,

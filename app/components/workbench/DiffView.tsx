@@ -39,7 +39,7 @@ interface FullscreenButtonProps {
 const FullscreenButton = memo(({ onClick, isFullscreen }: FullscreenButtonProps) => (
   <button
     onClick={onClick}
-    className="ml-4 p-1 rounded hover:bg-bolt-elements-background-depth-3 text-bolt-elements-textTertiary hover:text-bolt-elements-textPrimary transition-colors"
+    className="hover:bg-darken-50 text-bolt-elements-text-tertiary ml-4 rounded-sm p-1 transition-colors hover:text-black"
     title={isFullscreen ? 'Exit Fullscreen' : 'Enter Fullscreen'}
   >
     <div className={isFullscreen ? 'i-ph:corners-in' : 'i-ph:corners-out'} />
@@ -52,8 +52,8 @@ const FullscreenOverlay = memo(({ isFullscreen, children }: { isFullscreen: bool
   }
 
   return (
-    <div className="fixed inset-0 z-[9999] bg-black/50 flex items-center justify-center p-6">
-      <div className="w-full h-full max-w-[90vw] max-h-[90vh] bg-bolt-elements-background-depth-2 rounded-lg border border-bolt-elements-borderColor shadow-xl overflow-hidden">
+    <div className="fixed inset-0 z-9999 flex items-center justify-center bg-black/50 p-6">
+      <div className="bg-bolt-elements-background-depth-2 border-bolt-elements-border-color h-full max-h-[90vh] w-full max-w-[90vw] overflow-hidden rounded-lg border shadow-xl">
         {children}
       </div>
     </div>
@@ -312,9 +312,9 @@ const processChanges = (beforeCode: string, afterCode: string) => {
 };
 
 const lineNumberStyles =
-  'w-9 shrink-0 pl-2 py-1 text-left font-mono text-bolt-elements-textTertiary border-r border-bolt-elements-borderColor bg-bolt-elements-background-depth-1';
+  'w-9 shrink-0 pl-2 py-1 text-left font-mono text-bolt-elements-text-tertiary border-r border-bolt-elements-border-color bg-bolt-elements-background-depth-1';
 const lineContentStyles =
-  'px-1 py-1 font-mono whitespace-pre flex-1 group-hover:bg-bolt-elements-background-depth-2 text-bolt-elements-textPrimary';
+  'px-1 py-1 font-mono whitespace-pre flex-1 group-hover:bg-bolt-elements-background-depth-2 text-black';
 const diffPanelStyles = 'h-full overflow-auto diff-panel-content';
 
 // Updated color styles for better consistency
@@ -327,17 +327,15 @@ const diffLineStyles = {
 const changeColorStyles = {
   added: 'text-green-700 dark:text-green-500 bg-green-500/10 dark:bg-green-500/20',
   removed: 'text-red-700 dark:text-red-500 bg-red-500/10 dark:bg-red-500/20',
-  unchanged: 'text-bolt-elements-textPrimary',
+  unchanged: 'text-black',
 };
 
 const renderContentWarning = (type: 'binary' | 'error') => (
-  <div className="h-full flex items-center justify-center p-4">
-    <div className="text-center text-bolt-elements-textTertiary">
-      <div className={`i-ph:${type === 'binary' ? 'file-x' : 'warning-circle'} text-4xl text-red-400 mb-2 mx-auto`} />
-      <p className="font-medium text-bolt-elements-textPrimary">
-        {type === 'binary' ? 'Binary file detected' : 'Error processing file'}
-      </p>
-      <p className="text-sm mt-1">
+  <div className="flex h-full items-center justify-center p-4">
+    <div className="text-bolt-elements-text-tertiary text-center">
+      <div className={`i-ph:${type === 'binary' ? 'file-x' : 'warning-circle'} mx-auto mb-2 text-4xl text-red-400`} />
+      <p className="font-medium text-black">{type === 'binary' ? 'Binary file detected' : 'Error processing file'}</p>
+      <p className="mt-1 text-sm">
         {type === 'binary' ? 'Diff view is not available for binary files' : 'Could not generate diff preview'}
       </p>
     </div>
@@ -356,19 +354,19 @@ const NoChangesView = memo(
     highlighter: any;
     theme: string;
   }) => (
-    <div className="h-full flex flex-col items-center justify-center p-4">
-      <div className="text-center text-bolt-elements-textTertiary">
-        <div className="i-ph:files text-4xl text-green-400 mb-2 mx-auto" />
-        <p className="font-medium text-bolt-elements-textPrimary">Files are identical</p>
-        <p className="text-sm mt-1">Both versions match exactly</p>
+    <div className="flex h-full flex-col items-center justify-center p-4">
+      <div className="text-bolt-elements-text-tertiary text-center">
+        <div className="i-ph:files mx-auto mb-2 text-4xl text-green-400" />
+        <p className="font-medium text-black">Files are identical</p>
+        <p className="mt-1 text-sm">Both versions match exactly</p>
       </div>
-      <div className="mt-4 w-full max-w-2xl bg-bolt-elements-background-depth-1 rounded-lg border border-bolt-elements-borderColor overflow-hidden">
-        <div className="p-2 text-xs font-bold text-bolt-elements-textTertiary border-b border-bolt-elements-borderColor">
+      <div className="bg-bolt-elements-background-depth-1 border-bolt-elements-border-color mt-4 w-full max-w-2xl overflow-hidden rounded-lg border">
+        <div className="text-bolt-elements-text-tertiary border-bolt-elements-border-color border-b p-2 text-xs font-bold">
           Current Content
         </div>
-        <div className="overflow-auto max-h-96">
+        <div className="max-h-96 overflow-auto">
           {beforeCode.split('\n').map((line, index) => (
-            <div key={index} className="flex group min-w-fit">
+            <div key={index} className="group flex min-w-fit">
               <div className={lineNumberStyles}>{index + 1}</div>
               <div className={lineContentStyles}>
                 <span className="mr-2"> </span>
@@ -453,10 +451,10 @@ const CodeLine = memo(
     };
 
     return (
-      <div className="flex group min-w-fit">
+      <div className="group flex min-w-fit">
         <div className={lineNumberStyles}>{lineNumber + 1}</div>
         <div className={`${lineContentStyles} ${bgColor}`}>
-          <span className="mr-2 text-bolt-elements-textTertiary">
+          <span className="text-bolt-elements-text-tertiary mr-2">
             {type === 'added' && <span className="text-green-700 dark:text-green-500">+</span>}
             {type === 'removed' && <span className="text-red-700 dark:text-red-500">-</span>}
             {type === 'unchanged' && ' '}
@@ -516,10 +514,10 @@ const FileInfo = memo(
     const showStats = additions > 0 || deletions > 0;
 
     return (
-      <div className="flex items-center bg-bolt-elements-background-depth-1 p-2 text-sm text-bolt-elements-textPrimary shrink-0">
+      <div className="bg-bolt-elements-background-depth-1 flex shrink-0 items-center p-2 text-sm text-black">
         <div className="i-ph:file mr-2 h-4 w-4 shrink-0" />
         <span className="truncate">{filename}</span>
-        <span className="ml-auto shrink-0 flex items-center gap-2">
+        <span className="ml-auto flex shrink-0 items-center gap-2">
           {hasChanges ? (
             <>
               {showStats && (
@@ -529,7 +527,7 @@ const FileInfo = memo(
                 </div>
               )}
               <span className="text-yellow-600 dark:text-yellow-400">Modified</span>
-              <span className="text-bolt-elements-textTertiary text-xs">{new Date().toLocaleTimeString()}</span>
+              <span className="text-bolt-elements-text-tertiary text-xs">{new Date().toLocaleTimeString()}</span>
             </>
           ) : (
             <span className="text-green-700 dark:text-green-400">No Changes</span>
@@ -618,15 +616,15 @@ const InlineDiffComparison = memo(({ beforeCode, afterCode, filename, language }
   // Render a loading state or null while highlighter is not ready
   if (!highlighter) {
     return (
-      <div className="h-full flex items-center justify-center">
-        <div className="text-bolt-elements-textTertiary">Loading diff...</div>
+      <div className="flex h-full items-center justify-center">
+        <div className="text-bolt-elements-text-tertiary">Loading diff...</div>
       </div>
     );
   }
 
   return (
     <FullscreenOverlay isFullscreen={isFullscreen}>
-      <div className="w-full h-full flex flex-col">
+      <div className="flex h-full w-full flex-col">
         <FileInfo
           filename={filename}
           hasChanges={hasChanges}
@@ -637,7 +635,7 @@ const InlineDiffComparison = memo(({ beforeCode, afterCode, filename, language }
         />
         <div className={diffPanelStyles}>
           {hasChanges ? (
-            <div className="overflow-x-auto min-w-full">
+            <div className="min-w-full overflow-x-auto">
               {unifiedBlocks.map((block, index) => (
                 <CodeLine
                   key={`${block.lineNumber}-${index}`}
@@ -755,7 +753,7 @@ export const DiffView = memo(({ fileHistory, setFileHistory }: DiffViewProps) =>
 
   if (!selectedFile || !currentDocument) {
     return (
-      <div className="flex w-full h-full justify-center items-center bg-bolt-elements-background-depth-1 text-bolt-elements-textPrimary">
+      <div className="bg-bolt-elements-background-depth-1 flex h-full w-full items-center justify-center text-black">
         Select a file to view differences
       </div>
     );
@@ -785,9 +783,9 @@ export const DiffView = memo(({ fileHistory, setFileHistory }: DiffViewProps) =>
   } catch (error) {
     console.error('DiffView render error:', error);
     return (
-      <div className="flex w-full h-full justify-center items-center bg-bolt-elements-background-depth-1 text-red-400">
+      <div className="bg-bolt-elements-background-depth-1 flex h-full w-full items-center justify-center text-red-400">
         <div className="text-center">
-          <div className="i-ph:warning-circle text-4xl mb-2" />
+          <div className="i-ph:warning-circle mb-2 text-4xl" />
           <p>Failed to render diff view</p>
         </div>
       </div>

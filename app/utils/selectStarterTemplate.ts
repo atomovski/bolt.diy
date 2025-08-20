@@ -184,7 +184,7 @@ export async function getTemplates(templateName: string, title?: string) {
   }
 
   const assistantMessage = `
-Bolt is initializing your project with the required files using the ${template.name} template.
+Modern is initializing your project with the required files using the ${template.name} template.
 <boltArtifact id="imported-files" title="${title || 'Create initial files'}" type="bundled">
 ${filesToImport.files
   .map(
@@ -221,7 +221,6 @@ Permitted actions:
 ✓ Import these files as dependencies
 ✓ Read from these files
 ✓ Reference these files
-✓ Update files to fix CORS issues
 
 Strictly forbidden actions:
 ❌ Modify any content within these files

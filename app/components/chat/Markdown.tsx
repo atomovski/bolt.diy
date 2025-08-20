@@ -9,6 +9,7 @@ import type { Message } from 'ai';
 import styles from './Markdown.module.scss';
 import ThoughtBox from './ThoughtBox';
 import type { ProviderInfo } from '~/types/model';
+import { cn } from '~/utils/cn';
 
 const logger = createScopedLogger('MarkdownComponent');
 
@@ -62,16 +63,16 @@ export const Markdown = memo(
             }
 
             return (
-              <div className="bg-bolt-elements-background-depth-3 border border-bolt-elements-borderColor rounded-lg p-3 my-2">
-                <div className="flex items-center gap-2 mb-2">
-                  <span className="text-xs font-mono bg-bolt-elements-background-depth-2 px-2 py-1 rounded text-bolt-elements-textTer">
+              <div className="bg-darken-50 border-bolt-elements-border-color my-2 rounded-lg border p-3">
+                <div className="mb-2 flex items-center gap-2">
+                  <span className="bg-bolt-elements-background-depth-2 text-bolt-elements-textTer rounded-sm px-2 py-1 font-mono text-xs">
                     {elementData?.tagName}
                   </span>
                   {elementData?.className && (
-                    <span className="text-xs text-bolt-elements-textSecondary">.{elementData.className}</span>
+                    <span className="text-bolt-elements-text-secondary text-xs">.{elementData.className}</span>
                   )}
                 </div>
-                <code className="block text-sm !text-bolt-elements-textSecondary !bg-bolt-elements-background-depth-2 border border-bolt-elements-borderColor p-2 rounded">
+                <code className="text-bolt-elements-text-secondary! bg-bolt-elements-background-depth-2! border-bolt-elements-border-color block rounded-sm border p-2 text-sm">
                   {elementData?.displayText}
                 </code>
               </div>
@@ -83,7 +84,7 @@ export const Markdown = memo(
           }
 
           if (className?.includes('__boltQuickAction__') || dataProps?.dataBoltQuickAction) {
-            return <div className="flex items-center gap-2 flex-wrap mt-3.5">{children}</div>;
+            return <div className="mt-3.5 flex flex-wrap items-center gap-2">{children}</div>;
           }
 
           return (
@@ -135,7 +136,7 @@ export const Markdown = memo(
 
             return (
               <button
-                className="rounded-md justify-center px-3 py-1.5 text-xs bg-bolt-elements-item-backgroundAccent text-bolt-elements-item-contentAccent opacity-90 hover:opacity-100 flex items-center gap-2 cursor-pointer"
+                className="bg-bolt-elements-item-backgroundAccent text-bolt-elements-item-contentAccent flex cursor-pointer items-center justify-center gap-2 rounded-md px-3 py-1.5 text-xs opacity-90 hover:opacity-100"
                 data-type={type}
                 data-message={message}
                 data-path={path}
@@ -185,13 +186,27 @@ export const Markdown = memo(
 
           return <button {...props}>{children}</button>;
         },
+        p: ({ children, ...props }) => {
+          return (
+            <p className="text-base" {...props}>
+              {children}
+            </p>
+          );
+        },
+        li: ({ children, ...props }) => {
+          return (
+            <li {...props}>
+              <div className="[&>*:not(:last-child)]:mb-4 [&>*:not(:last-child)]:flex">{children}</div>
+            </li>
+          );
+        },
       } satisfies Components;
     }, []);
 
     return (
       <ReactMarkdown
         allowedElements={allowedHTMLElements}
-        className={styles.MarkdownContent}
+        className={cn(styles.MarkdownContent, 'text-base')}
         components={components}
         remarkPlugins={remarkPlugins(limitedMarkdown)}
         rehypePlugins={rehypePlugins(html)}

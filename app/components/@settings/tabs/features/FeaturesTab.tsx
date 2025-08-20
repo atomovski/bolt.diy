@@ -3,7 +3,7 @@ import React, { memo, useCallback } from 'react';
 import { motion } from 'framer-motion';
 import { Switch } from '~/components/ui/Switch';
 import { useSettings } from '~/lib/hooks/useSettings';
-import { classNames } from '~/utils/classNames';
+import { cn } from '~/utils/cn';
 import { toast } from 'react-toastify';
 import { PromptLibrary } from '~/lib/common/prompt-library';
 
@@ -31,12 +31,12 @@ const FeatureCard = memo(
     <motion.div
       key={feature.id}
       layoutId={feature.id}
-      className={classNames(
-        'relative group cursor-pointer',
+      className={cn(
+        'group relative cursor-pointer',
         'bg-bolt-elements-background-depth-2',
-        'hover:bg-bolt-elements-background-depth-3',
+        'hover:bg-darken-50',
         'transition-colors duration-200',
-        'rounded-lg overflow-hidden',
+        'overflow-hidden rounded-lg',
       )}
       initial={{ opacity: 0, y: 20 }}
       animate={{ opacity: 1, y: 0 }}
@@ -45,14 +45,14 @@ const FeatureCard = memo(
       <div className="p-4">
         <div className="flex items-center justify-between">
           <div className="flex items-center gap-3">
-            <div className={classNames(feature.icon, 'w-5 h-5 text-bolt-elements-textSecondary')} />
+            <div className={cn(feature.icon, 'text-bolt-elements-text-secondary h-5 w-5')} />
             <div className="flex items-center gap-2">
-              <h4 className="font-medium text-bolt-elements-textPrimary">{feature.title}</h4>
+              <h4 className="font-medium text-black">{feature.title}</h4>
               {feature.beta && (
-                <span className="px-2 py-0.5 text-xs rounded-full bg-blue-500/10 text-blue-500 font-medium">Beta</span>
+                <span className="rounded-full bg-blue-500/10 px-2 py-0.5 text-xs font-medium text-blue-500">Beta</span>
               )}
               {feature.experimental && (
-                <span className="px-2 py-0.5 text-xs rounded-full bg-orange-500/10 text-orange-500 font-medium">
+                <span className="rounded-full bg-orange-500/10 px-2 py-0.5 text-xs font-medium text-orange-500">
                   Experimental
                 </span>
               )}
@@ -60,8 +60,8 @@ const FeatureCard = memo(
           </div>
           <Switch checked={feature.enabled} onCheckedChange={(checked) => onToggle(feature.id, checked)} />
         </div>
-        <p className="mt-2 text-sm text-bolt-elements-textSecondary">{feature.description}</p>
-        {feature.tooltip && <p className="mt-1 text-xs text-bolt-elements-textTertiary">{feature.tooltip}</p>}
+        <p className="text-bolt-elements-text-secondary mt-2 text-sm">{feature.description}</p>
+        {feature.tooltip && <p className="text-bolt-elements-text-tertiary mt-1 text-xs">{feature.tooltip}</p>}
       </div>
     </motion.div>
   ),
@@ -89,14 +89,14 @@ const FeatureSection = memo(
       transition={{ duration: 0.3 }}
     >
       <div className="flex items-center gap-3">
-        <div className={classNames(icon, 'text-xl text-purple-500')} />
+        <div className={cn(icon, 'text-xl text-purple-500')} />
         <div>
-          <h3 className="text-lg font-medium text-bolt-elements-textPrimary">{title}</h3>
-          <p className="text-sm text-bolt-elements-textSecondary">{description}</p>
+          <h3 className="text-lg font-medium text-black">{title}</h3>
+          <p className="text-bolt-elements-text-secondary text-sm">{description}</p>
         </div>
       </div>
 
-      <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+      <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
         {features.map((feature, index) => (
           <FeatureCard key={feature.id} feature={feature} index={index} onToggle={onToggleFeature} />
         ))}
@@ -237,9 +237,9 @@ export default function FeaturesTab() {
 
       <motion.div
         layout
-        className={classNames(
+        className={cn(
           'bg-bolt-elements-background-depth-2',
-          'hover:bg-bolt-elements-background-depth-3',
+          'hover:bg-darken-50',
           'transition-all duration-200',
           'rounded-lg p-4',
           'group',
@@ -250,9 +250,9 @@ export default function FeaturesTab() {
       >
         <div className="flex items-center gap-4">
           <div
-            className={classNames(
-              'p-2 rounded-lg text-xl',
-              'bg-bolt-elements-background-depth-3 group-hover:bg-bolt-elements-background-depth-4',
+            className={cn(
+              'rounded-lg p-2 text-xl',
+              'bg-darken-50 group-hover:bg-bolt-elements-background-depth-4',
               'transition-colors duration-200',
               'text-purple-500',
             )}
@@ -260,10 +260,10 @@ export default function FeaturesTab() {
             <div className="i-ph:book" />
           </div>
           <div className="flex-1">
-            <h4 className="text-sm font-medium text-bolt-elements-textPrimary group-hover:text-purple-500 transition-colors">
+            <h4 className="text-sm font-medium text-black transition-colors group-hover:text-purple-500">
               Prompt Library
             </h4>
-            <p className="text-xs text-bolt-elements-textSecondary mt-0.5">
+            <p className="text-bolt-elements-text-secondary mt-0.5 text-xs">
               Choose a prompt from the library to use as the system prompt
             </p>
           </div>
@@ -273,11 +273,11 @@ export default function FeaturesTab() {
               setPromptId(e.target.value);
               toast.success('Prompt template updated');
             }}
-            className={classNames(
-              'p-2 rounded-lg text-sm min-w-[200px]',
-              'bg-bolt-elements-background-depth-3 border border-bolt-elements-borderColor',
-              'text-bolt-elements-textPrimary',
-              'focus:outline-none focus:ring-2 focus:ring-purple-500/30',
+            className={cn(
+              'min-w-[200px] rounded-lg p-2 text-sm',
+              'bg-darken-50 border-bolt-elements-border-color border',
+              'text-black',
+              'focus:ring-2 focus:ring-purple-500/30 focus:outline-hidden',
               'group-hover:border-purple-500/30',
               'transition-all duration-200',
             )}

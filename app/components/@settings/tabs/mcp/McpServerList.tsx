@@ -18,7 +18,7 @@ export default function McpServerList({
   toggleServerExpanded,
 }: McpServerListProps) {
   if (serverEntries.length === 0) {
-    return <p className="text-sm text-bolt-elements-textSecondary">No MCP servers configured</p>;
+    return <p className="text-bolt-elements-text-secondary text-sm">No MCP servers configured</p>;
   }
 
   const filteredEntries = onlyShowAvailableServers
@@ -33,32 +33,32 @@ export default function McpServerList({
         const serverTools = isAvailable ? Object.entries(mcpServer.tools) : [];
 
         return (
-          <div key={serverName} className="flex flex-col p-2 rounded-md bg-bolt-elements-background-depth-1">
+          <div key={serverName} className="bg-bolt-elements-background-depth-1 flex flex-col rounded-md p-2">
             <div className="flex items-center justify-between">
-              <div className="flex items-center gap-2 min-w-0 flex-1">
+              <div className="flex min-w-0 flex-1 items-center gap-2">
                 <div
                   onClick={() => toggleServerExpanded(serverName)}
-                  className="flex items-center gap-1.5 text-bolt-elements-textPrimary"
+                  className="flex items-center gap-1.5 text-black"
                   aria-expanded={isExpanded}
                 >
                   <div
-                    className={`i-ph:${isExpanded ? 'caret-down' : 'caret-right'} w-3 h-3 transition-transform duration-150`}
+                    className={`i-ph:${isExpanded ? 'caret-down' : 'caret-right'} h-3 w-3 transition-transform duration-150`}
                   />
-                  <span className="font-medium truncate text-left">{serverName}</span>
+                  <span className="truncate text-left font-medium">{serverName}</span>
                 </div>
 
-                <div className="flex-1 min-w-0 truncate">
+                <div className="min-w-0 flex-1 truncate">
                   {mcpServer.config.type === 'sse' || mcpServer.config.type === 'streamable-http' ? (
-                    <span className="text-xs text-bolt-elements-textSecondary truncate">{mcpServer.config.url}</span>
+                    <span className="text-bolt-elements-text-secondary truncate text-xs">{mcpServer.config.url}</span>
                   ) : (
-                    <span className="text-xs text-bolt-elements-textSecondary truncate">
+                    <span className="text-bolt-elements-text-secondary truncate text-xs">
                       {mcpServer.config.command} {mcpServer.config.args?.join(' ')}
                     </span>
                   )}
                 </div>
               </div>
 
-              <div className="ml-2 flex-shrink-0">
+              <div className="ml-2 shrink-0">
                 {checkingServers ? (
                   <McpStatusBadge status="checking" />
                 ) : (
@@ -75,9 +75,11 @@ export default function McpServerList({
             {/* Tool list */}
             {isExpanded && isAvailable && (
               <div className="mt-2">
-                <div className="text-bolt-elements-textSecondary text-xs font-medium ml-1 mb-1.5">Available Tools:</div>
+                <div className="text-bolt-elements-text-secondary mb-1.5 ml-1 text-xs font-medium">
+                  Available Tools:
+                </div>
                 {serverTools.length === 0 ? (
-                  <div className="ml-4 text-xs text-bolt-elements-textSecondary">No tools available</div>
+                  <div className="text-bolt-elements-text-secondary ml-4 text-xs">No tools available</div>
                 ) : (
                   <div className="mt-1 space-y-2">
                     {serverTools.map(([toolName, toolSchema]) => (

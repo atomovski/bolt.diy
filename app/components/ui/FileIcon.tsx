@@ -1,5 +1,5 @@
 import React from 'react';
-import { classNames } from '~/utils/classNames';
+import { cn } from '~/utils/cn';
 
 interface FileIconProps {
   filename: string;
@@ -342,5 +342,5 @@ export function FileIcon({ filename, size = 'md', className }: FileIconProps) {
   const color = getIconColorForExtension(extension);
   const sizeClass = getSizeClass(size);
 
-  return <span className={classNames(icon, color, sizeClass, className)} />;
+  return <span className={cn(icon, color, sizeClass, className)} />;
 }

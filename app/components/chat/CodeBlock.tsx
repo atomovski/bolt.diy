@@ -1,6 +1,6 @@
 import { memo, useEffect, useState } from 'react';
 import { bundledLanguages, codeToHtml, isSpecialLang, type BundledLanguage, type SpecialLanguage } from 'shiki';
-import { classNames } from '~/utils/classNames';
+import { cn } from '~/utils/cn';
 import { createScopedLogger } from '~/utils/logger';
 
 import styles from './CodeBlock.module.scss';
@@ -52,11 +52,11 @@ export const CodeBlock = memo(
     }, [code, language, theme]);
 
     return (
-      <div className={classNames('relative group text-left', className)}>
+      <div className={cn('group relative text-left', className)}>
         <div
-          className={classNames(
+          className={cn(
             styles.CopyButtonContainer,
-            'bg-transparant absolute top-[10px] right-[10px] rounded-md z-10 text-lg flex items-center justify-center opacity-0 group-hover:opacity-100',
+            'bg-transparant absolute top-[10px] right-[10px] z-10 flex items-center justify-center rounded-md text-lg opacity-0 group-hover:opacity-100',
             {
               'rounded-l-0 opacity-100': copied,
             },
@@ -64,8 +64,8 @@ export const CodeBlock = memo(
         >
           {!disableCopy && (
             <button
-              className={classNames(
-                'flex items-center bg-accent-500 p-[6px] justify-center before:bg-white before:rounded-l-md before:text-gray-500 before:border-r before:border-gray-300 rounded-md transition-theme',
+              className={cn(
+                'bg-accent-500 transition-theme flex items-center justify-center rounded-md p-[6px] before:rounded-l-md before:border-r before:border-gray-300 before:bg-white before:text-gray-500',
                 {
                   'before:opacity-0': !copied,
                   'before:opacity-100': copied,

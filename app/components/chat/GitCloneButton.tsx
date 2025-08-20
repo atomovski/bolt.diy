@@ -7,7 +7,7 @@ import { useState } from 'react';
 import { toast } from 'react-toastify';
 import { LoadingOverlay } from '~/components/ui/LoadingOverlay';
 import { RepositorySelectionDialog } from '~/components/@settings/tabs/connections/components/RepositorySelectionDialog';
-import { classNames } from '~/utils/classNames';
+import { cn } from '~/utils/cn';
 import { Button } from '~/components/ui/Button';
 import type { IChatMetadata } from '~/lib/persistence/db';
 import { WORK_DIR } from '~/utils/constants';
@@ -162,20 +162,20 @@ ${escapeBoltTags(file.content)}
       <Button
         onClick={() => setIsDialogOpen(true)}
         title="Clone a Git Repo"
-        variant="default"
+        variant="primary"
         size="lg"
-        className={classNames(
-          'gap-2 bg-bolt-elements-background-depth-1',
-          'text-bolt-elements-textPrimary',
+        className={cn(
+          'bg-bolt-elements-background-depth-1 gap-2',
+          'text-black',
           'hover:bg-bolt-elements-background-depth-2',
-          'border border-bolt-elements-borderColor',
-          'h-10 px-4 py-2 min-w-[120px] justify-center',
+          'border-bolt-elements-border-color border',
+          'h-10 min-w-[120px] justify-center px-4 py-2',
           'transition-all duration-200 ease-in-out',
           className,
         )}
         disabled={!ready || loading}
       >
-        <span className="i-ph:git-branch w-4 h-4" />
+        <span className="i-ph:git-branch h-4 w-4" />
         Clone a Git Repo
       </Button>
 
